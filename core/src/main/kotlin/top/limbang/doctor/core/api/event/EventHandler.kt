@@ -1,4 +1,4 @@
-package top.limbang.core.api.event
+package top.limbang.doctor.core.api.event
 
 /**
  * 事件处理器

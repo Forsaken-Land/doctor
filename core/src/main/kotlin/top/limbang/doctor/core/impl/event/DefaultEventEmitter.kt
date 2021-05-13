@@ -1,8 +1,8 @@
-package top.limbang.core.impl.event
+package top.limbang.doctor.core.impl.event
 
-import top.limbang.core.api.event.Event
-import top.limbang.core.api.event.EventEmitter
-import top.limbang.core.api.event.EventHandler
+import top.limbang.doctor.core.api.event.Event
+import top.limbang.doctor.core.api.event.EventEmitter
+import top.limbang.doctor.core.api.event.EventHandler
 import java.time.Duration
 import java.time.Instant
 /**

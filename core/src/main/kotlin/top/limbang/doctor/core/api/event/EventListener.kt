@@ -1,4 +1,4 @@
-package top.limbang.core.api.event
+package top.limbang.doctor.core.api.event
 
 /**
  * 事件监听器，用于一次性注册多个事件处理器

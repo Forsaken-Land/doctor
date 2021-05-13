@@ -1,4 +1,4 @@
-package top.limbang.core
+package top.limbang.doctor.core
 
 /**
  * ### Minecraft 客户端

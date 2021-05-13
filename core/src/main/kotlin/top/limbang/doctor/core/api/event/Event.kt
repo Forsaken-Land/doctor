@@ -1,4 +1,4 @@
-package top.limbang.core.api.event
+package top.limbang.doctor.core.api.event
 
 /**
  * 任何实现此接口的类均可以视为一个事件
