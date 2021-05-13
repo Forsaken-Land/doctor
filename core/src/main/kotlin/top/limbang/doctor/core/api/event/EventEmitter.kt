@@ -1,4 +1,4 @@
-package top.limbang.core.api.event
+package top.limbang.doctor.core.api.event
 
 import java.time.Duration
 import java.time.Instant

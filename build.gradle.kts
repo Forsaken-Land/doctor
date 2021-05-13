@@ -2,7 +2,7 @@ plugins {
     kotlin("jvm") version "1.4.32"
 }
 
-group = "top.limbang"
+group = "top.limbang.doctor"
 version = "1.0-SNAPSHOT"
 
 repositories {
