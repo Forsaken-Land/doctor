@@ -1,4 +1,4 @@
-package top.limbang.client
+package top.limbang.core
 
 /**
  * ### Minecraft 客户端

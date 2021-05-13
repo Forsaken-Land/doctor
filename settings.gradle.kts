@@ -1,4 +1,5 @@
 rootProject.name = "doctor"
 include("protocol")
+include("core")
 include("network")
 include("client")
