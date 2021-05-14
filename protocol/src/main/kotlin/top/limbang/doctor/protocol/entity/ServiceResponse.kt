@@ -8,16 +8,38 @@ interface SimpleServiceResponse {
 }
 
 @Serializable
+data class VanillaSimpleServiceResponse(
+    override val version: ServiceResponse.Version
+) : SimpleServiceResponse
+
+@Serializable
 data class FML1SimpleServiceResponse(
     override val version: ServiceResponse.Version,
     val modinfo: ServiceResponse.Modinfo
-) : SimpleServiceResponse
+) : SimpleServiceResponse {
+    fun toFML2Mod(): List<ServiceResponse.Mod2> {
+        val mods = mutableListOf<ServiceResponse.Mod2>()
+        for (mod in modinfo.modList) {
+            mods.add(ServiceResponse.Mod2(mod.modid, mod.version))
+        }
+        return mods
+    }
+}
 
 @Serializable
 data class FML2SimpleServiceResponse(
     override val version: ServiceResponse.Version,
     val forgeData: ServiceResponse.ForgeData
-) : SimpleServiceResponse
+) : SimpleServiceResponse {
+    fun toFML1Mod(): List<ServiceResponse.Mod> {
+        val mods = mutableListOf<ServiceResponse.Mod>()
+        for (mod in forgeData.mods) {
+            mods.add(ServiceResponse.Mod(mod.modId, mod.modmarker))
+        }
+        return mods
+    }
+}
+
 
 @Serializable
 data class ServiceResponse(
