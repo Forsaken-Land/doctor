@@ -1,6 +1,7 @@
 package top.limbang.doctor.protocol.api
 
-import top.limbang.doctor.core.api.protocol.IPacketBuffer
+import io.netty.buffer.ByteBuf
+import top.limbang.doctor.protocol.extension.*
 
 /**
  *
@@ -24,7 +25,7 @@ interface PacketDecoder<out T : Packet> : PacketCodec {
     /**
      * 解码
      */
-    fun decoder(buf: IPacketBuffer): T
+    fun decoder(buf: ByteBuf): T
 }
 
 /**
@@ -34,5 +35,5 @@ interface PacketEncoder<in T : Packet> : PacketCodec {
     /**
      * 编码
      */
-    fun encode(buf: IPacketBuffer, packet: T): IPacketBuffer
+    fun encode(buf: ByteBuf, packet: T): ByteBuf
 }
