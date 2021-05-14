@@ -1,4 +1,4 @@
-package top.limbang.doctor.network.api.handler.coder
+package top.limbang.doctor.network.codec
 
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
@@ -6,20 +6,20 @@ import io.netty.handler.codec.MessageToMessageCodec
 import io.netty.util.AttributeKey
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import top.limbang.doctor.network.api.handler.Connection
+import top.limbang.doctor.network.connection.Connection
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.extension.readVarInt
 import top.limbang.doctor.protocol.extension.writeVarInt
 import top.limbang.doctor.protocol.registry.IPacketRegistry
-import top.limbang.doctor.protocol.registry.PacketDirection
+import top.limbang.doctor.protocol.core.PacketDirection
 
 /**
  * ### 协议包编解码
  *
  * - [protocol]协议版本
  */
-class ProtocolPacketCoder(private val protocol: IPacketRegistry) : MessageToMessageCodec<ByteBuf, Packet>() {
-    private val logger: Logger = LoggerFactory.getLogger(ProtocolPacketCoder::class.java)
+class ProtocolPacketCodec(private val protocol: IPacketRegistry) : MessageToMessageCodec<ByteBuf, Packet>() {
+    private val logger: Logger = LoggerFactory.getLogger(ProtocolPacketCodec::class.java)
 
     override fun encode(ctx: ChannelHandlerContext, msg: Packet, out: MutableList<Any>) {
         val connection = ctx.channel().attr(AttributeKey.valueOf<Connection>("connection")).get()

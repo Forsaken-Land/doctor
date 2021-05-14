@@ -1,4 +1,4 @@
-package top.limbang.doctor.network.api.handler.coder
+package top.limbang.doctor.network.codec
 
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
@@ -17,8 +17,8 @@ import java.util.zip.Inflater
  *
  * 如果要压缩数据的长度小于服务器压缩阈值[threshold]则不压缩,直接发送长度为0的VarInt加数据。
  */
-class CompressionCoder(private val threshold: Int) : MessageToMessageCodec<ByteBuf, ByteBuf>() {
-    private val logger: Logger = LoggerFactory.getLogger(CompressionCoder::class.java)
+class CompressionCodec(private val threshold: Int) : MessageToMessageCodec<ByteBuf, ByteBuf>() {
+    private val logger: Logger = LoggerFactory.getLogger(CompressionCodec::class.java)
     private val inflater = Inflater()
     private val deflate = Deflater()
     private val buffer = ByteArray(8192)

@@ -1,5 +1,6 @@
-package top.limbang.doctor.protocol.hook
+package top.limbang.doctor.network.hooks
 
+import io.netty.channel.ChannelPipeline
 import top.limbang.doctor.core.api.plugin.Hook
 import top.limbang.doctor.core.api.plugin.PluginHookProvider
 import top.limbang.doctor.core.api.registry.Registry
@@ -13,4 +14,4 @@ import top.limbang.doctor.protocol.registry.IPacketRegistry
  * @since 2021-05-14
  */
 
-class PacketRegistryHook : DefaultHookProvider<IPacketRegistry>()
+class InitChannelHook : DefaultHookProvider<ChannelPipeline>()

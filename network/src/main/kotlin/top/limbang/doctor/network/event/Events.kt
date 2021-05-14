@@ -1,9 +1,9 @@
-package top.limbang.doctor.network.api.handler
+package top.limbang.doctor.network.handler
 
 import io.netty.channel.ChannelHandlerContext
 import top.limbang.doctor.core.api.event.Event
-import top.limbang.doctor.network.api.client.Client
-import top.limbang.doctor.network.api.handler.event.ReadPacketEventArgs
+import top.limbang.doctor.network.Client
+import top.limbang.doctor.network.event.ReadPacketEventArgs
 
 /**
  *

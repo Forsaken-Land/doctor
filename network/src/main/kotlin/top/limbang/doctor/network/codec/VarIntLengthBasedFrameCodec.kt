@@ -1,4 +1,4 @@
-package top.limbang.doctor.network.api.handler.coder
+package top.limbang.doctor.network.codec
 
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext

@@ -1,11 +1,14 @@
-package top.limbang.doctor.network.api.handler
+package top.limbang.doctor.network.connection
 
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import top.limbang.doctor.network.api.client.Client
-import top.limbang.doctor.network.api.handler.event.ReadPacketEventArgs
+import top.limbang.doctor.network.Client
+import top.limbang.doctor.network.event.ReadPacketEventArgs
+import top.limbang.doctor.network.handler.ConnectionSucceededEvent
+import top.limbang.doctor.network.handler.DisconnectEvent
+import top.limbang.doctor.network.handler.ReadPacketEvent
 import top.limbang.doctor.protocol.api.Packet
 
 /**

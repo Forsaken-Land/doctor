@@ -8,7 +8,7 @@ import top.limbang.doctor.protocol.definition.status.client.*
 import top.limbang.doctor.protocol.definition.status.server.*
 import top.limbang.doctor.protocol.registry.ICommonPacketGroup
 import top.limbang.doctor.protocol.registry.IPacketRegistry
-import top.limbang.doctor.protocol.registry.PacketDirection
+import top.limbang.doctor.protocol.core.PacketDirection
 
 /**
  *

@@ -4,6 +4,7 @@ import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
 import top.limbang.doctor.protocol.api.ProtocolState
+import top.limbang.doctor.protocol.core.PacketDirection
 import top.limbang.doctor.protocol.utils.packetClass
 
 /**
@@ -59,7 +60,3 @@ interface IPacketMap {
     }
 }
 
-enum class PacketDirection {
-    C2S,
-    S2C
-}
