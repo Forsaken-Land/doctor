@@ -1,11 +1,13 @@
 package top.limbang.doctor.protocol.api
 
+import top.limbang.doctor.protocol.registry.IPacketRegistry
+
 /**
  *
  * @author limbang
  * @since 2021-05-14
  */
-interface Protocol {
+interface Protocol : IPacketRegistry {
     /**
      * ### 协议接口
      */
@@ -13,20 +15,6 @@ interface Protocol {
     fun sendID(): Int
     fun readID(): Int
 
-    /**
-     * 基于协议包ID和协议状态,查询协议包解码[PacketDecoder]
-     */
-    fun <T : Packet> queryOriginalPacketDecoder(packetId: Int, state: ProtocolState): PacketDecoder<T>
-
-    /**
-     * 基于协议包[Packet]查询协议包编码[PacketEncoder]
-     */
-    fun <T : Packet> queryOriginalPacketEncoder(packet: T): PacketEncoder<T>
-
-    /**
-     * 基于协议包[Packet]查询协议包 ID
-     */
-    fun <T : Packet> queryOriginalPacketId(packet: T): Int
 }
 
 /**
