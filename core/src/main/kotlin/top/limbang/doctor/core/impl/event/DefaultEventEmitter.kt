@@ -3,8 +3,8 @@ package top.limbang.doctor.core.impl.event
 import top.limbang.doctor.core.api.event.Event
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.event.EventHandler
-import java.time.Duration
 import java.time.Instant
+
 /**
  * 事件触发器的默认实现
  * @author WarmthDawn
@@ -14,6 +14,7 @@ class DefaultEventEmitter : EventEmitter {
     private val listeners = HashMap<Event<*>, HashSet<EventHandler<*>>>()
     private val onceListeners = HashMap<Event<*>, HashSet<EventHandler<*>>>()
     private val durationListeners = HashMap<Event<*>, HashSet<Pair<Long, EventHandler<*>>>>()
+    private val targets = HashSet<DefaultEventEmitter>()
 
     private fun clearExpire() {
         val now = Instant.now().epochSecond
@@ -33,7 +34,7 @@ class DefaultEventEmitter : EventEmitter {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> EventHandler<*>.cast() : EventHandler<T> = this as EventHandler<T>
+    private fun <T> EventHandler<*>.cast(): EventHandler<T> = this as EventHandler<T>
 
     override fun <T> on(event: Event<T>, handler: EventHandler<T>): EventEmitter {
         if (!listeners.containsKey(event)) {
@@ -59,26 +60,29 @@ class DefaultEventEmitter : EventEmitter {
         return this
     }
 
-    override fun <T> during(event: Event<T>, duration: Duration, handler: EventHandler<T>): EventEmitter {
-        return until(event, Instant.now().plus(duration), handler)
+    private fun <T> handleEvent(handler: EventHandler<*>, args: T) {
+        targets.forEach {
+            it.handleEvent(handler, args)
+        }
+        handler.cast<T>().handle(args)
     }
 
     override fun <T> emit(event: Event<T>, args: T): EventEmitter {
         //普通事件
         listeners[event]?.forEach {
-            it.cast<T>().handle(args)
+            handleEvent(it, args)
         }
 
         //一次性事件
         onceListeners[event]?.forEach {
-            it.cast<T>().handle(args)
+            handleEvent(it, args)
         }
         onceListeners[event]?.clear()
 
         clearExpire(event)
         //计时事件
         durationListeners[event]?.forEach {
-            it.second.cast<T>().handle(args)
+            handleEvent(it.second, args)
         }
         return this
     }
@@ -134,6 +138,18 @@ class DefaultEventEmitter : EventEmitter {
             result.add(it.second)
         }
         return result.toList()
+    }
+
+    override fun targetTo(another: EventEmitter) {
+        if (another is DefaultEventEmitter) {
+            targets.add(another)
+        } else {
+            throw UnsupportedOperationException("只能附加类型为DefaultEventEmitter的触发器")
+        }
+    }
+
+    override fun removeTarget(another: EventEmitter) {
+        targets.remove(another)
     }
 
 }

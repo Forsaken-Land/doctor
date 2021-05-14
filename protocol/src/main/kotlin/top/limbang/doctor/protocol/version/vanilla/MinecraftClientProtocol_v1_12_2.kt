@@ -1,21 +1,24 @@
 package top.limbang.doctor.protocol.version.vanilla
 
+import top.limbang.doctor.core.plugin.PluginManager
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.play.client.*
 import top.limbang.doctor.protocol.definition.play.server.ChatEncoderC
+import top.limbang.doctor.protocol.hook.RegistryHook
 import top.limbang.doctor.protocol.registry.IPacketRegistry
 import top.limbang.doctor.protocol.registry.PacketRegistryImpl
-import top.limbang.doctor.protocol.version.BaseProtocol
+import top.limbang.doctor.protocol.version.CommonProtocol
 
 /**
  * ### Minecraft 客户端协议
  *
  * 版本 1.12.2
  */
-class MinecraftClientProtocol_v1_12_2 : IPacketRegistry by PacketRegistryImpl() {
+class MinecraftClientProtocol_v1_12_2(pluginManager: PluginManager) : IPacketRegistry by PacketRegistryImpl() {
 
     init {
-        registerGroup(BaseProtocol)
+
+        registerGroup(CommonProtocol)
 
         packetMap(ProtocolState.PLAY) {
             whenS2C {
@@ -30,9 +33,10 @@ class MinecraftClientProtocol_v1_12_2 : IPacketRegistry by PacketRegistryImpl() 
                 register(0x0B, KeepAliveEncoder())
                 register(0x04, ClientSettingEncoder())
                 register(0x00, TeleportConfirmEncoder())
-                register(2, ChatEncoderC())
+                register(0x02, ChatEncoderC())
             }
         }
+        pluginManager.invokeHook(RegistryHook::class.java, this, true)
 
 
     }

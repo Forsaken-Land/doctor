@@ -10,4 +10,5 @@ repositories {
 
 dependencies {
     implementation("io.netty:netty-buffer:4.1.63.Final")
+    implementation(project(":core"))
 }

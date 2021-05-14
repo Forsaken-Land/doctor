@@ -25,7 +25,8 @@ interface EventEmitter {
     /**
      * 监听一段时间内的事件
      */
-    fun <T> during(event: Event<T>, duration: Duration, handler: EventHandler<T>): EventEmitter
+    fun <T> during(event: Event<T>, duration: Duration, handler: EventHandler<T>): EventEmitter =
+        until(event, Instant.now().plus(duration), handler)
 
     /**
      * 监听某个时间点之前的事件
@@ -73,6 +74,20 @@ interface EventEmitter {
         listener.initListen(this)
         return this
     }
+
+    /**
+     * 使当前事件触发器监听其他触发器的事件
+     */
+    fun listenTo(another: EventEmitter) = another.targetTo(this)
+
+    /**
+     * 使当前事件触发器同时触发其他触发器的事件
+     */
+    fun targetTo(another: EventEmitter)
+    /**
+     * 取消触发器同时触发
+     */
+    fun removeTarget(another: EventEmitter)
 
     val emitter: EventEmitter
         get() = this
