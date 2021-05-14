@@ -6,7 +6,7 @@ import top.limbang.doctor.core.api.registry.Registry
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.core.impl.plugin.DefaultHookProvider
 import top.limbang.doctor.core.impl.registy.DefaultRegistry
-import top.limbang.minecraft.api.cast
+import top.limbang.doctor.core.cast
 
 /**
  * 插件管理器

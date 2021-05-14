@@ -1,4 +1,4 @@
-package top.limbang.doctor.network.api.client
+package top.limbang.doctor.network
 
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.Channel
@@ -14,12 +14,13 @@ import org.slf4j.LoggerFactory
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.core.plugin.PluginManager
-import top.limbang.doctor.network.api.handler.ClientHandler
-import top.limbang.doctor.network.api.handler.Connection
-import top.limbang.doctor.network.api.handler.ConnectionFailed
-import top.limbang.doctor.network.api.handler.NetworkConnection
-import top.limbang.doctor.network.api.handler.coder.ProtocolPacketCoder
-import top.limbang.doctor.network.api.handler.coder.VarIntLengthBasedFrameCodec
+import top.limbang.doctor.network.codec.ProtocolPacketCodec
+import top.limbang.doctor.network.codec.VarIntLengthBasedFrameCodec
+import top.limbang.doctor.network.connection.ClientHandler
+import top.limbang.doctor.network.connection.Connection
+import top.limbang.doctor.network.connection.NetworkConnection
+import top.limbang.doctor.network.handler.ConnectionFailed
+import top.limbang.doctor.network.hooks.InitChannelHook
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.play.server.ChatPacketC
@@ -38,9 +39,11 @@ class Client : EventEmitter by DefaultEventEmitter() {
     private val bootstrap = Bootstrap()
     private lateinit var channel: Channel
 
+    private val pluginManager = PluginManager(emitter)
+
     private var host = "127.0.0.1"
     private var port = 25565
-    private var protocol: IPacketRegistry = MinecraftClientProtocol_v1_12_2(PluginManager(emitter))
+    private var protocol: IPacketRegistry = MinecraftClientProtocol_v1_12_2(pluginManager)
 
     /**
      * 设置服务器地址,默认为 127.0.0.1
@@ -105,10 +108,11 @@ class Client : EventEmitter by DefaultEventEmitter() {
                         ch.pipeline().addLast("encryptionCoder", ChannelInboundHandlerAdapter())
                         ch.pipeline().addLast("varIntLengthBasedFrameCoder", VarIntLengthBasedFrameCodec())
                         ch.pipeline().addLast("compressionCoder", ChannelInboundHandlerAdapter())
-                        ch.pipeline().addLast("protocolPacketCoder", ProtocolPacketCoder(protocol))
+                        ch.pipeline().addLast("protocolPacketCoder", ProtocolPacketCodec(protocol))
 
                         // 客户端事件处理
                         ch.pipeline().addLast("clientHandler", ClientHandler(this@Client))
+                        pluginManager.invokeHook(InitChannelHook::class.java, ch.pipeline())
                     }
                 })
             // 连接服务器

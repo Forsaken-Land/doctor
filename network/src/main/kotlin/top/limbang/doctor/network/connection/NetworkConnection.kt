@@ -1,10 +1,10 @@
-package top.limbang.doctor.network.api.handler
+package top.limbang.doctor.network.connection
 
 import io.netty.channel.Channel
 import io.netty.channel.ChannelException
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelOutboundHandlerAdapter
-import top.limbang.doctor.network.api.handler.coder.CompressionCoder
+import top.limbang.doctor.network.codec.CompressionCodec
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.minecraft.netty.handler.EncryptionCodec
@@ -29,7 +29,7 @@ class NetworkConnection(
         super.setCompressionEnabled(threshold)
         channel.pipeline().replace(
             "compressionCoder", "compressionCoder",
-            if (isCompressionEnabled()) CompressionCoder(threshold) else ChannelOutboundHandlerAdapter()
+            if (isCompressionEnabled()) CompressionCodec(threshold) else ChannelOutboundHandlerAdapter()
         )
     }
 

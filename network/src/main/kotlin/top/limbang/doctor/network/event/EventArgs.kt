@@ -1,4 +1,4 @@
-package top.limbang.doctor.network.api.handler.event
+package top.limbang.doctor.network.event
 
 import io.netty.channel.Channel
 import top.limbang.doctor.protocol.api.Packet
