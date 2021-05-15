@@ -1,6 +1,6 @@
 package top.limbang.doctor.protocol.version.vanilla
 
-import top.limbang.doctor.core.plugin.PluginManager
+import top.limbang.doctor.core.api.plugin.IPluginManager
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.play.client.*
 import top.limbang.doctor.protocol.definition.play.server.ChatEncoderC
@@ -14,7 +14,7 @@ import top.limbang.doctor.protocol.version.CommonProtocol
  *
  * 版本 1.12.2
  */
-class MinecraftClientProtocol_v1_12_2(pluginManager: PluginManager) : IPacketRegistry by PacketRegistryImpl() {
+class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRegistry by PacketRegistryImpl() {
 
     init {
 

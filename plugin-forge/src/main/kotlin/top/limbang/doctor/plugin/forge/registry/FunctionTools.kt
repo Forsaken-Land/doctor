@@ -8,13 +8,13 @@ import top.limbang.doctor.protocol.core.PacketDirection
  * @author WarmthDawn
  * @since 2021-05-15
  */
-class ChannelAction(private val registry: IForgePacketRegistry, private val channel: String) {
+class ChannelAction(private val registry: IModPacketRegistry, private val channel: String) {
     fun with(state: ForgeProtocolState, action: DirectionActionMod.() -> Unit) =
         DirectionActionMod(registry, state, channel).run(action)
 }
 
 class DirectionActionMod(
-    private val registry: IForgePacketRegistry,
+    private val registry: IModPacketRegistry,
     private val state: ForgeProtocolState,
     private val channel: String
 ) {
@@ -27,12 +27,3 @@ class DirectionActionMod(
     }
 }
 
-class DirectionActionChannel(private val registry: IForgePacketRegistry, private val state: ForgeProtocolState) {
-    fun whenC2S(action: IChannelPacketMap.() -> Unit) {
-        action(registry.channelPacketMap(PacketDirection.C2S, state))
-    }
-
-    fun whenS2C(action: IChannelPacketMap.() -> Unit) {
-        action(registry.channelPacketMap(PacketDirection.S2C, state))
-    }
-}

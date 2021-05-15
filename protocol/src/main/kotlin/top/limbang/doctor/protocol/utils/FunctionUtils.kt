@@ -16,3 +16,11 @@ fun <T1, T2, TR> ((T1, T2) -> TR).currying(): (T1) -> (T2) -> TR {
         }
     }
 }
+
+
+fun <K, V> MutableMap<K, V>.getOrCreate(key: K, default: () -> V): V {
+    if (!this.containsKey(key)) {
+        this[key] = default()
+    }
+    return this[key]!!
+}

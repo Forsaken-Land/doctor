@@ -15,7 +15,7 @@ import top.limbang.doctor.protocol.core.PacketDirection
  * @author WarmthDawn
  * @since 2021-05-14
  */
-object CommonProtocol : ICommonPacketGroup {
+object CommonProtocol : ICommonPacketGroup<IPacketRegistry> {
     override fun registerPackets(registry: IPacketRegistry) {
         registry.run {
 
