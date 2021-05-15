@@ -22,11 +22,14 @@ interface Plugin {
 
     /**
      * 注册事件
+     * [emitter]是一个独立的事件触发器，在上面触发事件不会影响到发布者，仅会单向接收
+     * 如果希望同步事件，请自行调用 [EventEmitter.targetTo] 方法
      */
     fun registerEvent(emitter: EventEmitter)
 
     /**
      * 注册钩子
+     * [registry] 提供已经注册的钩子的查询接口
      */
     fun hookProvider(registry: IHookProviderRegistry)
 }
