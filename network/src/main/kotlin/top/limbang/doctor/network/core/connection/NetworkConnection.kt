@@ -11,13 +11,12 @@ import top.limbang.doctor.network.utils.suspendRun
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.minecraft.netty.handler.EncryptionCodec
-import java.util.concurrent.Future
 import javax.crypto.SecretKey
 
 /**
+ * ### 网络连接
  *
- * @author Doctor_Yin
- * @since 2021/5/14:20:22
+ * @see AbstractConnection
  */
 class NetworkConnection(
     private val channel: Channel,

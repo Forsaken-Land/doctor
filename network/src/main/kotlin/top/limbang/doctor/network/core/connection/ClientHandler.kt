@@ -9,11 +9,6 @@ import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.event.ConnectionEventArgs
 
 /**
- *
- * @author Doctor_Yin
- * @since 2021/5/14:20:41
- */
-/**
  * ### 客户端处理
  *
  * 通知断线重连等事件

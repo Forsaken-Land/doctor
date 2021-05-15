@@ -1,25 +1,20 @@
 package top.limbang.doctor.network.api
 
 import top.limbang.doctor.protocol.api.Packet
-import java.util.concurrent.Future
 import javax.crypto.SecretKey
 
 /**
+ * ### 连接接口
  *
- * @author Doctor_Yin
- * @since 2021/5/14:18:50
+ * 连接不应该实现此类,应该继承[AbstractConnection]
  */
-
 interface Connection {
     val host: String
     val port: Int
 
-
-
     /**
      * 判断是否启用压缩
      */
-
     fun isCompressionEnabled(): Boolean
 
     /**
@@ -47,7 +42,7 @@ interface Connection {
     /**
      * 关闭连接
      */
-    suspend fun  close()
+    suspend fun close()
 
     /**
      * 判断连接是否已关闭
