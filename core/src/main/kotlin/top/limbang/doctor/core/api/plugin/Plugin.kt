@@ -2,7 +2,6 @@ package top.limbang.doctor.core.api.plugin
 
 import top.limbang.doctor.core.api.IHookProviderRegistry
 import top.limbang.doctor.core.api.event.EventEmitter
-import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 
 /**
  * 表示一个插件的入口

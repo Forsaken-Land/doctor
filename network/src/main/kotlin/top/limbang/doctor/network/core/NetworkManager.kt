@@ -1,0 +1,151 @@
+package top.limbang.doctor.network.core
+
+import io.netty.bootstrap.Bootstrap
+import io.netty.channel.Channel
+import io.netty.channel.ChannelInitializer
+import io.netty.channel.ChannelOption
+import io.netty.channel.nio.NioEventLoopGroup
+import io.netty.channel.socket.SocketChannel
+import io.netty.channel.socket.nio.NioSocketChannel
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import top.limbang.doctor.core.api.event.EventEmitter
+import top.limbang.doctor.core.api.plugin.IPluginManager
+import top.limbang.doctor.core.impl.event.DefaultEventEmitter
+import top.limbang.doctor.core.impl.plugin.DummyPluginManager
+import top.limbang.doctor.network.api.CodecInitializer
+import top.limbang.doctor.network.api.Connection
+import top.limbang.doctor.network.api.DummyCodecInitializer
+import top.limbang.doctor.network.core.connection.ClientHandler
+import top.limbang.doctor.network.core.connection.NetworkConnection
+import top.limbang.doctor.network.event.ConnectionEvent
+import top.limbang.doctor.network.event.ConnectionEventArgs
+import top.limbang.doctor.network.handler.ReadPacketListener
+import top.limbang.doctor.network.hooks.InitChannelPipelineHook
+import top.limbang.doctor.network.lib.Attributes
+import top.limbang.doctor.network.utils.suspendRun
+import top.limbang.doctor.protocol.api.Packet
+import top.limbang.doctor.protocol.registry.IPacketRegistry
+import top.limbang.doctor.protocol.version.createProtocol
+
+/**
+ *
+ * @author WarmthDawn
+ * @since 2021-05-15
+ */
+class NetworkManager(
+    private val event: EventEmitter,
+    val host: String,
+    val port: Int,
+    val protocol: IPacketRegistry,
+    val pluginManager: IPluginManager,
+) : EventEmitter by event {
+    companion object {
+        val logger: Logger = LoggerFactory.getLogger(NetworkManager::class.java)
+        val MANAGER_CHANNEL = "clientHandler"
+    }
+
+    init {
+        //包事件分发
+        this.addListener(ReadPacketListener())
+    }
+
+
+    private val workGroup = NioEventLoopGroup()
+    private val bootstrap = Bootstrap()
+    private lateinit var channel: Channel
+
+    suspend fun connect() {
+        if (this::channel.isInitialized && channel.isActive) return
+        try {
+            bootstrap.connect(host, port).suspendRun()
+        } catch (e: Exception) {
+            this.emit(ConnectionEvent.Error, ConnectionEventArgs(null, error = e))
+            workGroup.shutdownGracefully().suspendRun()
+        }
+
+    }
+
+    val connection: Connection get() = channel.attr(Attributes.ATTR_CONNECTION).get()
+
+    suspend fun shutdown() {
+        if (workGroup.isShutdown) return
+        connection.close()
+        workGroup.shutdownGracefully().suspendRun()
+    }
+
+    suspend fun sendPacket(packet: Packet) {
+        connection.sendPacket(packet)
+    }
+
+    fun preInit(codecInitializer: CodecInitializer) {
+        bootstrap.group(workGroup)
+            .channel(NioSocketChannel::class.java)
+            .option(ChannelOption.TCP_NODELAY, true)
+            //.option(ChannelOption.SO_KEEPALIVE, true)
+            .handler(object : ChannelInitializer<SocketChannel>() {
+                override fun initChannel(ch: SocketChannel) {
+                    channel = ch
+                    codecInitializer.initChannel(ch, this@NetworkManager)
+                    // 客户端事件处理
+                    ch.pipeline().addLast(MANAGER_CHANNEL, ClientHandler(emitter))
+                    pluginManager.invokeHook(InitChannelPipelineHook::class.java, ch)
+                    val connection: Connection = NetworkConnection(channel, host, port)
+                    channel.attr(Attributes.ATTR_CONNECTION).set(connection)
+                }
+            })
+    }
+
+
+    class Builder {
+        private var host: String = "localhost";
+        private var port = 25565
+        private var protocolVersion: String = "1.12.2"
+        private var emitter: EventEmitter? = null
+        private var pluginManager: IPluginManager = DummyPluginManager()
+        private var codecInitializer: CodecInitializer = DummyCodecInitializer()
+
+        fun host(host: String): Builder {
+            this.host = host
+            return this
+        }
+
+        fun port(port: Int): Builder {
+            this.port = port
+            return this
+        }
+
+        fun protocolVersion(protocolVersion: String): Builder {
+            this.protocolVersion = protocolVersion
+            return this
+        }
+
+        fun pluginManager(pluginManager: IPluginManager): Builder {
+            this.pluginManager = pluginManager
+            return this
+        }
+
+        fun eventEmitter(eventEmitter: EventEmitter): Builder {
+            this.emitter = eventEmitter
+            return this
+        }
+
+
+        fun codecInitializer(codecInitializer: CodecInitializer): Builder {
+            this.codecInitializer = codecInitializer
+            return this
+        }
+
+        fun build(): NetworkManager {
+            return NetworkManager(
+                emitter ?: DefaultEventEmitter(),
+                host,
+                port,
+                createProtocol(protocolVersion, pluginManager),
+                pluginManager
+            )
+        }
+    }
+
+
+}

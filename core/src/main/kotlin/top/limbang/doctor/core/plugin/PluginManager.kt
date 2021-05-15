@@ -1,12 +1,12 @@
 package top.limbang.doctor.core.plugin
 
 import top.limbang.doctor.core.api.event.EventEmitter
+import top.limbang.doctor.core.api.plugin.IPluginManager
 import top.limbang.doctor.core.api.plugin.Plugin
-import top.limbang.doctor.core.api.registry.Registry
+import top.limbang.doctor.core.cast
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.core.impl.plugin.DefaultHookProvider
 import top.limbang.doctor.core.impl.registy.DefaultRegistry
-import top.limbang.doctor.core.cast
 
 /**
  * 插件管理器
@@ -15,15 +15,12 @@ import top.limbang.doctor.core.cast
  */
 class PluginManager(
     private val emitter: EventEmitter,
-    private val registry: DefaultRegistry<String, Plugin> = DefaultRegistry()
-) : Registry<String, Plugin> by registry {
+) : IPluginManager {
     private val hookProviderRegistry = HookProviderRegistry()
-    private val pluginEventRegistry = DefaultRegistry<String, EventEmitter>()
+    private val pluginEventRegistry = DefaultRegistry<Class<*>, EventEmitter>()
+    private val pluginRegistry = DefaultRegistry<Class<*>, Plugin>()
 
-    /**
-     * 触发插件钩子
-     */
-    fun <T, V : DefaultHookProvider<T>> invokeHook(provider: Class<V>, args: T, clearHooks: Boolean = false) {
+    override fun <T, V : DefaultHookProvider<T>> invokeHook(provider: Class<V>, args: T, clearHooks: Boolean) {
         val hooks = hookProviderRegistry.tryGet(provider)?.cast<V>()
         hooks?.invokeHook(args)
         if (clearHooks) {
@@ -35,29 +32,33 @@ class PluginManager(
     /**
      * 注册插件
      */
-    override fun register(key: String, value: Plugin) {
+    override fun <T : Plugin> registerPlugin(key: Class<T>, value: Plugin) {
         value.created()
         val redirect = DefaultEventEmitter()
         pluginEventRegistry.register(key, redirect)
         emitter.targetTo(redirect)
         value.registerEvent(redirect)
         value.hookProvider(hookProviderRegistry)
-        registry.register(key, value)
+        pluginRegistry.register(key, value)
     }
 
     /**
      * 移除插件
      */
-    override fun remove(key: String) {
-        if (have(key)) {
-            val plugin = get(key)
+    override fun <T : Plugin> removePlugin(key: Class<T>) {
+        if (pluginRegistry.have(key)) {
+            val plugin = pluginRegistry.get(key)
             val redirect = pluginEventRegistry.get(key)
             emitter.removeTarget(redirect)
             plugin.destroy()
         }
-        registry.remove(key)
+        pluginRegistry.remove(key)
         pluginEventRegistry.remove(key)
     }
+
+    override fun <T : Plugin> getPlugin(key: Class<T>) = pluginRegistry.get(key)
+    override fun getAllPlugins() = pluginRegistry.all()
+    override fun <T : Plugin> hasPlugin(key: Class<T>) = pluginRegistry.have(key)
 
 
 }

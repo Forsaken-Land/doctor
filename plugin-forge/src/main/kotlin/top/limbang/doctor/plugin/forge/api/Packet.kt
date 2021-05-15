@@ -1,6 +1,7 @@
 package top.limbang.doctor.plugin.forge.api
 
-interface ForgePacketBase
+import top.limbang.doctor.protocol.api.Packet
 
-interface ModPacket : ForgePacketBase
-interface ChannelPacket : ForgePacketBase
+
+interface ModPacket : Packet
+interface ChannelPacket : Packet

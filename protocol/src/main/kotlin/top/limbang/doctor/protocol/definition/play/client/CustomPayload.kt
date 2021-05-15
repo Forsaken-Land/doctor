@@ -1,11 +1,13 @@
 package top.limbang.doctor.protocol.definition.play.client
 
 import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
-import top.limbang.doctor.protocol.api.plugin.ChannelPacket
+import top.limbang.doctor.protocol.entity.extra.CustomPayloadType
 import top.limbang.doctor.protocol.extension.readString
 import top.limbang.doctor.protocol.extension.writeString
 
@@ -16,16 +18,17 @@ import top.limbang.doctor.protocol.extension.writeString
  */
 @Serializable
 data class CustomPayloadPacket(
-    val channel: String = "MC|Brand",
-    @Contextual
-    val data: ByteBuf
-) : ChannelPacket
+    val channel: String,
+    val data: MutableMap<String, @Contextual Any>
+) : Packet
 
 class CustomPayloadDecoder : PacketDecoder<CustomPayloadPacket> {
     override fun decoder(buf: ByteBuf): CustomPayloadPacket {
         val channel = buf.readString()
         val byteBuf = buf.readBytes(buf.readableBytes())
-        return CustomPayloadPacket(channel, byteBuf)
+        val data = HashMap<String, Any>()
+        CustomPayloadType.get(channel).readPacket(byteBuf, data)
+        return CustomPayloadPacket(channel, data)
     }
 
 }
@@ -33,11 +36,9 @@ class CustomPayloadDecoder : PacketDecoder<CustomPayloadPacket> {
 class CustomPayloadEncoder : PacketEncoder<CustomPayloadPacket> {
     override fun encode(buf: ByteBuf, packet: CustomPayloadPacket): ByteBuf {
         buf.writeString(packet.channel)
-        synchronized(packet.data) {
-            packet.data.markReaderIndex()
-            buf.writeBytes(packet.data)
-            packet.data.resetReaderIndex()
-        }
+        val data = Unpooled.buffer()
+        CustomPayloadType.get(packet.channel).writePacket(data, packet.data)
+        buf.writeBytes(data)
         return buf
     }
 }

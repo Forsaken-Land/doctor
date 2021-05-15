@@ -1,22 +1,21 @@
 package top.limbang.doctor.plugin.forge.api
 
-import top.limbang.doctor.plugin.forge.registry.IForgePacketRegistry
+import top.limbang.doctor.plugin.forge.registry.IChannelPacketRegistry
 
 /**
  *
  * @author limbang
  * @since 2021-05-14
  */
-interface ForgeProtocol : IForgePacketRegistry {
-
-    val sendId: Int
-    val readId: Int
+interface ForgeProtocol : IChannelPacketRegistry {
 
 }
 
 enum class ForgeProtocolState {
+    REGISTER,
+    HELLO,
+    MODLIST,
     HANDSHAKE,
-    STATUS,
-    LOGIN,
+    REGISTERDATA,
     PLAY
 }
