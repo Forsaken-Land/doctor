@@ -1,21 +1,6 @@
 package top.limbang.doctor.protocol.api
 
-import top.limbang.doctor.protocol.registry.IPacketRegistry
-
-/**
- *
- * @author limbang
- * @since 2021-05-14
- */
-interface Protocol : IPacketRegistry {
-    /**
-     * ### 协议接口
-     */
-
-    fun sendID(): Int
-    fun readID(): Int
-
-}
+import top.limbang.doctor.protocol.api.ProtocolState.*
 
 /**
  * ## 协议状态

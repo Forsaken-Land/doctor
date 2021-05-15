@@ -1,13 +1,11 @@
 package top.limbang.doctor.network.api
 
-import top.limbang.doctor.protocol.api.ProtocolState
-import top.limbang.doctor.protocol.entity.ServiceResponse
 import javax.crypto.SecretKey
 
 /**
+ * ### 连接抽象类
  *
- * @author Doctor_Yin
- * @since 2021/5/14:20:21
+ * @see Connection
  */
 abstract class AbstractConnection(
     override val host: String,

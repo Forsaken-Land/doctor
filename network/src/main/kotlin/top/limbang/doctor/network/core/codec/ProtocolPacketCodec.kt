@@ -35,6 +35,7 @@ class ProtocolPacketEncoder(
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
         logger.trace(cause.message)
+        ctx.close()
     }
 }
 
@@ -57,6 +58,7 @@ class ProtocolPacketDecoder(
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
         logger.trace(cause.message)
+        ctx.close()
     }
 
 }

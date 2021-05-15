@@ -1,5 +1,6 @@
 package top.limbang.doctor.protocol.api
 
-interface Packet {
-
-}
+/**
+ * ### 协议包
+ */
+interface Packet
