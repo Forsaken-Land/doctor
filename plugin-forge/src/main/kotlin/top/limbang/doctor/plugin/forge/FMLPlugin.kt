@@ -4,10 +4,12 @@ import top.limbang.doctor.core.api.IHookProviderRegistry
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.plugin.Plugin
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
+import top.limbang.doctor.network.handler.PacketEvent
 import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.handler.ForgeHandshakeListener
 import top.limbang.doctor.protocol.entity.ServiceResponse
+import top.limbang.doctor.protocol.entity.SimpleServiceResponse
 
 /**
  *
@@ -25,6 +27,7 @@ class FMLPlugin : Plugin,
     }
 
     override fun registerEvent(emitter: EventEmitter) {
+        //TODO: 这里要获取modlist
         emitter.addListener(ForgeHandshakeListener(this))
     }
 

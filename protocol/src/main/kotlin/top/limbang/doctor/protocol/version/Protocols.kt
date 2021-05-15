@@ -9,6 +9,10 @@ import top.limbang.doctor.protocol.version.vanilla.MinecraftClientProtocol_v1_12
  * @author WarmthDawn
  * @since 2021-05-14
  */
+
+/**
+ * 获取协议
+ */
 fun createProtocol(name: String, pluginManager: IPluginManager): MinecraftClientProtocol_v1_12_2 {
     return when (name) {
         "1.12.2" -> {
