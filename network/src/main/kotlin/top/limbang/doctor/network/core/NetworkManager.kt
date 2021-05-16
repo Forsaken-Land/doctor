@@ -7,6 +7,7 @@ import io.netty.channel.ChannelOption
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioSocketChannel
+import io.netty.util.concurrent.Future
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.core.api.event.EventEmitter
@@ -23,7 +24,7 @@ import top.limbang.doctor.network.event.ConnectionEventArgs
 import top.limbang.doctor.network.handler.ReadPacketListener
 import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.network.lib.Attributes
-import top.limbang.doctor.network.utils.suspendRun
+import top.limbang.doctor.network.utils.FutureUtils
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.registry.IPacketRegistry
 import top.limbang.doctor.protocol.version.createProtocol
@@ -55,27 +56,28 @@ class NetworkManager(
     private val bootstrap = Bootstrap()
     private lateinit var channel: Channel
 
-    suspend fun connect() {
-        if (this::channel.isInitialized && channel.isActive) return
-        try {
-            bootstrap.connect(host, port).suspendRun()
-        } catch (e: Exception) {
-            this.emit(ConnectionEvent.Error, ConnectionEventArgs(null, error = e))
-            workGroup.shutdownGracefully().suspendRun()
-        }
+    fun connect(): Future<*> {
+        if (this::channel.isInitialized && channel.isActive)
+            return try {
+                bootstrap.connect(host, port)
+            } catch (e: Exception) {
+                this.emit(ConnectionEvent.Error, ConnectionEventArgs(null, error = e))
+                workGroup.shutdownGracefully()
+            }
 
+        return FutureUtils.pass()
     }
 
     val connection: Connection get() = channel.attr(Attributes.ATTR_CONNECTION).get()
 
-    suspend fun shutdown() {
-        if (workGroup.isShutdown) return
+    fun shutdown(): Future<*> {
+        if (workGroup.isShutdown) return FutureUtils.pass()
         connection.close()
-        workGroup.shutdownGracefully().suspendRun()
+        return workGroup.shutdownGracefully()
     }
 
-    suspend fun sendPacket(packet: Packet) {
-        connection.sendPacket(packet)
+    fun sendPacket(packet: Packet): Future<*> {
+        return connection.sendPacket(packet)
     }
 
     fun preInit(codecInitializer: CodecInitializer) {
