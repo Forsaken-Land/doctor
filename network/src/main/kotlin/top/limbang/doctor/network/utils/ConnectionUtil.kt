@@ -2,6 +2,7 @@ package top.limbang.doctor.network.utils
 
 import io.netty.channel.ChannelHandlerContext
 import top.limbang.doctor.network.lib.Attributes
+import top.limbang.doctor.network.lib.Attributes.ATTR_PROTOCOL_STATE
 import top.limbang.doctor.protocol.api.ProtocolState
 
 /**
@@ -12,7 +13,7 @@ import top.limbang.doctor.protocol.api.ProtocolState
 
 
 fun ChannelHandlerContext.protocolState(): ProtocolState {
-    val attr = this.channel().attr(Attributes.ATTR_PROTOCOL_STATE)
+    val attr = this.channel().attr(ATTR_PROTOCOL_STATE)
     if (attr.get() == null) {
         attr.set(ProtocolState.HANDSHAKE)
     }
@@ -20,7 +21,7 @@ fun ChannelHandlerContext.protocolState(): ProtocolState {
 }
 
 fun ChannelHandlerContext.setProtocolState(state: ProtocolState) {
-    return this.channel().attr(Attributes.ATTR_PROTOCOL_STATE).set(state)
+    this.channel().attr(ATTR_PROTOCOL_STATE).set(state)
 }
 
 

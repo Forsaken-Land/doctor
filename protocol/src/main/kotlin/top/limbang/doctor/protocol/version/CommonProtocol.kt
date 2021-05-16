@@ -45,7 +45,7 @@ object CommonProtocol : ICommonPacketGroup<IPacketRegistry> {
                 }
             }
 
-            packetMap(PacketDirection.S2C, ProtocolState.HANDSHAKE) {
+            packetMap(PacketDirection.C2S, ProtocolState.HANDSHAKE) {
                 register(0x00, HandshakeEncoder())
             }
 

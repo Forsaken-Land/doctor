@@ -1,7 +1,6 @@
 package top.limbang.doctor.network.utils
 
-import io.netty.util.concurrent.Future
-import io.netty.util.concurrent.ImmediateEventExecutor
+import io.netty.util.concurrent.*
 
 /**
  *
@@ -21,4 +20,5 @@ object FutureUtils {
     fun pass(): Future<Unit> {
         return success(Unit)
     }
+
 }

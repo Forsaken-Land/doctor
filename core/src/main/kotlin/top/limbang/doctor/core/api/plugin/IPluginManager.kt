@@ -16,14 +16,14 @@ interface IPluginManager {
     /**
      * 注册插件
      */
-    fun <T: Plugin> registerPlugin(key: Class<T>, value: Plugin)
+    fun <T: Plugin> registerPlugin(plugin: T)
 
     /**
      * 移除插件
      */
     fun <T: Plugin> removePlugin(key: Class<T>)
 
-    fun <T: Plugin> getPlugin(key: Class<T>): Plugin
+    fun <T: Plugin> getPlugin(key: Class<T>): T
     fun getAllPlugins(): List<Plugin>
     fun <T: Plugin> hasPlugin(key: Class<T>): Boolean
 

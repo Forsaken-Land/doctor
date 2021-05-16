@@ -14,13 +14,14 @@ class DummyPluginManager : IPluginManager {
 
     }
 
-    override fun <T : Plugin> registerPlugin(key: Class<T>, value: Plugin) {
+    override fun <T : Plugin> registerPlugin(plugin: T) {
     }
+
 
     override fun <T : Plugin> removePlugin(key: Class<T>) {
     }
 
-    override fun <T : Plugin> getPlugin(key: Class<T>): Plugin {
+    override fun <T : Plugin> getPlugin(key: Class<T>): T {
         throw RegistryException("无法获取插件：当前插件管理器为空")
     }
 

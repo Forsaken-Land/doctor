@@ -1,6 +1,8 @@
 package top.limbang.doctor.protocol.version.autoversion
 
 import top.limbang.doctor.protocol.api.ProtocolState
+import top.limbang.doctor.protocol.core.PacketDirection
+import top.limbang.doctor.protocol.definition.client.HandshakeEncoder
 import top.limbang.doctor.protocol.definition.status.client.PingEncoder
 import top.limbang.doctor.protocol.definition.status.client.RequestEncoder
 import top.limbang.doctor.protocol.definition.status.server.PongDecoder
@@ -24,6 +26,10 @@ class PingProtocol : IPacketRegistry by PacketRegistryImpl() {
                 register(0x00, RequestEncoder())
                 register(0x01, PingEncoder())
             }
+        }
+
+        packetMap(PacketDirection.C2S, ProtocolState.HANDSHAKE) {
+            register(0x00, HandshakeEncoder())
         }
     }
 }

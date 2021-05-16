@@ -13,3 +13,4 @@ data class ForgeStateChangeEventArgs(
     val from: ForgeProtocolState,
     val to: ForgeProtocolState
 )
+

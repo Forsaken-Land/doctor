@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 import top.limbang.doctor.network.utils.protocolState
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.core.PacketDirection
+import top.limbang.doctor.protocol.core.ProtocolException
 import top.limbang.doctor.protocol.extension.readVarInt
 import top.limbang.doctor.protocol.extension.writeVarInt
 import top.limbang.doctor.protocol.registry.IPacketRegistry
@@ -42,7 +43,7 @@ class ProtocolPacketCodec(
     }
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
-        logger.trace(cause.message)
+        logger.error(cause.message)
         ctx.close()
     }
 }

@@ -14,7 +14,7 @@ class DefaultEventEmitter : EventEmitter {
     private val listeners = HashMap<Event<*>, HashSet<EventHandler<*>>>()
     private val onceListeners = HashMap<Event<*>, HashSet<EventHandler<*>>>()
     private val durationListeners = HashMap<Event<*>, HashSet<Pair<Long, EventHandler<*>>>>()
-    private val targets = HashSet<DefaultEventEmitter>()
+    private val targets = HashSet<EventEmitter>()
 
     private fun clearExpire() {
         val now = Instant.now().epochSecond
@@ -61,10 +61,8 @@ class DefaultEventEmitter : EventEmitter {
     }
 
     private fun <T> handleEvent(handler: EventHandler<*>, args: T) {
-        targets.forEach {
-            it.handleEvent(handler, args)
-        }
         handler.cast<T>().handle(args)
+//        handler.cast<T>()(args)
     }
 
     override fun <T> emit(event: Event<T>, args: T): EventEmitter {
@@ -83,6 +81,12 @@ class DefaultEventEmitter : EventEmitter {
         //计时事件
         durationListeners[event]?.forEach {
             handleEvent(it.second, args)
+        }
+
+        targets.forEach {
+            if (it != this) {
+                it.emit(event, args)
+            }
         }
         return this
     }
@@ -141,11 +145,7 @@ class DefaultEventEmitter : EventEmitter {
     }
 
     override fun targetTo(another: EventEmitter) {
-        if (another is DefaultEventEmitter) {
-            targets.add(another)
-        } else {
-            throw UnsupportedOperationException("只能附加类型为DefaultEventEmitter的触发器")
-        }
+        targets.add(another)
     }
 
     override fun removeTarget(another: EventEmitter) {
