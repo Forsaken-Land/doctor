@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.google.gson.JsonParser
 import io.netty.util.concurrent.Promise
-import top.limbang.doctor.client.listener.HandshakeListener
+import top.limbang.doctor.client.old.listener.HandshakeListener
 import top.limbang.doctor.client.utils.newPromise
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
@@ -22,8 +22,8 @@ import top.limbang.doctor.protocol.definition.status.client.RequestPacket
 import top.limbang.doctor.protocol.definition.status.server.ResponsePacket
 import top.limbang.doctor.protocol.entity.ServiceResponse
 import top.limbang.doctor.protocol.version.autoversion.PingProtocol
-import top.limbang.minecraft.core.listener.LoginServiceListener
-import top.limbang.minecraft.core.listener.PingServiceListListener
+import top.limbang.doctor.client.old.listener.LoginServiceListener
+import top.limbang.doctor.client.old.listener.PingServiceListListener
 
 /**
  * ### Minecraft 客户端

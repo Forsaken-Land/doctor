@@ -1,4 +1,4 @@
-package top.limbang.minecraft.core.listener
+package top.limbang.doctor.client.old.listener
 
 
 import io.netty.channel.ChannelHandlerContext
@@ -17,7 +17,6 @@ import top.limbang.doctor.network.event.ConnectionEventArgs
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.protocolState
 import top.limbang.doctor.network.utils.setProtocolState
-import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.login.client.EncryptionResponsePacket
 import top.limbang.doctor.protocol.definition.login.client.LoginStartPacket

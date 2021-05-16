@@ -29,7 +29,6 @@ import top.limbang.doctor.network.utils.FutureUtils
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.registry.IPacketRegistry
 import top.limbang.doctor.protocol.version.createProtocol
-import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -65,7 +64,7 @@ class NetworkManager(
             .addListener {
                 if (it.isSuccess) {
                     channel = (it as ChannelFuture).channel()
-                    val connection: Connection = NetworkConnection(channel, host, port)
+                    val connection: Connection = NetworkConnection(channel, this, host, port)
                     channel.attr(Attributes.ATTR_CONNECTION).set(connection)
                 } else {
                     this.emit(ConnectionEvent.Error, ConnectionEventArgs(error = it.cause()))

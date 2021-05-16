@@ -1,6 +1,7 @@
 package top.limbang.doctor.network.api
 
 import io.netty.util.concurrent.Future
+import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.protocol.api.Packet
 import javax.crypto.SecretKey
 
@@ -12,6 +13,7 @@ import javax.crypto.SecretKey
 interface Connection {
     val host: String
     val port: Int
+    val emitter: EventEmitter
 
     /**
      * 判断是否启用压缩

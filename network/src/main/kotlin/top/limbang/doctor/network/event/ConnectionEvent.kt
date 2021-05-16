@@ -1,7 +1,9 @@
 package top.limbang.doctor.network.event
 
+import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import top.limbang.doctor.core.api.event.Event
+import top.limbang.doctor.protocol.api.ProtocolState
 
 /**
  *
@@ -21,3 +23,12 @@ data class ConnectionEventArgs(
     val message: Any? = null,
     val error: Throwable? = null
 )
+
+
+object ProtocolStateChange : Event<ProtocolStateChangeEventArgs>
+data class ProtocolStateChangeEventArgs(
+    val channel: Channel,
+    val from: ProtocolState,
+    val to: ProtocolState
+)
+
