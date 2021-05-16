@@ -4,6 +4,7 @@ import io.netty.channel.Channel
 import io.netty.channel.ChannelException
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelOutboundHandlerAdapter
+import io.netty.util.concurrent.Future
 import top.limbang.doctor.network.api.AbstractConnection
 import top.limbang.doctor.network.core.codec.CompressionCodec
 import top.limbang.doctor.network.lib.Attributes
@@ -48,28 +49,27 @@ class NetworkConnection(
     }
 
 
-    override suspend fun sendPacket(packet: Packet) {
-        if (!isClosed()) {
-            channel.writeAndFlush(packet).suspendRun()
+    override fun sendPacket(packet: Packet): Future<*> {
+        return if (!isClosed()) {
+            channel.writeAndFlush(packet)
         } else throw ChannelException("channel 已关闭.")
 
     }
 
-    override suspend fun close(packet: Packet?) {
-        if (!isClosed()) {
+    override fun close(packet: Packet?): Future<*>  {
+        return if (!isClosed()) {
             if (packet != null && channel.isActive) {
                 channel.writeAndFlush(packet)
                     .addListener(ChannelFutureListener.CLOSE)
-                    .suspendRun()
             } else {
                 channel.flush()
-                channel.close().suspendRun()
+                channel.close()
             }
         } else throw ChannelException("channel 已关闭.")
     }
 
-    override suspend fun close() {
-        close(null)
+    override fun close(): Future<*> {
+        return close(null)
     }
 
     override fun isClosed(): Boolean {

@@ -1,5 +1,6 @@
 package top.limbang.doctor.network.api
 
+import io.netty.util.concurrent.Future
 import top.limbang.doctor.protocol.api.Packet
 import javax.crypto.SecretKey
 
@@ -35,14 +36,14 @@ interface Connection {
     /**
      * 发送数据包
      */
-    suspend fun sendPacket(packet: Packet)
+    fun sendPacket(packet: Packet): Future<*>
 
-    suspend fun close(packet: Packet?)
+    fun close(packet: Packet?): Future<*>
 
     /**
      * 关闭连接
      */
-    suspend fun close()
+    fun close(): Future<*>
 
     /**
      * 判断连接是否已关闭
