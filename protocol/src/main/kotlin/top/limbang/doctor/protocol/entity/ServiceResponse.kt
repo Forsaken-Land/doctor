@@ -1,10 +1,14 @@
 package top.limbang.doctor.protocol.entity
 
 import kotlinx.serialization.Serializable
+import top.limbang.doctor.protocol.core.ProtocolException
 
 
 interface SimpleServiceResponse {
     val version: ServiceResponse.Version
+    fun toModMap(): Map<String, String> {
+        throw ProtocolException("原版无mod列表")
+    }
 }
 
 @Serializable
@@ -17,13 +21,14 @@ data class FML1SimpleServiceResponse(
     override val version: ServiceResponse.Version,
     val modinfo: ServiceResponse.Modinfo
 ) : SimpleServiceResponse {
-    fun toFML2Mod(): List<ServiceResponse.Mod2> {
-        val mods = mutableListOf<ServiceResponse.Mod2>()
+    override fun toModMap(): Map<String, String> {
+        val mods = mutableMapOf<String, String>()
         for (mod in modinfo.modList) {
-            mods.add(ServiceResponse.Mod2(mod.modid, mod.version))
+            mods[mod.modid] = mod.version
         }
         return mods
     }
+
 }
 
 @Serializable
@@ -31,13 +36,14 @@ data class FML2SimpleServiceResponse(
     override val version: ServiceResponse.Version,
     val forgeData: ServiceResponse.ForgeData
 ) : SimpleServiceResponse {
-    fun toFML1Mod(): List<ServiceResponse.Mod> {
-        val mods = mutableListOf<ServiceResponse.Mod>()
+    override fun toModMap(): Map<String, String> {
+        val mods = mutableMapOf<String, String>()
         for (mod in forgeData.mods) {
-            mods.add(ServiceResponse.Mod(mod.modId, mod.modmarker))
+            mods[mod.modId] = mod.modmarker
         }
         return mods
     }
+
 }
 
 

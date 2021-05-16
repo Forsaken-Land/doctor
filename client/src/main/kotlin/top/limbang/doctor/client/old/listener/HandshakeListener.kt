@@ -8,7 +8,6 @@ import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.event.EventListener
 import top.limbang.doctor.network.api.Connection
 import top.limbang.doctor.network.event.ConnectionEvent
-import top.limbang.doctor.network.event.ProtocolStateChange
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.connection
 import top.limbang.doctor.network.utils.protocolState
@@ -22,14 +21,14 @@ import top.limbang.doctor.protocol.entity.FML1SimpleServiceResponse
 import top.limbang.doctor.protocol.entity.SimpleServiceResponse
 
 
-open class HandshakeListener : EventListener {
+open class HandshakeListener(private val protocolVersion: Int, private val fml: String) : EventListener {
     override fun initListen(emitter: EventEmitter) {
         emitter.on(ConnectionEvent.Connected) {
             handshake(it.context!!)
         }
         emitter.on(ConnectionEvent.Read) {
             when (it.message) {
-                is ResponsePacket ->{
+                is ResponsePacket -> {
                     getServiceResponse(it.message as ResponsePacket)
                     val connection = it.context!!.connection()
                     val version = serviceResponse.version.protocol
@@ -75,6 +74,13 @@ open class HandshakeListener : EventListener {
                     .await()
                 // 更改连接状态为: 状态
                 ctx.setProtocolState(ProtocolState.STATUS)
+            }
+            ProtocolState.STATUS -> {
+                val host = "${connection.host}$fml"
+                // 发送登录握手包
+                connection.sendPacket(HandshakePacket(protocolVersion, host, connection.port, ProtocolState.LOGIN))
+                // 更改连接状态为: 登录
+                ctx.setProtocolState(ProtocolState.LOGIN)
             }
             else -> return
         }
