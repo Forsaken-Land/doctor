@@ -7,17 +7,16 @@ import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.codec.ForgePacketHandler
-import top.limbang.doctor.plugin.forge.handler.ForgeHandshakeListener
-import top.limbang.doctor.plugin.forge.protocol.FML1
+import top.limbang.doctor.plugin.forge.protocol.FML2
 import top.limbang.doctor.protocol.entity.ServiceResponse
 
 /**
  *
- * @author WarmthDawn
- * @since 2021-05-14
+ * @author Doctor_Yin
+ * @since 2021/5/16 下午9:50
  */
-class FMLPlugin(
-    val modList: List<ServiceResponse.Mod>,
+class FML2Plugin(
+    val modList: List<ServiceResponse.Mod2>,
 ) : Plugin,
     EventEmitter by DefaultEventEmitter() {
 
@@ -32,14 +31,14 @@ class FMLPlugin(
      * 注册插件的事件
      */
     override fun registerEvent(emitter: EventEmitter) {
-        emitter.addListener(ForgeHandshakeListener(this))
+     //   emitter.addListener(ForgeHandshakeListener(this))
     }
 
     override fun hookProvider(registry: IHookProviderRegistry) {
         registry.provider(InitChannelPipelineHook::class.java).addHook {
             this.pipeline().addBefore(
-                "clientHandler", "fml:clientHandler",
-                ForgePacketHandler(this@FMLPlugin, FML1()) //TODO: 这个handler逻辑或许得改
+                "clientHandler", "fml2:clientHandler",
+                ForgePacketHandler(this@FML2Plugin, FML2()) //TODO: 这个handler逻辑或许得改
             )
 
             this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.REGISTER)
