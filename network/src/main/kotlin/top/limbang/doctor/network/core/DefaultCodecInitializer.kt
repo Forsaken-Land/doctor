@@ -1,12 +1,9 @@
 package top.limbang.doctor.network.core
 
-import io.netty.channel.ChannelDuplexHandler
-import io.netty.channel.ChannelInboundHandler
 import io.netty.channel.ChannelInboundHandlerAdapter
 import io.netty.channel.socket.SocketChannel
 import top.limbang.doctor.network.api.CodecInitializer
-import top.limbang.doctor.network.core.codec.ProtocolPacketDecoder
-import top.limbang.doctor.network.core.codec.ProtocolPacketEncoder
+import top.limbang.doctor.network.core.codec.ProtocolPacketCodec
 import top.limbang.doctor.network.core.codec.VarIntLengthBasedFrameCodec
 import top.limbang.doctor.protocol.core.PacketDirection
 
@@ -23,12 +20,16 @@ class DefaultClientCodecInitializer : CodecInitializer {
         ch.pipeline().addLast("varIntLengthBasedFrameCoder", VarIntLengthBasedFrameCodec())
         ch.pipeline().addLast("compressionCoder", ChannelInboundHandlerAdapter())
         ch.pipeline().addLast(
-            "protocolPacketDecoder",
-            ProtocolPacketDecoder(manager.protocol, PacketDirection.S2C)
+            "protocolPacketCodec",
+            ProtocolPacketCodec(manager.protocol, PacketDirection.C2S, PacketDirection.S2C)
         )
-        ch.pipeline().addLast(
-            "protocolPacketEncoder",
-            ProtocolPacketEncoder(manager.protocol, PacketDirection.C2S)
-        )
+//        ch.pipeline().addLast(
+//            "protocolPacketDecoder",
+//            ProtocolPacketDecoder(manager.protocol, PacketDirection.S2C)
+//        )
+//        ch.pipeline().addLast(
+//            "protocolPacketEncoder",
+//            ProtocolPacketEncoder(manager.protocol, PacketDirection.C2S)
+//        )
     }
 }

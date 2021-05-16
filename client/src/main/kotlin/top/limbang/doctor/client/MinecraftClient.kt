@@ -29,6 +29,6 @@ class MinecraftClient() : EventEmitter by DefaultEventEmitter(){
             .eventEmitter(this)
             .protocol(PingProtocol())
             .build()
-        networkManager.connect()
+        networkManager.connect().await()
     }
 }
