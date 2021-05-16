@@ -24,9 +24,9 @@ import top.limbang.doctor.protocol.definition.login.server.DisconnectPacket
 import top.limbang.doctor.protocol.definition.login.server.EncryptionRequestPacket
 import top.limbang.doctor.protocol.definition.login.server.LoginSuccessPacket
 import top.limbang.doctor.protocol.definition.login.server.SetCompressionPacket
-import top.limbang.minecraft.entity.yggdrasil.AuthenticateRequest
-import top.limbang.minecraft.entity.yggdrasil.AuthenticateResponse
-import top.limbang.minecraft.entity.yggdrasil.JoinRequest
+import top.limbang.doctor.client.yggdrasil.AuthenticateRequest
+import top.limbang.doctor.client.yggdrasil.AuthenticateResponse
+import top.limbang.doctor.client.yggdrasil.JoinRequest
 import top.limbang.minecraft.entity.yggdrasil.YggdrasilError
 import java.util.concurrent.TimeUnit
 
