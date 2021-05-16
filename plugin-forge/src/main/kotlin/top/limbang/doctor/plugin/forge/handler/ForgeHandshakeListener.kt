@@ -8,7 +8,7 @@ import top.limbang.doctor.network.api.Connection
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.plugin.forge.ATTR_FORGE_STATE
-import top.limbang.doctor.plugin.forge.FMLPlugin
+import top.limbang.doctor.plugin.forge.FML1Plugin
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.definations.fml.*
 import top.limbang.doctor.plugin.forge.event.ForgeStateChange
@@ -21,7 +21,7 @@ import top.limbang.doctor.protocol.api.Packet
  * @time 21:16
  */
 class ForgeHandshakeListener(
-    val plugin: FMLPlugin
+    val a1Plugin: FML1Plugin
 ) : EventListener {
     override fun initListen(emitter: EventEmitter) {
         emitter.on(ConnectionEvent.Read) {
@@ -36,12 +36,12 @@ class ForgeHandshakeListener(
 
     private fun setForgeState(channel: Channel, state: ForgeProtocolState) {
         val from = channel.attr(ATTR_FORGE_STATE).getAndSet(state)
-        plugin.emit(ForgeStateChange, ForgeStateChangeEventArgs(from, state))
+        a1Plugin.emit(ForgeStateChange, ForgeStateChangeEventArgs(from, state))
     }
 
     private var channels: List<String> = listOf()
 
-    private suspend fun handshake(connection: Connection, packet: Packet, channel: Channel) {
+    private fun handshake(connection: Connection, packet: Packet, channel: Channel) {
         when (packet) {
             is RegisterPacket -> {
                 channels = packet.channels
@@ -51,7 +51,7 @@ class ForgeHandshakeListener(
                 //一个协议一个协议写
                 connection.sendPacket(RegisterPacket(channels))
                 connection.sendPacket(HelloClientPacket())
-                connection.sendPacket(ModListPacket(plugin.modList))
+                connection.sendPacket(ModListPacket(a1Plugin.modList))
 
                 setForgeState(channel, ForgeProtocolState.MODLIST)
 

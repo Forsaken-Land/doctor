@@ -29,13 +29,6 @@ data class FML1SimpleServiceResponse(
         return mods
     }
 
-    fun toFML2Mod(): List<ServiceResponse.Mod2> {
-        val mods = mutableListOf<ServiceResponse.Mod2>()
-        for (mod in modinfo.modList) {
-            mods.add(ServiceResponse.Mod2(mod.modid, mod.version))
-        }
-        return mods
-    }
 }
 
 @Serializable
@@ -51,13 +44,6 @@ data class FML2SimpleServiceResponse(
         return mods
     }
 
-    fun toFML1Mod(): List<ServiceResponse.Mod> {
-        val mods = mutableListOf<ServiceResponse.Mod>()
-        for (mod in forgeData.mods) {
-            mods.add(ServiceResponse.Mod(mod.modId, mod.modmarker))
-        }
-        return mods
-    }
 }
 
 
