@@ -1,5 +1,6 @@
 package top.limbang.doctor.network.handler
 
+import io.netty.channel.ChannelHandlerContext
 import top.limbang.doctor.core.api.event.Event
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.event.EventListener
@@ -17,8 +18,23 @@ class ReadPacketListener : EventListener {
         emitter.on(ConnectionEvent.Read) {
             if (it.message is Packet) {
                 emitter.emit(PacketEvent(it.message.javaClass.kotlin), it.message)
+                emitter.emit(
+                    WrappedPacketEvent(it.message.javaClass.kotlin),
+                    WrappedPacketEventArgs(it.context!!, it.message)
+                )
             }
         }
+    }
+}
+
+data class WrappedPacketEventArgs<T : Packet>(val ctx: ChannelHandlerContext, val packet: T)
+class WrappedPacketEvent<T : Packet>(val type: KClass<T>) : Event<WrappedPacketEventArgs<T>> {
+    override fun equals(other: Any?): Boolean {
+        return other is WrappedPacketEvent<*> && other.type == type
+    }
+
+    override fun hashCode(): Int {
+        return type.hashCode()
     }
 }
 

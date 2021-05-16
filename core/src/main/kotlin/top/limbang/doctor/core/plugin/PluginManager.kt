@@ -32,14 +32,19 @@ class PluginManager(
     /**
      * 注册插件
      */
-    override fun <T : Plugin> registerPlugin(key: Class<T>, value: Plugin) {
-        value.created()
-        val redirect = DefaultEventEmitter()
+    override fun <T : Plugin> registerPlugin(plugin: T) {
+        val key = plugin.javaClass
+        plugin.created()
+        val redirect = if (plugin is EventEmitter)
+            plugin as EventEmitter
+        else DefaultEventEmitter()
+
+
         pluginEventRegistry.register(key, redirect)
         emitter.targetTo(redirect)
-        value.registerEvent(redirect)
-        value.hookProvider(hookProviderRegistry)
-        pluginRegistry.register(key, value)
+        plugin.registerEvent(redirect)
+        plugin.hookProvider(hookProviderRegistry)
+        pluginRegistry.register(key, plugin)
     }
 
     /**
@@ -56,7 +61,7 @@ class PluginManager(
         pluginEventRegistry.remove(key)
     }
 
-    override fun <T : Plugin> getPlugin(key: Class<T>) = pluginRegistry.get(key)
+    override fun <T : Plugin> getPlugin(key: Class<T>) = pluginRegistry.get(key).cast<T>()
     override fun getAllPlugins() = pluginRegistry.all()
     override fun <T : Plugin> hasPlugin(key: Class<T>) = pluginRegistry.have(key)
 

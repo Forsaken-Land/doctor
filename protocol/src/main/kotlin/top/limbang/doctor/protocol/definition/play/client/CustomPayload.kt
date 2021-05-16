@@ -19,7 +19,10 @@ import top.limbang.doctor.protocol.extension.writeString
 @Serializable
 data class CustomPayloadPacket(
     val channel: String,
-    val data: MutableMap<String, @Contextual Any>
+    val data: Map<String, @Contextual Any>,
+    @Contextual
+    val rawData: ByteBuf? = null,
+    val processed: Boolean = false
 ) : Packet
 
 class CustomPayloadDecoder : PacketDecoder<CustomPayloadPacket> {
@@ -27,8 +30,12 @@ class CustomPayloadDecoder : PacketDecoder<CustomPayloadPacket> {
         val channel = buf.readString()
         val byteBuf = buf.readBytes(buf.readableBytes())
         val data = HashMap<String, Any>()
-        CustomPayloadType.get(channel).readPacket(byteBuf, data)
-        return CustomPayloadPacket(channel, data)
+        val type = CustomPayloadType.get(channel)
+        if (type != CustomPayloadType.UNKNOWN) {
+            type.readPacket(byteBuf, data)
+            return CustomPayloadPacket(channel, data, processed = true)
+        }
+        return CustomPayloadPacket(channel, emptyMap(), byteBuf)
     }
 
 }

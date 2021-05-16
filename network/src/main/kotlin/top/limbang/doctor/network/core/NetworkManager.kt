@@ -65,11 +65,14 @@ class NetworkManager(
             .addListener {
                 if (it.isSuccess) {
                     channel = (it as ChannelFuture).channel()
+                    val connection: Connection = NetworkConnection(channel, host, port)
+                    channel.attr(Attributes.ATTR_CONNECTION).set(connection)
                 } else {
                     this.emit(ConnectionEvent.Error, ConnectionEventArgs(error = it.cause()))
                     workGroup.shutdownGracefully()
                 }
             }
+
 
     }
 
@@ -81,7 +84,6 @@ class NetworkManager(
 
     fun shutdown(): Future<*> {
         if (workGroup.isShutdown) return FutureUtils.pass()
-        connection.close()
         return workGroup.shutdownGracefully()
     }
 
@@ -99,9 +101,7 @@ class NetworkManager(
                     try {
                         codecInitializer.initChannel(ch, this@NetworkManager)
                         // 客户端事件处理
-                        ch.pipeline().addLast(MANAGER_CHANNEL, ClientHandler(emitter))
-                        val connection: Connection = NetworkConnection(ch, host, port)
-                        ch.attr(Attributes.ATTR_CONNECTION).set(connection)
+                        ch.pipeline().addLast(MANAGER_CHANNEL, ClientHandler(this@NetworkManager))
                         pluginManager.invokeHook(InitChannelPipelineHook::class.java, ch)
                     } catch (e: Exception) {
                         e.printStackTrace()

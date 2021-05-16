@@ -4,12 +4,11 @@ import org.junit.Test
 
 class MinecraftClientTest {
 
-    @Test
-    fun ping() {
-        MinecraftClient().ping("mc.blackyin.xyz", 524)
+//    @Test
 
-    }
 }
 
-
+fun main() {
+    MinecraftClient().start("mc.blackyin.xyz", 524)
+}
 

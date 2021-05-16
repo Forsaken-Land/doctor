@@ -6,6 +6,7 @@ import top.limbang.doctor.protocol.extension.*
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
+import top.limbang.doctor.protocol.api.ProtocolState
 
 /**
  * ### 握手协议包
@@ -20,7 +21,7 @@ data class HandshakePacket(
     val version: Int,
     val address: String,
     val port: Int,
-    val state: Int
+    val state: ProtocolState
 ) : Packet
 
 /**
@@ -38,7 +39,7 @@ class HandshakeEncoder : PacketEncoder<HandshakePacket> {
         buf.writeVarInt(packet.version)
         buf.writeString(packet.address)
         buf.writeShort(packet.port)
-        buf.writeVarInt(packet.state)
+        buf.writeVarInt(packet.state.id)
         return buf
     }
 
@@ -64,7 +65,7 @@ class HandshakeDecoder : PacketDecoder<HandshakePacket> {
             version = version,
             address = address,
             port = port,
-            state = state
+            state = ProtocolState.fromId(state)
         )
     }
 }
