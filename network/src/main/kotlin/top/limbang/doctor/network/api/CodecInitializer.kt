@@ -12,7 +12,7 @@ interface CodecInitializer {
     fun initChannel(ch: SocketChannel, manager: NetworkManager)
 }
 
-class DummyCodecInitializer : CodecInitializer {
+object DummyCodecInitializer : CodecInitializer {
     override fun initChannel(ch: SocketChannel, manager: NetworkManager) {
     }
 

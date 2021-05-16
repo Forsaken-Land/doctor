@@ -1,7 +1,6 @@
 package top.limbang.doctor.client.listener
 
 import io.netty.util.AttributeKey
-import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.core.api.event.EventEmitter
@@ -18,11 +17,10 @@ class HandshakeListener : EventListener {
         emitter.on(ConnectionEvent.Connected) {
             log.debug("Handshake:${it.context!!.channel().remoteAddress()}")
             val connection = it.context!!.channel().attr(connectionKey).get()
-            runBlocking {
-                connection.sendPacket(
-                    HandshakePacket(0, connection.host, connection.port, 1)
-                )
-            }
+            connection.sendPacket(
+                HandshakePacket(0, connection.host, connection.port, 1)
+            )
+
         }
 
 
