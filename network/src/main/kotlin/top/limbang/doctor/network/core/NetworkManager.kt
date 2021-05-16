@@ -2,6 +2,7 @@ package top.limbang.doctor.network.core
 
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.Channel
+import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
 import io.netty.channel.nio.NioEventLoopGroup
@@ -58,14 +59,19 @@ class NetworkManager(
 
     fun connect(): Future<*> {
         if (this::channel.isInitialized && channel.isActive)
-            return try {
-                bootstrap.connect(host, port)
-            } catch (e: Exception) {
-                this.emit(ConnectionEvent.Error, ConnectionEventArgs(null, error = e))
-                workGroup.shutdownGracefully()
+            return FutureUtils.pass()
+        return bootstrap.connect(host, port)
+            .addListener {
+                if (it.isSuccess) {
+                    channel = (it as ChannelFuture).channel()
+                    val connection: Connection = NetworkConnection(channel, host, port)
+                    channel.attr(Attributes.ATTR_CONNECTION).set(connection)
+                } else {
+                    this.emit(ConnectionEvent.Error, ConnectionEventArgs(error = it.cause()))
+                    workGroup.shutdownGracefully()
+                }
             }
 
-        return FutureUtils.pass()
     }
 
     val connection: Connection get() = channel.attr(Attributes.ATTR_CONNECTION).get()
@@ -87,13 +93,14 @@ class NetworkManager(
             //.option(ChannelOption.SO_KEEPALIVE, true)
             .handler(object : ChannelInitializer<SocketChannel>() {
                 override fun initChannel(ch: SocketChannel) {
-                    channel = ch
-                    codecInitializer.initChannel(ch, this@NetworkManager)
-                    // 客户端事件处理
-                    ch.pipeline().addLast(MANAGER_CHANNEL, ClientHandler(emitter))
-                    pluginManager.invokeHook(InitChannelPipelineHook::class.java, ch)
-                    val connection: Connection = NetworkConnection(channel, host, port)
-                    channel.attr(Attributes.ATTR_CONNECTION).set(connection)
+                    try {
+                        codecInitializer.initChannel(ch, this@NetworkManager)
+                        // 客户端事件处理
+                        ch.pipeline().addLast(MANAGER_CHANNEL, ClientHandler(emitter))
+                        pluginManager.invokeHook(InitChannelPipelineHook::class.java, ch)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             })
     }
@@ -105,7 +112,8 @@ class NetworkManager(
         private var protocolVersion: String = "1.12.2"
         private var emitter: EventEmitter? = null
         private var pluginManager: IPluginManager = DummyPluginManager()
-        private var codecInitializer: CodecInitializer = DummyCodecInitializer()
+        private var codecInitializer: CodecInitializer = DummyCodecInitializer
+        private var protocol: IPacketRegistry? = null
 
         fun host(host: String): Builder {
             this.host = host
@@ -119,6 +127,14 @@ class NetworkManager(
 
         fun protocolVersion(protocolVersion: String): Builder {
             this.protocolVersion = protocolVersion
+            return this
+        }
+
+        /**
+         * 手动指定协议
+         */
+        fun protocol(registry: IPacketRegistry): Builder {
+            this.protocol = registry
             return this
         }
 
@@ -139,15 +155,20 @@ class NetworkManager(
         }
 
         fun build(): NetworkManager {
+            val protocol = this.protocol ?: createProtocol(protocolVersion, pluginManager)
             return NetworkManager(
                 emitter ?: DefaultEventEmitter(),
                 host,
                 port,
-                createProtocol(protocolVersion, pluginManager),
+                protocol,
                 pluginManager
-            )
+            ).also {
+                if (codecInitializer == DummyCodecInitializer) {
+                    codecInitializer(DefaultClientCodecInitializer())
+                }
+                it.preInit(codecInitializer)
+            }
         }
     }
-
 
 }

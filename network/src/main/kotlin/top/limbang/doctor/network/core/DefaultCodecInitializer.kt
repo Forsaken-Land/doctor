@@ -1,6 +1,8 @@
 package top.limbang.doctor.network.core
 
 import io.netty.channel.ChannelDuplexHandler
+import io.netty.channel.ChannelInboundHandler
+import io.netty.channel.ChannelInboundHandlerAdapter
 import io.netty.channel.socket.SocketChannel
 import top.limbang.doctor.network.api.CodecInitializer
 import top.limbang.doctor.network.core.codec.ProtocolPacketDecoder
@@ -17,9 +19,9 @@ class DefaultClientCodecInitializer : CodecInitializer {
 
     override fun initChannel(ch: SocketChannel, manager: NetworkManager) {
         // 协议包处理流程
-        ch.pipeline().addLast("encryptionCoder", ChannelDuplexHandler())
+        ch.pipeline().addLast("encryptionCoder", ChannelInboundHandlerAdapter())
         ch.pipeline().addLast("varIntLengthBasedFrameCoder", VarIntLengthBasedFrameCodec())
-        ch.pipeline().addLast("compressionCoder", ChannelDuplexHandler())
+        ch.pipeline().addLast("compressionCoder", ChannelInboundHandlerAdapter())
         ch.pipeline().addLast(
             "protocolPacketDecoder",
             ProtocolPacketDecoder(manager.protocol, PacketDirection.S2C)
