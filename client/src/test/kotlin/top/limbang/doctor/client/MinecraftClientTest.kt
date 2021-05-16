@@ -6,7 +6,7 @@ class MinecraftClientTest {
 
     @Test
     fun ping() {
-        MinecraftClient().ping("127.0.0.1", 25565)
+        MinecraftClient().ping("mc.blackyin.xyz", 524)
 
     }
 }
