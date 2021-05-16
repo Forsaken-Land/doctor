@@ -1,4 +1,4 @@
-package top.limbang.minecraft.entity.yggdrasil
+package top.limbang.doctor.client.yggdrasil
 
 import kotlinx.serialization.Serializable
 

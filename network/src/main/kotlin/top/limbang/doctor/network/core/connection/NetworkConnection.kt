@@ -6,10 +6,12 @@ import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelOutboundHandlerAdapter
 import io.netty.util.concurrent.Future
 import top.limbang.doctor.core.api.event.EventEmitter
+import top.limbang.doctor.core.api.plugin.IPluginManager
 import top.limbang.doctor.network.api.AbstractConnection
 import top.limbang.doctor.network.core.codec.CompressionCodec
+import top.limbang.doctor.network.hooks.BeforePacketSendHook
+import top.limbang.doctor.network.hooks.BeforePacketSendHookOperation
 import top.limbang.doctor.network.lib.Attributes
-import top.limbang.doctor.network.utils.suspendRun
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.minecraft.netty.handler.EncryptionCodec
@@ -22,6 +24,7 @@ import javax.crypto.SecretKey
  */
 class NetworkConnection(
     private val channel: Channel,
+    private val pluginManager: IPluginManager,
     override val emitter: EventEmitter,
     host: String,
     port: Int,
@@ -53,12 +56,18 @@ class NetworkConnection(
 
     override fun sendPacket(packet: Packet): Future<*> {
         return if (!isClosed()) {
-            channel.writeAndFlush(packet)
+            val hook = BeforePacketSendHookOperation(false, packet)
+            pluginManager.invokeHook(BeforePacketSendHook::class.java, hook, false)
+            if (hook.modified) {
+                channel.writeAndFlush(hook.packet)
+            } else {
+                channel.writeAndFlush(packet)
+            }
         } else throw ChannelException("channel 已关闭.")
 
     }
 
-    override fun close(packet: Packet?): Future<*>  {
+    override fun close(packet: Packet?): Future<*> {
         return if (!isClosed()) {
             if (packet != null && channel.isActive) {
                 channel.writeAndFlush(packet)

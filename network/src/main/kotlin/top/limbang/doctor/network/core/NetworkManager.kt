@@ -64,7 +64,7 @@ class NetworkManager(
             .addListener {
                 if (it.isSuccess) {
                     channel = (it as ChannelFuture).channel()
-                    val connection: Connection = NetworkConnection(channel, this, host, port)
+                    val connection: Connection = NetworkConnection(channel, this.pluginManager, this, host, port)
                     channel.attr(Attributes.ATTR_CONNECTION).set(connection)
                 } else {
                     this.emit(ConnectionEvent.Error, ConnectionEventArgs(error = it.cause()))

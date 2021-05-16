@@ -9,6 +9,7 @@ class MinecraftClientTest {
 }
 
 fun main() {
-    MinecraftClient().start("mc.blackyin.xyz", 524)
+//    MinecraftClient().start("mc.blackyin.xyz", 524)
+    MinecraftClient().start("localhost", 25565)
 }
 
