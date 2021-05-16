@@ -5,6 +5,7 @@ import io.netty.channel.ChannelException
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelOutboundHandlerAdapter
 import io.netty.util.concurrent.Future
+import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.network.api.AbstractConnection
 import top.limbang.doctor.network.core.codec.CompressionCodec
 import top.limbang.doctor.network.lib.Attributes
@@ -21,6 +22,7 @@ import javax.crypto.SecretKey
  */
 class NetworkConnection(
     private val channel: Channel,
+    override val emitter: EventEmitter,
     host: String,
     port: Int,
 ) : AbstractConnection(host, port) {
