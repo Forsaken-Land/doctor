@@ -1,9 +1,11 @@
 package top.limbang.doctor.client
 
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.JsonParser
 import io.netty.util.concurrent.Promise
+import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.old.listener.HandshakeListener
 import top.limbang.doctor.client.utils.newPromise
 import top.limbang.doctor.core.api.event.EventEmitter
@@ -15,7 +17,6 @@ import top.limbang.doctor.network.event.ConnectionEventArgs
 import top.limbang.doctor.network.handler.PacketEvent
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.setProtocolState
-import top.limbang.doctor.plugin.forge.FMLPlugin
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.client.HandshakePacket
 import top.limbang.doctor.protocol.definition.login.server.DisconnectPacket
@@ -25,6 +26,8 @@ import top.limbang.doctor.protocol.entity.ServiceResponse
 import top.limbang.doctor.protocol.version.autoversion.PingProtocol
 import top.limbang.doctor.client.old.listener.LoginServiceListener
 import top.limbang.doctor.client.old.listener.PingServiceListListener
+import top.limbang.doctor.plugin.forge.FML1Plugin
+import top.limbang.doctor.plugin.forge.FML2Plugin
 
 /**
  * ### Minecraft 客户端
@@ -39,11 +42,10 @@ class MinecraftClient() : EventEmitter by DefaultEventEmitter() {
         val pluginManager = PluginManager(this)
         val version = ping(host, port).get()
         val mcversion = autoVersion(version)
-        val modlist = autoForge(version)
-        pluginManager.registerPlugin(FMLPlugin(modlist))
+        val prefix = autoForge(version,pluginManager)
 
         val net = NetworkManager.Builder()
-            .host(host)
+            .host(host + prefix)
             .port(port)
             .pluginManager(pluginManager)
             .protocolVersion(mcversion)
