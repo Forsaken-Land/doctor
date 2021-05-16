@@ -29,6 +29,7 @@ import top.limbang.doctor.network.utils.FutureUtils
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.registry.IPacketRegistry
 import top.limbang.doctor.protocol.version.createProtocol
+import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -64,14 +65,16 @@ class NetworkManager(
             .addListener {
                 if (it.isSuccess) {
                     channel = (it as ChannelFuture).channel()
-                    val connection: Connection = NetworkConnection(channel, host, port)
-                    channel.attr(Attributes.ATTR_CONNECTION).set(connection)
                 } else {
                     this.emit(ConnectionEvent.Error, ConnectionEventArgs(error = it.cause()))
                     workGroup.shutdownGracefully()
                 }
             }
 
+    }
+
+    fun terminationFuture(): Future<*> {
+        return workGroup.terminationFuture()
     }
 
     val connection: Connection get() = channel.attr(Attributes.ATTR_CONNECTION).get()
@@ -97,6 +100,8 @@ class NetworkManager(
                         codecInitializer.initChannel(ch, this@NetworkManager)
                         // 客户端事件处理
                         ch.pipeline().addLast(MANAGER_CHANNEL, ClientHandler(emitter))
+                        val connection: Connection = NetworkConnection(ch, host, port)
+                        ch.attr(Attributes.ATTR_CONNECTION).set(connection)
                         pluginManager.invokeHook(InitChannelPipelineHook::class.java, ch)
                     } catch (e: Exception) {
                         e.printStackTrace()

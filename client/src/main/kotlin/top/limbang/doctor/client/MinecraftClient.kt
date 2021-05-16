@@ -5,6 +5,7 @@ import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.network.core.DefaultClientCodecInitializer
 import top.limbang.doctor.network.core.NetworkManager
+import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.ReadPacketListener
 import top.limbang.doctor.protocol.version.autoversion.PingProtocol
 
@@ -23,12 +24,20 @@ class MinecraftClient() : EventEmitter by DefaultEventEmitter(){
         defaultEventEmitter.addListener(HandshakeListener())
 //        defaultEventEmitter.addListener(ReadPacketListener())
 
+        defaultEventEmitter.on(ConnectionEvent.Connected){
+            print(it.message)
+        }
+
         val networkManager = NetworkManager.Builder()
             .host(host)
             .port(port)
-            .eventEmitter(this)
+            .eventEmitter(defaultEventEmitter)
             .protocol(PingProtocol())
             .build()
-        networkManager.connect().await()
+
+        networkManager.connect()
+        networkManager.terminationFuture().await()
+
+
     }
 }
