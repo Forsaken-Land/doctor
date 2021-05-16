@@ -5,8 +5,8 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.JsonParser
 import io.netty.util.concurrent.Promise
+import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.old.listener.HandshakeListener
-import top.limbang.doctor.client.old.listener.LoginServiceListener
 import top.limbang.doctor.client.utils.newPromise
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
@@ -17,14 +17,17 @@ import top.limbang.doctor.network.event.ConnectionEventArgs
 import top.limbang.doctor.network.handler.PacketEvent
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.setProtocolState
-import top.limbang.doctor.plugin.forge.FML1Plugin
-import top.limbang.doctor.plugin.forge.FML2Plugin
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.client.HandshakePacket
+import top.limbang.doctor.protocol.definition.login.server.DisconnectPacket
 import top.limbang.doctor.protocol.definition.status.client.RequestPacket
 import top.limbang.doctor.protocol.definition.status.server.ResponsePacket
 import top.limbang.doctor.protocol.entity.ServiceResponse
 import top.limbang.doctor.protocol.version.autoversion.PingProtocol
+import top.limbang.doctor.client.old.listener.LoginServiceListener
+import top.limbang.doctor.client.old.listener.PingServiceListListener
+import top.limbang.doctor.plugin.forge.FML1Plugin
+import top.limbang.doctor.plugin.forge.FML2Plugin
 
 /**
  * ### Minecraft 客户端
@@ -35,23 +38,30 @@ class MinecraftClient() : EventEmitter by DefaultEventEmitter() {
         val loginServiceListener = LoginServiceListener("tfgv852@qq.com", "12345678")
             .authServer("https://skin.blackyin.xyz/api/yggdrasil/authserver")
             .sessionServer("https://skin.blackyin.xyz/api/yggdrasil/sessionserver")
+
         val pluginManager = PluginManager(this)
         val version = ping(host, port).get()
         val mcversion = autoVersion(version)
-        val protocolVersion = protocolVersion(version)
-        val fml = autoForge(version, pluginManager)
-
-
+        val prefix = autoForge(version,pluginManager)
 
         val net = NetworkManager.Builder()
-            .host(host)
+            .host(host + prefix)
             .port(port)
             .pluginManager(pluginManager)
             .protocolVersion(mcversion)
             .build()
 
-        net.addListener(loginServiceListener)
-            .addListener(HandshakeListener(protocolVersion, fml))
+        net.addListener(LoginListener("tfgv852@qq.com", "12345678").also {
+            it.authServer = "https://skin.blackyin.xyz/api/yggdrasil/authserver"
+            it.sessionServer = "https://skin.blackyin.xyz/api/yggdrasil/sessionserver"
+            it.loginAuthlib()
+        })
+
+        net.on(PacketEvent(DisconnectPacket::class)) {
+            print(it.reason)
+        }
+
+//        net.addListener(HandshakeListener())
 //            .addListener(loginServiceListener)
 //            .addListener(PingServiceListListener())
         net.connect()

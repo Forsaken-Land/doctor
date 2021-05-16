@@ -47,18 +47,18 @@ class FML1Plugin(
             this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.REGISTER)
         }
 
-        registry.provider(BeforePacketSendHook::class.java).addHook {
-            if (packet is HandshakePacket) {
-                val old = packet as HandshakePacket
-                modified = true
-                packet = HandshakePacket(
-                    old.version,
-                    old.address + "\u0000FML\u0000",
-                    old.port,
-                    old.state
-                )
-            }
-        }
+//        registry.provider(BeforePacketSendHook::class.java).addHook {
+//            if (packet is HandshakePacket) {
+//                val old = packet as HandshakePacket
+//                modified = true
+//                packet = HandshakePacket(
+//                    old.version,
+//                    old.address + "\u0000FML\u0000",
+//                    old.port,
+//                    old.state
+//                )
+//            }
+//        }
     }
 
 }
