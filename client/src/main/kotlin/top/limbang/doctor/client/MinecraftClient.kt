@@ -1,67 +1,90 @@
 package top.limbang.doctor.client
 
-import com.google.gson.Gson
-import com.google.gson.JsonObject
-import com.google.gson.JsonParseException
-import com.google.gson.JsonParser
 import io.netty.util.concurrent.Promise
 import io.reactivex.rxjava3.core.Observable
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.event.LoginSuccessEvent
+import top.limbang.doctor.client.factory.NetworkManagerFactory
 import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
+import top.limbang.doctor.client.utils.AutoUtils
 import top.limbang.doctor.client.utils.newPromise
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.core.plugin.PluginManager
-import top.limbang.doctor.network.core.NetworkManager
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.event.ConnectionEventArgs
 import top.limbang.doctor.network.handler.PacketEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.setProtocolState
-import top.limbang.doctor.plugin.forge.FML1Plugin
-import top.limbang.doctor.plugin.forge.FML2Plugin
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.client.HandshakePacket
 import top.limbang.doctor.protocol.definition.play.client.CKeepAlivePacket
 import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import top.limbang.doctor.protocol.definition.status.client.RequestPacket
 import top.limbang.doctor.protocol.definition.status.server.ResponsePacket
-import top.limbang.doctor.protocol.entity.ServiceResponse
 import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
-import top.limbang.doctor.protocol.version.autoversion.PingProtocol
 import java.util.concurrent.TimeUnit
 
 /**
  * ### Minecraft 客户端
  */
-class MinecraftClient() : EventEmitter by DefaultEventEmitter() {
-    val logger = LoggerFactory.getLogger(this.javaClass)
+class MinecraftClient : EventEmitter by DefaultEventEmitter() {
+    private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
+    private var username: String = ""
+    private var password: String = ""
+    private var name: String = ""
+    private var authServerUrl = "https://authserver.mojang.com/authenticate"
+    private var sessionServerUrl = "https://sessionserver.mojang.com"
+
+    /**
+     * ### 设置在线登录
+     */
+    fun user(username: String, password: String): MinecraftClient {
+        this.username = username
+        this.password = password
+        return this
+    }
+
+    /**
+     * ### 设置离线登录名称
+     */
+    fun name(name: String): MinecraftClient {
+        this.name = name
+        return this
+    }
+
+    /**
+     * ### 设置外置登录 验证地址
+     */
+    fun authServerUrl(url: String): MinecraftClient {
+        this.authServerUrl = url
+        return this
+    }
+
+    /**
+     * ### 设置外置登录 session地址
+     */
+    fun sessionServerUrl(url: String): MinecraftClient {
+        this.sessionServerUrl = url
+        return this
+    }
+
     fun start(host: String, port: Int) {
         val pluginManager = PluginManager(this)
-        val version = ping(host, port).get()
+        val jsonStr = ping(host, port).get()
+        val suffix = AutoUtils.autoForgeVersion(jsonStr, pluginManager)
+        val version = AutoUtils.autoVersion(jsonStr)
 
-        val suffix = autoForge(version, pluginManager)
+        val sessionService = YggdrasilMinecraftSessionService(authServerUrl, sessionServerUrl)
+        val session = sessionService.loginYggdrasilWithPassword(username, password)
 
-        val sessionService = YggdrasilMinecraftSessionService(
-            authServer = "https://skin.blackyin.xyz/api/yggdrasil/authserver",
-            sessionServer = "https://skin.blackyin.xyz/api/yggdrasil/sessionserver"
-        )
-        val session = sessionService.loginYggdrasilWithPassword("tfgv852@qq.com", "12345678")
+        val net = NetworkManagerFactory.createNetworkManager(host + suffix, port, pluginManager, version, this)
 
-        val net = NetworkManager.Builder()
-            .host(host + suffix)
-            .port(port)
-            .pluginManager(pluginManager)
-            .protocolVersion(autoVersion(version))
-            .eventEmitter(this)
-            .build()
-
-
-        net.addListener(LoginListener(session, protocolVersion(version), sessionService))
+        net.addListener(LoginListener(session, AutoUtils.getProtocolVersion(jsonStr), sessionService))
         net.addListener(PlayListener())
 
         net.on(ConnectionEvent.Disconnect) {
@@ -81,66 +104,46 @@ class MinecraftClient() : EventEmitter by DefaultEventEmitter() {
     }
 
     companion object {
-        private fun toJsonObj(jsonStr: String): JsonObject {
-            val json = JsonParser.parseString(jsonStr)
-            if (!json.isJsonObject) {
-                throw JsonParseException("服务器的返回值不是一个json对象")
-            }
-            return json.asJsonObject
-        }
 
-        fun protocolVersion(jsonStr: String): Int {
-            val obj = toJsonObj(jsonStr)
-            return obj.getAsJsonObject("version").getAsJsonPrimitive("protocol").asInt
-        }
-
-        fun autoVersion(jsonStr: String): String {
-            val obj = toJsonObj(jsonStr)
-            //原版
-            return obj.getAsJsonObject("version").getAsJsonPrimitive("name").asString!!
-
-        }
-
-        fun autoForge(jsonStr: String, pluginManager: PluginManager): String {
-            val obj = toJsonObj(jsonStr)
-            val fml1 = obj.getAsJsonObject("modinfo")
-            val fml2 = obj.getAsJsonObject("forgeData")
-            return if (fml1 != null) {
-                val modList = Gson().fromJson(fml1, ServiceResponse.Modinfo::class.java).modList
-                pluginManager.registerPlugin(FML1Plugin(modList))
-                "\u0000FML\u0000"
-            } else if (fml2 != null) {
-                val modList = Gson().fromJson(fml2, ServiceResponse.ForgeData::class.java).mods
-                pluginManager.registerPlugin(FML2Plugin(modList))
-                "\u0000FML2\u0000"
-            } else ""
-        }
-
+        /**
+         * ### Ping 服务器
+         *
+         * ping(host,port).get() 获取服务器 Json字符串
+         */
         fun ping(host: String, port: Int): Promise<String> {
             return newPromise { result ->
-                val net = NetworkManager.Builder()
-                    .host(host)
-                    .port(port)
-                    .protocol(PingProtocol())
-                    .build()
+                val net = NetworkManagerFactory.createNetworkManager(host, port)
 
                 net.once(ConnectionEvent.Connected, this::startPing)
                     .once(PacketEvent(ResponsePacket::class)) {
                         net.shutdown()
                         result.setSuccess(it.json)
                     }
+
                 net.connect()
             }
         }
 
+        /**
+         * ### 开始Ping
+         */
         private fun startPing(arg: ConnectionEventArgs) {
             val connection = arg.context!!.channel().attr(Attributes.ATTR_CONNECTION).get()
-            connection.sendPacket(
-                HandshakePacket(0, connection.host, connection.port, ProtocolState.STATUS)
-            ).await()
-            arg.context!!.setProtocolState(ProtocolState.STATUS)
+            handshake(arg, ProtocolState.STATUS, 0)
             connection.sendPacket(RequestPacket())
         }
+
+        /**
+         * ### 握手
+         */
+        private fun handshake(arg: ConnectionEventArgs, protocolState: ProtocolState, version: Int) {
+            val connection = arg.context!!.channel().attr(Attributes.ATTR_CONNECTION).get()
+            connection.sendPacket(
+                HandshakePacket(version, connection.host, connection.port, protocolState)
+            ).await()
+            arg.context!!.setProtocolState(protocolState)
+        }
+
 
     }
 }

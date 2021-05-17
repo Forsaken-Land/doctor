@@ -1,6 +1,5 @@
 package top.limbang.doctor.client.session
 
-import sun.plugin2.util.SystemUtil.decodeBase64
 import java.security.*
 import java.util.*
 
