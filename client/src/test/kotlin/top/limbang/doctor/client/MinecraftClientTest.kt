@@ -1,5 +1,6 @@
 package top.limbang.doctor.client
 
+import io.reactivex.rxjava3.core.Observable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.network.event.ConnectionEvent
@@ -32,6 +33,12 @@ fun main() {
     }.onPacket<ChatPacket> {
         val chat = ChatGsonSerializer.jsonToChat(packet.json)
         logger.info(chat.getFormattedText())
+    }
+
+    while (true){
+        val msg = readLine()
+        client.sendMessage(msg!!)
+
     }
 }
 

@@ -3,7 +3,7 @@ package top.limbang.doctor.protocol.version.vanilla
 import top.limbang.doctor.core.api.plugin.IPluginManager
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.play.client.*
-import top.limbang.doctor.protocol.definition.play.server.ChatEncoderC
+import top.limbang.doctor.protocol.definition.play.server.CChatEncoder
 import top.limbang.doctor.protocol.hook.PacketRegistryHook
 import top.limbang.doctor.protocol.registry.IPacketRegistry
 import top.limbang.doctor.protocol.registry.PacketRegistryImpl
@@ -34,8 +34,9 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x0B, KeepAliveEncoder())
                 register(0x04, ClientSettingEncoder())
                 register(0x00, TeleportConfirmEncoder())
-                register(0x02, ChatEncoderC())
+                register(0x02, CChatEncoder())
                 register(0x09, CustomPayloadEncoder())
+                register(0x03, ClientStatusEncoder())
             }
         }
         pluginManager.invokeHook(PacketRegistryHook::class.java, this, true)

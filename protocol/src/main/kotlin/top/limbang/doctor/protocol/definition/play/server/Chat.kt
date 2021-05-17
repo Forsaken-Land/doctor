@@ -12,12 +12,12 @@ import top.limbang.doctor.protocol.api.PacketEncoder
  * @since 2021-05-12
  */
 @Serializable
-data class ChatPacketC(
+data class CChatPacket(
     val message: String
 ) : Packet
 
-class ChatEncoderC : PacketEncoder<ChatPacketC> {
-    override fun encode(buf: ByteBuf, packet: ChatPacketC): ByteBuf {
+class CChatEncoder : PacketEncoder<CChatPacket> {
+    override fun encode(buf: ByteBuf, packet: CChatPacket): ByteBuf {
         buf.writeString(packet.message)
         return buf
     }
