@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf
 import top.limbang.doctor.protocol.entity.nbt.NbtBase
 import java.io.IOException
 import java.nio.charset.StandardCharsets
+import java.util.*
 
 /**
  *
@@ -117,5 +118,13 @@ fun ByteBuf.writeString(value: String) {
 
 fun ByteBuf.readNbt(): NbtBase {
     TODO()
+}
+
+fun <T : Enum<T>> ByteBuf.readEnumValue(enumClass: Class<T>): T {
+    return (enumClass.enumConstants as Array<*>)[readVarInt()] as T
+}
+
+fun ByteBuf.readUUID(): UUID {
+    return UUID(readLong(), readLong())
 }
 

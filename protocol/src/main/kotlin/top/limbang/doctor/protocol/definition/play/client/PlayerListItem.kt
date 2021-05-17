@@ -1,11 +1,15 @@
 package top.limbang.doctor.protocol.definition.play.client
 
+import io.netty.buffer.ByteBuf
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
+import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
+import top.limbang.doctor.protocol.extension.readEnumValue
+import top.limbang.doctor.protocol.extension.readString
+import top.limbang.doctor.protocol.extension.readUUID
+import top.limbang.doctor.protocol.extension.readVarInt
 
 /**
  * @author Doctor_Yin
@@ -21,16 +25,49 @@ data class PlayerListItemPacket(
 
 class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
     override fun decoder(buf: ByteBuf): PlayerListItemPacket {
-//        val action = buf.readEnumValue(Action::class.java)
+        val action = buf.readEnumValue(Action::class.java)
 
-        TODO()
-//        val i = buf.readVarInt()
-//        for (j in 0 until i) {
-//
-//            var gameprofile: GameProfile? = null
-//            var k = 0
-//            var gametype: GameType? = null
-//            var itextcomponent: ITextComponent? = null
+        val i = buf.readVarInt()
+        for (j in 0 until i) {
+            when (action) {
+                Action.ADD_PLAYER -> {
+                    println(buf.readUUID())
+                    println(buf.readString(16))
+                    val size = buf.readVarInt()
+                    for (k in 0 until size) {
+                        println(buf.readString() + ":" + buf.readString())
+                        if (buf.readBoolean()) {
+                            println(buf.readString())
+                        }
+                    }
+                    println("game:${buf.readVarInt()}")
+                    println("ping:${buf.readVarInt()}")
+                    if (buf.readBoolean()) {
+                        val chat = ChatGsonSerializer.jsonToChat(buf.readString())
+                        println("nick:${chat.getFormattedText()}")
+                    }
+                }
+                Action.UPDATE_LATENCY -> {
+                    println(buf.readUUID())
+                    println(buf.readVarInt())
+                }
+                Action.REMOVE_PLAYER -> {
+                    println(buf.readUUID())
+                }
+                Action.UPDATE_GAME_MODE -> {
+                    println(buf.readUUID())
+                    println(buf.readVarInt())
+                }
+                Action.UPDATE_DISPLAY_NAME -> {
+                    println(buf.readUUID())
+                    if (buf.readBoolean()) {
+                        val chat = ChatGsonSerializer.jsonToChat(buf.readString())
+                        println(chat.getFormattedText())
+                    }
+                }
+            }
+        }
+        return PlayerListItemPacket(action, buf)
 //
 //            when (action) {
 //                Action.ADD_PLAYER -> {
@@ -86,10 +123,10 @@ class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
 }
 
 @Serializable
-enum class Action {
-    ADD_PLAYER,
-    UPDATE_GAME_MODE,
-    UPDATE_LATENCY,
-    UPDATE_DISPLAY_NAME,
-    REMOVE_PLAYER;
+enum class Action(val id: Int) {
+    ADD_PLAYER(0),
+    UPDATE_GAME_MODE(1),
+    UPDATE_LATENCY(2),
+    UPDATE_DISPLAY_NAME(3),
+    REMOVE_PLAYER(4);
 }
