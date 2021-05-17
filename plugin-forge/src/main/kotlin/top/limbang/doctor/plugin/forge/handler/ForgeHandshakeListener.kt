@@ -10,6 +10,7 @@ import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.definations.fml.*
 import top.limbang.doctor.plugin.forge.event.ForgeStateChange
 import top.limbang.doctor.plugin.forge.event.ForgeStateChangeEventArgs
+import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
 
 /**
  * @author Doctor_Yin
@@ -22,6 +23,9 @@ class ForgeHandshakeListener(
 
     private var channels: List<String> = listOf()
     override fun initListen(emitter: EventEmitter) {
+        emitter.onPacket<DisconnectPacket> {
+            setForgeState(ctx.channel(), ForgeProtocolState.REGISTER) //TODO 不确定
+        }
         emitter.onPacket<RegisterPacket> {
             channels = packet.channels
             registerChannels(channels)
@@ -29,11 +33,15 @@ class ForgeHandshakeListener(
         }
 
         emitter.onPacket<HelloServerPacket> {
+            setForgeState(ctx.channel(), ForgeProtocolState.REGISTER)
             connection.sendPacket(RegisterPacket(channels))
+
+            setForgeState(ctx.channel(), ForgeProtocolState.HELLO)
             connection.sendPacket(HelloClientPacket())
-            connection.sendPacket(ModListPacket(fmlPlugin.modList))
 
             setForgeState(ctx.channel(), ForgeProtocolState.MODLIST)
+            connection.sendPacket(ModListPacket(fmlPlugin.modList))
+
         }
 
         emitter.onPacket<ModListPacket> {
