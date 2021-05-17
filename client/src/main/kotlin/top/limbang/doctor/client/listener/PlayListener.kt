@@ -29,6 +29,10 @@ class PlayListener : EventListener {
             connection.sendPacket(ClientStatusPacket(ClientStatusEnum.PerformRespawn))
         }
 
+        emitter.onPacket<CustomPayloadPacket> {
+            packet.rawData?.release()
+        }
+
     }
 
 }

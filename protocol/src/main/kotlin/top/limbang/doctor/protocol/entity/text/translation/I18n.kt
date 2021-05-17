@@ -11,11 +11,14 @@ import java.util.concurrent.locks.ReentrantLock
 object I18n {
     private val lock = ReentrantLock()
     fun translate(key: String): String {
+
         lock.lock()
         if(!Resources.loaded){
             Resources.loadLocaleData()
+            Resources.loaded = true
         }
         lock.unlock()
+
         return Resources.rawMessage(key)
     }
 
