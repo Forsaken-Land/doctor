@@ -1,6 +1,7 @@
 package top.limbang.doctor.protocol.definition.play.client
 
 import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
@@ -38,7 +39,8 @@ fun CustomPayloadPacket.type(): CustomPayloadType {
 class CustomPayloadDecoder : PacketDecoder<CustomPayloadPacket> {
     override fun decoder(buf: ByteBuf): CustomPayloadPacket {
         val channel = buf.readString()
-        val byteBuf = buf.readBytes(buf.readableBytes())
+        val byteBuf = Unpooled.buffer(buf.readableBytes())
+        buf.readBytes(byteBuf)
         val data = HashMap<String, Any>()
         val type = CustomPayloadType.get(channel)
         if (type != CustomPayloadType.UNKNOWN) {
