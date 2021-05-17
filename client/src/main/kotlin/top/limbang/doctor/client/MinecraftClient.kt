@@ -20,6 +20,7 @@ import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.setProtocolState
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.client.HandshakePacket
+import top.limbang.doctor.protocol.definition.play.server.CChatPacket
 import top.limbang.doctor.protocol.definition.status.client.RequestPacket
 import top.limbang.doctor.protocol.definition.status.server.ResponsePacket
 
@@ -77,7 +78,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         val sessionService = YggdrasilMinecraftSessionService(authServerUrl, sessionServerUrl)
         val session = sessionService.loginYggdrasilWithPassword(username, password)
 
-        val networkManager =
+        networkManager =
             NetworkManagerFactory.createNetworkManager(host + suffix, port, pluginManager, version, this)
 
         networkManager
@@ -94,6 +95,10 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         }
 
         return this
+    }
+
+    fun sendMessage(msg: String) {
+        networkManager.sendPacket(CChatPacket(msg))
     }
 
     companion object {

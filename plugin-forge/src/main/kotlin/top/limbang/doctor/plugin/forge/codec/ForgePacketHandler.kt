@@ -5,8 +5,7 @@ import io.netty.handler.codec.MessageToMessageCodec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.core.api.event.EventEmitter
-import top.limbang.doctor.network.handler.WrappedPacketEvent
-import top.limbang.doctor.network.handler.WrappedPacketEventArgs
+import top.limbang.doctor.network.handler.emitPacketEvent
 import top.limbang.doctor.plugin.forge.api.ChannelPacket
 import top.limbang.doctor.plugin.forge.forgeProtocolState
 import top.limbang.doctor.plugin.forge.registry.IChannelPacketRegistry
@@ -84,10 +83,7 @@ class ForgePacketHandler(
 
                         packet = decoder.decoder(msg.rawData!!)
 //                        emitter.emit(PacketEvent(packet.javaClass.kotlin), packet)
-                        emitter.emit(
-                            WrappedPacketEvent(packet.javaClass.kotlin),
-                            WrappedPacketEventArgs(ctx, packet)
-                        )
+                        emitPacketEvent(emitter, packet, ctx)
                         ctx.fireChannelReadComplete()
                         handled = true
                     } catch (e: Exception) {

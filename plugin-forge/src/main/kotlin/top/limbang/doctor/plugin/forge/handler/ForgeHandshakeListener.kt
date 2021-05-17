@@ -28,7 +28,7 @@ class ForgeHandshakeListener(
         }
         emitter.onPacket<RegisterPacket> {
             channels = packet.channels
-            registerChannels(channels)
+//            registerChannels(channels)
             setForgeState(ctx.channel(), ForgeProtocolState.HELLO)
         }
 

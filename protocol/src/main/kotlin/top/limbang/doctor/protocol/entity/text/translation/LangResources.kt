@@ -14,6 +14,7 @@ import java.util.regex.Pattern
  * @since 2021-05-12
  */
 class LangResources {
+    var loaded: Boolean = false
     private val properties: MutableMap<String, String> = Maps.newHashMap()
     private var unicode = false
 

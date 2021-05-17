@@ -19,19 +19,29 @@ class ReadPacketListener : EventListener {
     override fun initListen(emitter: EventEmitter) {
         emitter.on(ConnectionEvent.Read) {
             if (it.message is Packet) {
-                emitter.emit(PacketEvent(it.message.javaClass.kotlin), it.message)
-                emitter.emit(
-                    WrappedPacketEvent(it.message.javaClass.kotlin),
-                    WrappedPacketEventArgs(it.context!!, it.message)
-                )
+                emitPacketEvent(emitter, it.message, it.context!!)
             }
         }
     }
+
+
 }
 
 interface PacketEventResult<T : Packet> {
     fun reply(packet: Packet)
     fun reply(action: (T) -> Packet)
+}
+
+fun emitPacketEvent(
+    emitter: EventEmitter,
+    message: Packet,
+    ctx: ChannelHandlerContext
+) {
+    emitter.emit(PacketEvent(message.javaClass.kotlin), message)
+    emitter.emit(
+        WrappedPacketEvent(message.javaClass.kotlin),
+        WrappedPacketEventArgs(ctx, message)
+    )
 }
 
 
