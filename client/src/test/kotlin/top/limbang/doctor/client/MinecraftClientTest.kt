@@ -3,6 +3,7 @@ package top.limbang.doctor.client
 import io.reactivex.rxjava3.core.Observable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import top.limbang.doctor.client.utils.ProfileUtils
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.protocol.definition.play.client.ChatPacket
@@ -32,7 +33,9 @@ fun main() {
         client.reconnect()
     }.onPacket<ChatPacket> {
         val chat = ChatGsonSerializer.jsonToChat(packet.json)
-        logger.info(chat.getFormattedText())
+        ProfileUtils.exectueTime("聊天格式化") {
+            logger.info(chat.getFormattedText())
+        }
     }
 
     while (true){

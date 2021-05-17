@@ -82,6 +82,7 @@ class ForgePacketHandler(
                             .decoder<ChannelPacket>(msg.channel)
 
                         packet = decoder.decoder(msg.rawData!!)
+                        msg.rawData?.release()
 //                        emitter.emit(PacketEvent(packet.javaClass.kotlin), packet)
                         emitPacketEvent(emitter, packet, ctx)
                         ctx.fireChannelReadComplete()
