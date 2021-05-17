@@ -29,6 +29,7 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x1A, DisconnectDecoder())
                 register(0x0F, ChatDecoder())
                 register(0x18, CustomPayloadDecoder())
+                register(0x2E, PlayerListItemDecoder())
             }
             whenC2S {
                 register(0x0B, KeepAliveEncoder())
