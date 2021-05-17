@@ -72,33 +72,26 @@ class ForgePacketHandler(
     }
 
     override fun decode(ctx: ChannelHandlerContext, msg: Packet, out: MutableList<Any>) {
-        var handled = false
-        when (msg) {
-            is CustomPayloadPacket -> {
-                if (!msg.processed && channelRegistry.channels.contains(msg.channel)) {
-                    val packet: ChannelPacket
-                    try {
-                        val decoder = channelRegistry.channelPacketMap(PacketDirection.S2C, ctx.forgeProtocolState())
-                            .decoder<ChannelPacket>(msg.channel)
+        if (msg is CustomPayloadPacket) {
+            if (!msg.processed && channelRegistry.channels.contains(msg.channel)) {
+                val packet: ChannelPacket
+                try {
+                    val decoder = channelRegistry.channelPacketMap(PacketDirection.S2C, ctx.forgeProtocolState())
+                        .decoder<ChannelPacket>(msg.channel)
 
-                        packet = decoder.decoder(msg.rawData!!)
+                    packet = decoder.decoder(msg.rawData!!)
                         msg.rawData?.release()
 //                        emitter.emit(PacketEvent(packet.javaClass.kotlin), packet)
-                        emitPacketEvent(emitter, packet, ctx)
-                        ctx.fireChannelReadComplete()
-                        handled = true
-                    } catch (e: Exception) {
-                        logger.warn(e.message)
-                        return
-                    }
-                    logger.debug("协议包解码:channel=${msg.channel} $packet")
+                    emitPacketEvent(emitter, packet, ctx)
+                    ctx.fireChannelReadComplete()
+                } catch (e: Exception) {
+                    logger.warn(e.message)
+                    return
                 }
-            }
-        }
-        //包没有处理，交给下一个codec
-        if (!handled) {
-            ctx.fireChannelRead(msg)
-        }
+                logger.debug("协议包解码:channel=${msg.channel} $packet")
+            }//包没有处理，交给下一个codec
+        } else ctx.fireChannelRead(msg)
+
 
     }
 
