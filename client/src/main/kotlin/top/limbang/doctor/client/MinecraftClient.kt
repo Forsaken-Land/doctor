@@ -5,8 +5,12 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.JsonParser
 import io.netty.util.concurrent.Promise
+import io.reactivex.rxjava3.core.Observable
+import org.slf4j.LoggerFactory
+import top.limbang.doctor.client.event.LoginSuccessEvent
 import top.limbang.doctor.client.listener.LoginListener
-import top.limbang.doctor.client.old.listener.HandshakeListener
+import top.limbang.doctor.client.listener.PlayListener
+import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
 import top.limbang.doctor.client.utils.newPromise
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
@@ -15,55 +19,64 @@ import top.limbang.doctor.network.core.NetworkManager
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.event.ConnectionEventArgs
 import top.limbang.doctor.network.handler.PacketEvent
+import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.setProtocolState
+import top.limbang.doctor.plugin.forge.FML1Plugin
+import top.limbang.doctor.plugin.forge.FML2Plugin
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.client.HandshakePacket
-import top.limbang.doctor.protocol.definition.login.server.DisconnectPacket
+import top.limbang.doctor.protocol.definition.play.client.CKeepAlivePacket
+import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import top.limbang.doctor.protocol.definition.status.client.RequestPacket
 import top.limbang.doctor.protocol.definition.status.server.ResponsePacket
 import top.limbang.doctor.protocol.entity.ServiceResponse
+import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
 import top.limbang.doctor.protocol.version.autoversion.PingProtocol
-import top.limbang.doctor.client.old.listener.LoginServiceListener
-import top.limbang.doctor.client.old.listener.PingServiceListListener
-import top.limbang.doctor.plugin.forge.FML1Plugin
-import top.limbang.doctor.plugin.forge.FML2Plugin
+import java.util.concurrent.TimeUnit
 
 /**
  * ### Minecraft 客户端
  */
 class MinecraftClient() : EventEmitter by DefaultEventEmitter() {
-
+    val logger = LoggerFactory.getLogger(this.javaClass)
     fun start(host: String, port: Int) {
-        val loginServiceListener = LoginServiceListener("tfgv852@qq.com", "12345678")
-            .authServer("https://skin.blackyin.xyz/api/yggdrasil/authserver")
-            .sessionServer("https://skin.blackyin.xyz/api/yggdrasil/sessionserver")
-
         val pluginManager = PluginManager(this)
         val version = ping(host, port).get()
-        val mcversion = autoVersion(version)
-        val prefix = autoForge(version,pluginManager)
+
+        val suffix = autoForge(version, pluginManager)
+
+        val sessionService = YggdrasilMinecraftSessionService(
+            authServer = "https://skin.blackyin.xyz/api/yggdrasil/authserver",
+            sessionServer = "https://skin.blackyin.xyz/api/yggdrasil/sessionserver"
+        )
+        val session = sessionService.loginYggdrasilWithPassword("tfgv852@qq.com", "12345678")
 
         val net = NetworkManager.Builder()
-            .host(host + prefix)
+            .host(host + suffix)
             .port(port)
             .pluginManager(pluginManager)
-            .protocolVersion(mcversion)
+            .protocolVersion(autoVersion(version))
+            .eventEmitter(this)
             .build()
 
-        net.addListener(LoginListener("tfgv852@qq.com", "12345678").also {
-            it.authServer = "https://skin.blackyin.xyz/api/yggdrasil/authserver"
-            it.sessionServer = "https://skin.blackyin.xyz/api/yggdrasil/sessionserver"
-            it.loginAuthlib()
-        })
 
-        net.on(PacketEvent(DisconnectPacket::class)) {
-            print(it.reason)
+        net.addListener(LoginListener(session, protocolVersion(version), sessionService))
+        net.addListener(PlayListener())
+
+        net.on(ConnectionEvent.Disconnect) {
+            Thread.sleep(2000)
+            net.connect()
+        }.onPacket<ChatPacket> {
+            val chat = ChatGsonSerializer.jsonToChat(packet.json)
+            logger.info(chat.getFormattedText())
+        }.on(LoginSuccessEvent) {
+            Observable.timer(5, TimeUnit.SECONDS).subscribe {
+                net.sendPacket(CKeepAlivePacket(System.currentTimeMillis()))
+            }
         }
 
-//        net.addListener(HandshakeListener())
-//            .addListener(loginServiceListener)
-//            .addListener(PingServiceListListener())
+
         net.connect()
     }
 

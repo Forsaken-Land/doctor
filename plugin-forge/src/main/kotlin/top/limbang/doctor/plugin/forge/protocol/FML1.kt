@@ -13,8 +13,11 @@ import top.limbang.doctor.protocol.core.PacketDirection
  * @since 2021-05-15
  */
 class FML1 :
-    ForgeProtocol, IChannelPacketRegistry by ChannelPacketRegistryImpl()
-{
+    ForgeProtocol,
+    IChannelPacketRegistry by
+    ChannelPacketRegistryImpl(
+        listOf("REGISTER", "FML|HS", "FORGE")
+    ) {
 
     init {
         channelPacketMap(PacketDirection.S2C, ForgeProtocolState.REGISTER)
