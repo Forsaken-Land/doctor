@@ -4,6 +4,7 @@ import top.limbang.doctor.core.api.IHookProviderRegistry
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.plugin.Plugin
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
+import top.limbang.doctor.network.handler.ReadPacketListener
 import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.codec.ForgePacketHandler
@@ -33,6 +34,7 @@ class FML1Plugin(
      * 注册插件的事件
      */
     override fun registerEvent(emitter: EventEmitter) {
+        emitter.addListener(ReadPacketListener())
         emitter.addListener(ForgeHandshakeListener(this))
     }
 
