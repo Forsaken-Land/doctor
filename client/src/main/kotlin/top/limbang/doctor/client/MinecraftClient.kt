@@ -1,10 +1,8 @@
 package top.limbang.doctor.client
 
 import io.netty.util.concurrent.Promise
-import io.reactivex.rxjava3.core.Observable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import top.limbang.doctor.client.event.LoginSuccessEvent
 import top.limbang.doctor.client.factory.NetworkManagerFactory
 import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
@@ -14,20 +12,16 @@ import top.limbang.doctor.client.utils.newPromise
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.core.plugin.PluginManager
+import top.limbang.doctor.network.core.NetworkManager
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.event.ConnectionEventArgs
 import top.limbang.doctor.network.handler.PacketEvent
-import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.setProtocolState
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.client.HandshakePacket
-import top.limbang.doctor.protocol.definition.play.client.CKeepAlivePacket
-import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import top.limbang.doctor.protocol.definition.status.client.RequestPacket
 import top.limbang.doctor.protocol.definition.status.server.ResponsePacket
-import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
-import java.util.concurrent.TimeUnit
 
 /**
  * ### Minecraft 客户端
@@ -39,6 +33,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     private var name: String = ""
     private var authServerUrl = "https://authserver.mojang.com/authenticate"
     private var sessionServerUrl = "https://sessionserver.mojang.com"
+    private lateinit var networkManager: NetworkManager
 
     /**
      * ### 设置在线登录
@@ -73,7 +68,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         return this
     }
 
-    fun start(host: String, port: Int) {
+    fun start(host: String, port: Int): MinecraftClient {
         val pluginManager = PluginManager(this)
         val jsonStr = ping(host, port).get()
         val suffix = AutoUtils.autoForgeVersion(jsonStr, pluginManager)
@@ -82,25 +77,23 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         val sessionService = YggdrasilMinecraftSessionService(authServerUrl, sessionServerUrl)
         val session = sessionService.loginYggdrasilWithPassword(username, password)
 
-        val net = NetworkManagerFactory.createNetworkManager(host + suffix, port, pluginManager, version, this)
+        val networkManager =
+            NetworkManagerFactory.createNetworkManager(host + suffix, port, pluginManager, version, this)
 
-        net.addListener(LoginListener(session, AutoUtils.getProtocolVersion(jsonStr), sessionService))
-        net.addListener(PlayListener())
+        networkManager
+            .addListener(LoginListener(session, AutoUtils.getProtocolVersion(jsonStr), sessionService))
+            .addListener(PlayListener())
 
-        net.on(ConnectionEvent.Disconnect) {
-            Thread.sleep(2000)
-            net.connect()
-        }.onPacket<ChatPacket> {
-            val chat = ChatGsonSerializer.jsonToChat(packet.json)
-            logger.info(chat.getFormattedText())
-        }.on(LoginSuccessEvent) {
-            Observable.timer(5, TimeUnit.SECONDS).subscribe {
-                net.sendPacket(CKeepAlivePacket(System.currentTimeMillis()))
-            }
+        networkManager.connect()
+        return this
+    }
+
+    fun reconnect(): MinecraftClient {
+        if (this::networkManager.isInitialized) {
+            networkManager.connect()
         }
 
-
-        net.connect()
+        return this
     }
 
     companion object {
