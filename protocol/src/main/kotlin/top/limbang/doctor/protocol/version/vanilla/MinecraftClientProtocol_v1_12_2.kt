@@ -28,12 +28,14 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x2D, CombatEventDecoder())
                 register(0x1A, DisconnectDecoder())
                 register(0x0F, ChatDecoder())
+                register(0x18, CustomPayloadDecoder())
             }
             whenC2S {
                 register(0x0B, KeepAliveEncoder())
                 register(0x04, ClientSettingEncoder())
                 register(0x00, TeleportConfirmEncoder())
                 register(0x02, ChatEncoderC())
+                register(0x09, CustomPayloadEncoder())
             }
         }
         pluginManager.invokeHook(PacketRegistryHook::class.java, this, true)

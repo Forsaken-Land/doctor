@@ -1,7 +1,6 @@
 package top.limbang.doctor.protocol.definition.play.client
 
 import io.netty.buffer.ByteBuf
-import io.netty.buffer.Unpooled
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
@@ -54,9 +53,9 @@ class CustomPayloadDecoder : PacketDecoder<CustomPayloadPacket> {
 class CustomPayloadEncoder : PacketEncoder<CustomPayloadPacket> {
     override fun encode(buf: ByteBuf, packet: CustomPayloadPacket): ByteBuf {
         buf.writeString(packet.channel)
-        val data = Unpooled.buffer()
-        CustomPayloadType.get(packet.channel).writePacket(data, packet.data)
-        buf.writeBytes(data)
+//        val data = Unpooled.buffer()
+//        CustomPayloadType.get(packet.channel).writePacket(data, packet.data)
+        buf.writeBytes(packet.rawData)
         return buf
     }
 }

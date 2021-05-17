@@ -33,5 +33,14 @@ class FML1 :
         channelPacketMap(PacketDirection.S2C, ForgeProtocolState.HANDSHAKE)
             .register("FORGE", ForgeChannelDecoder())
 
+        channelPacketMap(PacketDirection.C2S, ForgeProtocolState.REGISTER)
+            .register("REGISTER", RegisterEncoder())
+        channelPacketMap(PacketDirection.C2S, ForgeProtocolState.HELLO)
+            .register("FML|HS", HelloClientEncoder())
+        channelPacketMap(PacketDirection.C2S, ForgeProtocolState.MODLIST)
+            .register("FML|HS", ModListEncoder())
+        channelPacketMap(PacketDirection.C2S, ForgeProtocolState.HANDSHAKE)
+            .register("FML|HS", HandshakeAckEncoder())
+
     }
 }
