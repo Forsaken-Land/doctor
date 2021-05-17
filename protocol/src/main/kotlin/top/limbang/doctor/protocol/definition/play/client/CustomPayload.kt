@@ -23,7 +23,18 @@ data class CustomPayloadPacket(
     @Contextual
     val rawData: ByteBuf? = null,
     val processed: Boolean = false
-) : Packet
+) : Packet {
+    constructor(
+        type: CustomPayloadType,
+        data: Map<String, Any>
+    ) : this(type.channelName, data, processed = true) {
+
+    }
+}
+
+fun CustomPayloadPacket.type(): CustomPayloadType {
+    return CustomPayloadType.get(this.channel)
+}
 
 class CustomPayloadDecoder : PacketDecoder<CustomPayloadPacket> {
     override fun decoder(buf: ByteBuf): CustomPayloadPacket {

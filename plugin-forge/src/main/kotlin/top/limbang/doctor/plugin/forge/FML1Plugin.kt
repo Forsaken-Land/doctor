@@ -23,6 +23,7 @@ class FML1Plugin(
 ) : Plugin,
     EventEmitter by DefaultEventEmitter() {
 
+    val channelPacketRegistry = FML1()
 
     override fun created() {
     }
@@ -41,7 +42,7 @@ class FML1Plugin(
         registry.provider(InitChannelPipelineHook::class.java).addHook {
             this.pipeline().addBefore(
                 "clientHandler", "fml1:clientHandler",
-                ForgePacketHandler(this@FML1Plugin, FML1()) //TODO: 这个handler逻辑或许得改
+                ForgePacketHandler(this@FML1Plugin, channelPacketRegistry) //TODO: 这个handler逻辑或许得改
             )
 
             this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.REGISTER)

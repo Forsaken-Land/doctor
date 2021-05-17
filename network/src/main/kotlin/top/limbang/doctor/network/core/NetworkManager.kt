@@ -22,6 +22,7 @@ import top.limbang.doctor.network.core.connection.ClientHandler
 import top.limbang.doctor.network.core.connection.NetworkConnection
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.event.ConnectionEventArgs
+import top.limbang.doctor.network.event.NetLifeCycleEvent
 import top.limbang.doctor.network.handler.ReadPacketListener
 import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.network.lib.Attributes
@@ -58,6 +59,7 @@ class NetworkManager(
     private lateinit var channel: Channel
 
     fun connect(): Future<*> {
+        this.emit(NetLifeCycleEvent.BeforeConnect, this)
         if (this::channel.isInitialized && channel.isActive)
             return FutureUtils.pass()
         return bootstrap.connect(host, port)
@@ -82,6 +84,7 @@ class NetworkManager(
     val connection: Connection get() = channel.attr(Attributes.ATTR_CONNECTION).get()
 
     fun shutdown(): Future<*> {
+        this.emit(NetLifeCycleEvent.BeforeShutdown, this)
         if (workGroup.isShutdown) return FutureUtils.pass()
         return workGroup.shutdownGracefully()
     }

@@ -24,8 +24,7 @@ class ForgePacketHandler(
         var handled = false
         when (msg) {
             is CustomPayloadPacket -> {
-                if (!msg.processed) {
-
+                if (!msg.processed && channelRegistry.channels.contains(msg.channel)) {
                     try {
                         val decoder = channelRegistry.channelPacketMap(PacketDirection.C2S, ctx.forgeProtocolState())
                             .decoder<ChannelPacket>(msg.channel)

@@ -19,7 +19,8 @@ import java.nio.charset.StandardCharsets
 
 
 @Serializable
-data class HttpResponse (val code:Int,val content:String)
+data class HttpResponse(val code: Int, val content: String)
+
 /**
  * http 客户端
  *
@@ -83,6 +84,16 @@ class HttpClient {
     fun close() {
         // 释放线程组
         group.shutdownGracefully()
+    }
+
+    companion object {
+        fun postJson(url: String, body: String): HttpResponse {
+            return HttpClient().let {
+                val result = it.postJson(url, body)
+                it.close()
+                result
+            }
+        }
     }
 }
 

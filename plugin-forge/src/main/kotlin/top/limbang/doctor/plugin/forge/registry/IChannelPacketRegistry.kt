@@ -22,6 +22,7 @@ interface IChannelPacketRegistry : GroupRegistrable<IChannelPacketRegistry> {
     fun channelPacketMap(state: ForgeProtocolState, action: DirectionActionChannel.() -> Unit) =
         DirectionActionChannel(this, state).run(action)
 
+    var channels: List<String>
 }
 
 

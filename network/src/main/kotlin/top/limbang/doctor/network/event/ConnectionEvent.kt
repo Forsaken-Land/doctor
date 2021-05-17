@@ -3,6 +3,7 @@ package top.limbang.doctor.network.event
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import top.limbang.doctor.core.api.event.Event
+import top.limbang.doctor.network.core.NetworkManager
 import top.limbang.doctor.protocol.api.ProtocolState
 
 /**
@@ -23,6 +24,11 @@ data class ConnectionEventArgs(
     val message: Any? = null,
     val error: Throwable? = null
 )
+
+enum class NetLifeCycleEvent: Event<NetworkManager> {
+    BeforeConnect,
+    BeforeShutdown
+}
 
 
 object ProtocolStateChange : Event<ProtocolStateChangeEventArgs>

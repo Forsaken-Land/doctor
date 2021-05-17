@@ -37,14 +37,14 @@ class FML2Plugin(
     }
 
     override fun hookProvider(registry: IHookProviderRegistry) {
-        registry.provider(InitChannelPipelineHook::class.java).addHook {
-            this.pipeline().addBefore(
-                "clientHandler", "fml2:clientHandler",
-                ForgePacketHandler(this@FML2Plugin, FML2()) //TODO: 这个handler逻辑或许得改
-            )
-
-            this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.REGISTER)
-        }
+//        registry.provider(InitChannelPipelineHook::class.java).addHook {
+//            this.pipeline().addBefore(
+//                "clientHandler", "fml2:clientHandler",
+//                ForgePacketHandler(this@FML2Plugin, FML2()) //TODO: 这个handler逻辑或许得改
+//            )
+//
+//            this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.REGISTER)
+//        }
 
     }
 

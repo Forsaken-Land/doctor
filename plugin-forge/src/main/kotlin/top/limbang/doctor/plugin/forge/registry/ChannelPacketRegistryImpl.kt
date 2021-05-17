@@ -11,7 +11,7 @@ import java.util.*
  * @author WarmthDawn
  * @since 2021-05-14
  */
-class ChannelPacketRegistryImpl : IChannelPacketRegistry {
+class ChannelPacketRegistryImpl(override var channels: List<String>) : IChannelPacketRegistry {
 
     private val channelMap: MutableMap<PacketDirection, MutableMap<ForgeProtocolState, IChannelPacketMap>> =
         EnumMap(PacketDirection::class.java)
