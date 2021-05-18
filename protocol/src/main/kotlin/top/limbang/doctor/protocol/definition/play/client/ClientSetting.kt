@@ -6,28 +6,25 @@ import top.limbang.doctor.protocol.extension.*
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketEncoder
 
-enum class MainHandEnum(val id: Int) {
-    Left(0),
-    Right(1);
-}
-
+/**
+ * ### 客户端配置
+ *
+ * - [lang] 语言
+ * - [viewDistance] 可视距离
+ * - [chatMode]
+ * - [chatColors]
+ * - [displayedSkinParts]
+ * - [mainHand]
+ */
 @Serializable
 data class ClientSettingPacket(
-    val lang: String,
-    val viewDistance: Byte,
-    val chatMode: Int,
-    val chatColors: Boolean,
+    val lang: String = "zh_cn",
+    val viewDistance: Byte = 8,
+    val chatMode: Int = 0,
+    val chatColors: Boolean = true,
     val displayedSkinParts: Int = displayedSkinParts(),
-    val mainHand: Int
+    val mainHand: Int = 1
 ) : Packet {
-    constructor() : this(
-        "zh_cn",
-        8,
-        0,
-        true,
-        displayedSkinParts(),
-        1
-    )
 
     companion object {
         private fun displayedSkinParts(): Int {
@@ -40,15 +37,11 @@ data class ClientSettingPacket(
 
     }
 
-    constructor(
-        lang: String,
-        viewDistance: Byte,
-        chatMode: Int,
-        chatColors: Boolean,
-        displayedSkinParts: Int,
-        mainHand: MainHandEnum
-    ) : this(lang, viewDistance, chatMode, chatColors, displayedSkinParts, mainHand.id)
+}
 
+enum class MainHandEnum(val id: Int) {
+    Left(0),
+    Right(1);
 }
 
 class ClientSettingEncoder : PacketEncoder<ClientSettingPacket> {

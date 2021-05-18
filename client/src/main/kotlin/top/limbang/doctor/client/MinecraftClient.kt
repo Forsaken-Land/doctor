@@ -69,6 +69,9 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         return this
     }
 
+    /**
+     * ### 启动客户端
+     */
     fun start(host: String, port: Int): MinecraftClient {
         val pluginManager = PluginManager(this)
         val jsonStr = ping(host, port).get()
@@ -89,6 +92,9 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         return this
     }
 
+    /**
+     * ### 重新连接
+     */
     fun reconnect(): MinecraftClient {
         if (this::networkManager.isInitialized) {
             networkManager.connect()
@@ -97,6 +103,9 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         return this
     }
 
+    /**
+     * ### 发送消息
+     */
     fun sendMessage(msg: String) {
         networkManager.sendPacket(CChatPacket(msg))
     }
