@@ -13,13 +13,19 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 
-private val logger: Logger = LoggerFactory.getLogger("MAIN")
-fun main() {
 
+fun main() {
+    val logger: Logger = LoggerFactory.getLogger("main")
     val pros = Properties()
     val file = FileInputStream("local.properties")
     pros.load(file)
 
+    // 离线登陆测试
+//    val host = "localhost"
+//    val port = 25565
+//    val name = pros["name"] as String
+
+    // 外置正版登陆测试
     val host = pros["host"] as String
     val port = (pros["port"] as String).toInt()
     val username = pros["username"] as String
@@ -30,6 +36,7 @@ fun main() {
     var playerUpdateTime = LocalDateTime.now()
 
     val client = MinecraftClient()
+        //.name(name)
         .user(username, password)
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)

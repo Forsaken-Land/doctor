@@ -10,9 +10,7 @@ import top.limbang.doctor.network.core.HttpClient
 import top.limbang.minecraft.entity.yggdrasil.YggdrasilError
 
 /**
- *
- * @author WarmthDawn
- * @since 2021-05-17
+ * ### 会话
  */
 class Session(
     val profile: GameProfile,
@@ -20,6 +18,9 @@ class Session(
     val clientToken: String,
 )
 
+/**
+ * ### 提取会话
+ */
 fun AuthenticateResponse.toSession(): Session {
     return Session(
         this.selectedProfile,
@@ -28,10 +29,14 @@ fun AuthenticateResponse.toSession(): Session {
     )
 }
 
-
+/**
+ * ### Yggdrasil SessionService
+ * @param authServer 验证服务器Url
+ * @param sessionServer 会话服务器Url
+ */
 open class YggdrasilMinecraftSessionService(
-    val authServer: String = "https://authserver.mojang.com/authenticate",
-    val sessionServer: String = "https://sessionserver.mojang.com"
+    private val authServer: String = "https://authserver.mojang.com/authenticate",
+    private val sessionServer: String = "https://sessionserver.mojang.com"
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -39,10 +44,21 @@ open class YggdrasilMinecraftSessionService(
 
     private val json = Json { ignoreUnknownKeys = true }
 
+    /**
+     * ### 进入服务器
+     * @param session 会话
+     * @param serverHash 服务器哈希
+     */
     fun joinServer(session: Session, serverHash: String) {
         joinServer(session.profile, session.accessToken, serverHash)
     }
 
+    /**
+     * ### 进入服务器
+     * @param profile
+     * @param accessToken 访问令牌
+     * @param serverHash 服务器哈希
+     */
     fun joinServer(profile: GameProfile, accessToken: String, serverHash: String) {
         val joinRequest =
             JoinRequest(accessToken, profile.id!!, serverHash)
@@ -53,6 +69,12 @@ open class YggdrasilMinecraftSessionService(
         }
     }
 
+    /**
+     * ### 登陆服务器
+     * @param username 用户名
+     * @param password 密码
+     * @return [Session]
+     */
     fun loginYggdrasilWithPassword(username: String, password: String): Session {
         val authServer = "$authServer/authenticate"
         val body = json.encodeToString(AuthenticateRequest(username, password))
@@ -65,6 +87,10 @@ open class YggdrasilMinecraftSessionService(
 
     }
 
+    /**
+     * ### 验证 yggdrasil 会话
+     * @param session 会话
+     */
     fun validateYggdrasilSession(session: Session): Session {
         val client = HttpClient()
         if (client.postJson(

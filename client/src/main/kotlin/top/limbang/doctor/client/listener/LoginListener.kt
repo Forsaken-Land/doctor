@@ -13,9 +13,7 @@ import top.limbang.doctor.network.api.Connection
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.event.NetLifeCycleEvent
 import top.limbang.doctor.network.handler.onPacket
-import top.limbang.doctor.network.handler.onPacketWrapped
 import top.limbang.doctor.network.handler.oncePacket
-import top.limbang.doctor.network.handler.oncePacketWrapped
 import top.limbang.doctor.network.utils.connection
 import top.limbang.doctor.network.utils.setProtocolState
 import top.limbang.doctor.protocol.api.ProtocolState
@@ -28,16 +26,18 @@ import top.limbang.doctor.protocol.definition.login.server.LoginSuccessPacket
 import top.limbang.doctor.protocol.definition.login.server.SetCompressionPacket
 
 /**
+ * ### 登陆监听器
  *
- * @author WarmthDawn
- * @since 2021-05-16
+ * - [name] 离线登陆名称
+ * - [session] 会话
+ * - [protocolVersion] 协议版本
+ * - [sessionService] 会话服务
  */
-
-
 class LoginListener(
-    var session: Session,
-    val protocolVersion: Int = 340,
-    val sessionService: YggdrasilMinecraftSessionService = YggdrasilMinecraftSessionService.Default
+    private val name: String = "",
+    var session: Session? = null,
+    private val protocolVersion: Int = 340,
+    private val sessionService: YggdrasilMinecraftSessionService = YggdrasilMinecraftSessionService.Default
 ) : EventListener {
     lateinit var emitter: EventEmitter
     private val logger: Logger = LoggerFactory.getLogger(LoginListener::class.java)
@@ -48,16 +48,32 @@ class LoginListener(
 
         //启动前：验证用户
         emitter.on(NetLifeCycleEvent.BeforeConnect) {
-            session = sessionService.validateYggdrasilSession(session)
+            if (session != null)
+                session = sessionService.validateYggdrasilSession(session!!)
         }
 
         //连接开始
         emitter.on(ConnectionEvent.Connected) { (ctx) ->
             ctx!!
             val connection = ctx.connection()
-            connection.sendPacket(HandshakePacket(protocolVersion, connection.host, connection.port, ProtocolState.LOGIN))
+            connection.sendPacket(
+                HandshakePacket(
+                    protocolVersion,
+                    connection.host,
+                    connection.port,
+                    ProtocolState.LOGIN
+                )
+            )
             ctx.setProtocolState(ProtocolState.LOGIN)
-            connection.sendPacket(LoginStartPacket(session.profile.name))
+
+            connection.sendPacket(
+                if (session == null) {
+                    LoginStartPacket(name)
+                } else {
+                    LoginStartPacket(session!!.profile.name)
+                }
+            )
+
             //监听登录事件
             emitter.oncePacket<LoginSuccessPacket> {
                 ctx.setProtocolState(ProtocolState.PLAY)
@@ -84,7 +100,8 @@ class LoginListener(
         val verify = SecurityUtils.encryptRSA(publicKey, packet.verifyToken)
         val serverHash = SecurityUtils.generateAuthHash(packet.serverID, sharedSecret, publicKey)
 
-        sessionService.joinServer(session, serverHash)
+        if (session != null)
+            sessionService.joinServer(session!!, serverHash)
 
         connection.sendPacket(EncryptionResponsePacket(secret, verify))
         connection.setEncryptionEnabled(sharedSecret)

@@ -78,14 +78,20 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         val suffix = AutoUtils.autoForgeVersion(jsonStr, pluginManager)
         val version = AutoUtils.autoVersion(jsonStr)
 
-        val sessionService = YggdrasilMinecraftSessionService(authServerUrl, sessionServerUrl)
-        val session = sessionService.loginYggdrasilWithPassword(username, password)
+        // 判断是否设置了名称,有就代码离线登陆
+        val loginListener: LoginListener = if (name.isEmpty()) {
+            val sessionService = YggdrasilMinecraftSessionService(authServerUrl, sessionServerUrl)
+            val session = sessionService.loginYggdrasilWithPassword(username, password)
+            LoginListener(name, session, AutoUtils.getProtocolVersion(jsonStr), sessionService)
+        } else {
+            LoginListener(name = name, protocolVersion = AutoUtils.getProtocolVersion(jsonStr))
+        }
 
         networkManager =
             NetworkManagerFactory.createNetworkManager(host + suffix, port, pluginManager, version, this)
 
         networkManager
-            .addListener(LoginListener(session, AutoUtils.getProtocolVersion(jsonStr), sessionService))
+            .addListener(loginListener)
             .addListener(PlayListener())
 
         networkManager.connect()
