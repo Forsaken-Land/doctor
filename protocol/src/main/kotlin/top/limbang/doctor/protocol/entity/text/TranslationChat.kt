@@ -14,7 +14,7 @@ import java.util.regex.Pattern
  */
 class TranslationChat(
     val key: String,
-    private var formatArgs: Array<Any> = emptyArray()
+    val formatArgs: Array<Any> = emptyArray()
 ) : AbstractChat() {
     init {
         this.formatArgs.forEach {

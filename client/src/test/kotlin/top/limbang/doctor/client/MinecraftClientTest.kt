@@ -2,7 +2,7 @@ package top.limbang.doctor.client
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import top.limbang.doctor.client.utils.ProfileUtils
+import top.limbang.doctor.client.running.TpsUtils
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.protocol.definition.play.client.ChatPacket
@@ -43,10 +43,21 @@ fun main() {
 //        }
     }
 
-    while (true){
+    val tps = TpsUtils(client)
+
+    while (true) {
         val msg = readLine()
-        client.sendMessage(msg!!)
+        if (msg == "tps") {
+            try {
+                val result = tps.getTps()
+                logger.info(result.toString())
+            } catch (e: Exception) {
+            }
+        } else {
+            client.sendMessage(msg!!)
+        }
 
     }
 }
+
 
