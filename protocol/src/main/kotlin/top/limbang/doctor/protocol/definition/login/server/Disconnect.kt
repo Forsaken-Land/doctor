@@ -1,14 +1,15 @@
 package top.limbang.doctor.protocol.definition.login.server
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
+import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
+import top.limbang.doctor.protocol.extension.readString
+import top.limbang.doctor.protocol.extension.writeString
 
 /**
- * ### 登录时断开连接
+ * ### 断开连接
  *
  * [reason] 断开连接的原因
  */
