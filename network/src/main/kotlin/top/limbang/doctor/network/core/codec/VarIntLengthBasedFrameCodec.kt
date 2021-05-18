@@ -3,6 +3,7 @@ package top.limbang.doctor.network.core.codec
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.ByteToMessageCodec
+import kotlinx.io.errors.IOException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.protocol.extension.readVarInt
@@ -25,7 +26,14 @@ class VarIntLengthBasedFrameCodec : ByteToMessageCodec<ByteBuf>() {
         if (!msg.isReadable) {
             return
         }
-        val remainingPacketLength: Int = msg.readVarInt()
+        val remainingPacketLength: Int
+        try {
+            remainingPacketLength = msg.readVarInt()
+        }catch (e : IOException){
+            // 如果出现异常说明数据还没接收完,重新定位到之前标记的读取索引,等待后面的数据
+            msg.resetReaderIndex()
+            return
+        }
         // 判断可读字节是否小于要读数据包长度
         if (msg.readableBytes() < remainingPacketLength) {
             // 如果小于说明数据还没接收完,重新定位到之前标记的读取索引,等待后面的数据

@@ -16,7 +16,11 @@ import top.limbang.doctor.protocol.extension.readVarInt
 import top.limbang.doctor.protocol.extension.writeVarInt
 import top.limbang.doctor.protocol.registry.IPacketRegistry
 
-
+/**
+ * ### 协议包编解码
+ *
+ * - [protocol]协议版本
+ */
 class ProtocolPacketCodec(
     private val protocol: IPacketRegistry,
     private val encodeDirection: PacketDirection,
@@ -49,7 +53,7 @@ class ProtocolPacketCodec(
             // 查询协议包解码
             packetDecoder = packetMap.decoder(packetId)
         } catch (e: ProtocolException) {
-            logger.debug(e.message)
+            logger.trace(e.message)
             return
         }
         // 解码数据交给下一步处理
@@ -64,11 +68,7 @@ class ProtocolPacketCodec(
     }
 }
 
-/**
- * ### 协议包编解码
- *
- * - [protocol]协议版本
- */
+
 //class ProtocolPacketEncoder(
 //    private val protocol: IPacketRegistry,
 //    private val direction: PacketDirection
