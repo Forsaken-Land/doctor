@@ -7,24 +7,29 @@ import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
+import java.io.FileInputStream
+import java.util.*
 
 
 private val logger: Logger = LoggerFactory.getLogger("MAIN")
 fun main() {
 //    val host = "localhost"
 //    val port = 25565
-    val host = "mc.blackyin.xyz"
-    val port = 524
+    val pros = Properties()
+    val file = FileInputStream("local.properties")
+    pros.load(file)
 
-//    val pingJson = MinecraftClient.ping(host, port).get()
-//    println(AutoUtils.autoVersion(pingJson))
-//    println(AutoUtils.autoForgeVersion(pingJson))
-
+    val host = pros["host"] as String
+    val port = (pros["port"] as String).toInt()
+    val username = pros["username"] as String
+    val password = pros["password"] as String
+    val authServerUrl = pros["authServerUrl"] as String
+    val sessionServerUrl = pros["sessionServerUrl"] as String
 
     val client = MinecraftClient()
-        .user("tfgv852@qq.com", "12345678")
-        .authServerUrl("https://skin.blackyin.xyz/api/yggdrasil/authserver")
-        .sessionServerUrl("https://skin.blackyin.xyz/api/yggdrasil/sessionserver")
+        .user(username, password)
+        .authServerUrl(authServerUrl)
+        .sessionServerUrl(sessionServerUrl)
         .start(host, port)
 
     client.on(ConnectionEvent.Disconnect) {
