@@ -37,9 +37,10 @@ fun main() {
         client.reconnect()
     }.onPacket<ChatPacket> {
         val chat = ChatGsonSerializer.jsonToChat(packet.json)
-        ProfileUtils.exectueTime("聊天格式化") {
-            logger.info(chat.getFormattedText())
-        }
+        logger.info(chat.getFormattedText())
+//        ProfileUtils.exectueTime("聊天格式化") {
+//            logger.info(chat.getFormattedText())
+//        }
     }
 
     while (true){
