@@ -17,7 +17,7 @@ class PlayListener : EventListener {
         emitter.replyPacket<SKeepAlivePacket> { CKeepAlivePacket(it.keepAliveId) }
         // 监听战斗事件
         emitter.replyPacket<CombatEventPacket> {
-            when(it.event){
+            when (it.event) {
                 // 事件等于实体死亡,就执行重生
                 CombatEvent.ENTITY_DEAD -> ClientStatusPacket(ClientStatusEnum.PerformRespawn)
                 else -> null
