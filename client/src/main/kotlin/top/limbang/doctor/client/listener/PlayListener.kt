@@ -7,20 +7,20 @@ import top.limbang.doctor.network.handler.replyPacket
 import top.limbang.doctor.protocol.definition.play.client.*
 
 /**
- *
- * @author WarmthDawn
- * @since 2021-05-17
+ * ### 游戏状态监听器
  */
 class PlayListener : EventListener {
     override fun initListen(emitter: EventEmitter) {
+        // 监听加入游戏包并回复
         emitter.replyPacket<JoinGamePacket>(ClientSettingPacket())
+        // 监听心跳数据包并回复
         emitter.replyPacket<SKeepAlivePacket> { CKeepAlivePacket(it.keepAliveId) }
-
+        // 监听战斗事件
         emitter.replyPacket<CombatEventPacket> {
-            if (it.event == 2) {
-                ClientStatusPacket(ClientStatusEnum.PerformRespawn)
-            } else {
-                null
+            when(it.event){
+                // 事件等于实体死亡,就执行重生
+                CombatEvent.ENTITY_DEAD -> ClientStatusPacket(ClientStatusEnum.PerformRespawn)
+                else -> null
             }
         }
 
