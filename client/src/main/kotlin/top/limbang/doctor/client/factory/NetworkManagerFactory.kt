@@ -8,9 +8,7 @@ import top.limbang.doctor.protocol.version.autoversion.PingProtocol
 /**
  * ### 网络管理工厂
  */
-class NetworkManagerFactory {
-
-    companion object {
+object NetworkManagerFactory {
         /**
          * ### 创建 Ping [NetworkManager]
          */
@@ -40,5 +38,4 @@ class NetworkManagerFactory {
                 .eventEmitter(eventEmitter)
                 .build()
         }
-    }
 }

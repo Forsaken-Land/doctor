@@ -11,9 +11,7 @@ import top.limbang.doctor.protocol.api.Packet
 import kotlin.reflect.KClass
 
 /**
- *
- * @author WarmthDawn
- * @since 2021-05-13
+ * ### 读取数据包监听器
  */
 class ReadPacketListener : EventListener {
     override fun initListen(emitter: EventEmitter) {
@@ -23,15 +21,19 @@ class ReadPacketListener : EventListener {
             }
         }
     }
-
-
 }
 
+/**
+ * ### 数据包事件结果
+ */
 interface PacketEventResult<T : Packet> {
     fun reply(packet: Packet)
     fun reply(action: (T) -> Packet)
 }
 
+/**
+ * ### 发出数据包事件
+ */
 fun emitPacketEvent(
     emitter: EventEmitter,
     message: Packet,
@@ -44,7 +46,9 @@ fun emitPacketEvent(
     )
 }
 
-
+/**
+ * ### 监听指定数据包事件并处理
+ */
 inline fun <reified T : Packet> EventEmitter.onPacket(crossinline handler: WrappedPacketEventArgs<T>.() -> Unit): EventEmitter {
     return this.on(WrappedPacketEvent(T::class)) {
         handler(it)
@@ -64,6 +68,9 @@ inline fun <reified T : Packet> EventEmitter.replyPacket(crossinline reply: (T) 
     return this
 }
 
+/**
+ * ### 监听指定数据包并回复一次数据包
+ */
 inline fun <reified T : Packet> EventEmitter.replyPacketOnce(crossinline reply: (T) -> Packet?): EventEmitter {
     return this.once(WrappedPacketEvent(T::class)) {
         val rep = reply(it.packet)
@@ -73,6 +80,9 @@ inline fun <reified T : Packet> EventEmitter.replyPacketOnce(crossinline reply: 
     }
 }
 
+/**
+ * ### 监听指定数据包并回复数据包
+ */
 inline fun <reified T : Packet> EventEmitter.replyPacket(vararg reply: Packet): EventEmitter {
     return this.on(WrappedPacketEvent(T::class)) { event ->
         reply.forEach {
@@ -81,6 +91,9 @@ inline fun <reified T : Packet> EventEmitter.replyPacket(vararg reply: Packet): 
     }
 }
 
+/**
+ * ### 监听指定数据包并回复一次数据包
+ */
 inline fun <reified T : Packet> EventEmitter.replyPacketOnce(vararg reply: Packet): EventEmitter {
     return this.once(WrappedPacketEvent(T::class)) { event ->
         reply.forEach {

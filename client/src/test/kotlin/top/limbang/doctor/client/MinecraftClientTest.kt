@@ -11,8 +11,8 @@ import java.io.FileInputStream
 import java.util.*
 
 
-private val logger: Logger = LoggerFactory.getLogger("MAIN")
 fun main() {
+    val logger: Logger = LoggerFactory.getLogger("main")
 //    val host = "localhost"
 //    val port = 25565
     val pros = Properties()

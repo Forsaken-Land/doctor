@@ -6,9 +6,6 @@ import top.limbang.doctor.protocol.api.ProtocolState
 import java.util.*
 
 /**
- *
- * @author WarmthDawn
- * @since 2021-05-16
+ * ### 登陆成功事件
  */
-
 object LoginSuccessEvent : Event<GameProfile>
