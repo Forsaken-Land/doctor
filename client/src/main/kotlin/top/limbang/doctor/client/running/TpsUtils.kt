@@ -12,25 +12,30 @@ import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import java.util.concurrent.TimeUnit
 
 /**
- *
+ * 解析tps工具（基于 forge tps 命令)
  * @author WarmthDawn
  * @since 2021-05-18
  */
 class TpsUtils(
     val client: MinecraftClient
 ) {
+    //观察流（基于ChatPacket事件）
     private val tpsObservable = client.asObservable(PacketEvent(ChatPacket::class))
         .filter {
+            //过滤Tps消息
             it.json.contains("commands.forge.tps.summary")
         }.map { (json) ->
+            //吧tps消息的json解析
             parseTpsEntity(json)
         }.takeUntil {
+            //一直解析到Overall
             it.dim == "Overall"
-        }.timeout(5, TimeUnit.SECONDS)
-        .toList()
+        }.timeout(5, TimeUnit.SECONDS) // 5秒超时
+        .toList() //结果转换为列表
 
     fun getTps(): MutableList<TpsEntity> {
         client.sendMessage("/forge tps")
+        //订阅一次流
         return tpsObservable.blockingGet()
     }
 
