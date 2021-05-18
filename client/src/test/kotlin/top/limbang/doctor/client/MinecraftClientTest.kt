@@ -5,10 +5,7 @@ import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.running.TpsUtils
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
-import top.limbang.doctor.protocol.definition.play.client.Action
-import top.limbang.doctor.protocol.definition.play.client.ChatPacket
-import top.limbang.doctor.protocol.definition.play.client.PlayerInfo
-import top.limbang.doctor.protocol.definition.play.client.PlayerListItemPacket
+import top.limbang.doctor.protocol.definition.play.client.*
 import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
 import java.io.FileInputStream
 import java.time.LocalDateTime
@@ -81,6 +78,11 @@ fun main() {
                 }
             }
         }
+    }.onPacket<DisconnectPacket> {
+        val reason = ChatGsonSerializer.jsonToChat(packet.reason)
+        logger.warn(reason.getFormattedText())
+    }.onPacket<JoinGamePacket> {
+        logger.info("登录成功")
     }
 
     val tps = TpsUtils(client)
