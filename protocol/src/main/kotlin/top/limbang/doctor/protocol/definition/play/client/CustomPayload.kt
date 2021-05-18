@@ -58,6 +58,7 @@ class CustomPayloadEncoder : PacketEncoder<CustomPayloadPacket> {
 //        val data = Unpooled.buffer()
 //        CustomPayloadType.get(packet.channel).writePacket(data, packet.data)
         buf.writeBytes(packet.rawData)
+        packet.rawData?.release()
         return buf
     }
 }
