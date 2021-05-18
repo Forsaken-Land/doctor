@@ -5,7 +5,13 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
+import top.limbang.doctor.protocol.definition.play.client.Action.*
+import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
 import top.limbang.doctor.protocol.extension.readEnumValue
+import top.limbang.doctor.protocol.extension.readString
+import top.limbang.doctor.protocol.extension.readUUID
+import top.limbang.doctor.protocol.extension.readVarInt
+import java.util.*
 
 /**
  * @author Doctor_Yin
@@ -15,109 +21,85 @@ import top.limbang.doctor.protocol.extension.readEnumValue
 @Serializable
 data class PlayerListItemPacket(
     val action: Action,
-    @Contextual
-    val buf: ByteBuf
-) : Packet
+    val numberOfPlayerInfo: Int,
+    val players: List<PlayerInfo>
+) : Packet {
+    override fun toString(): String {
+        return "PlayerListItemPacket(action=$action, numberOfPlayerInfo=$numberOfPlayerInfo, $players)"
+    }
+}
 
 class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
     override fun decoder(buf: ByteBuf): PlayerListItemPacket {
         val action = buf.readEnumValue(Action::class.java)
 
-//        val i = buf.readVarInt()
-//        for (j in 0 until i) {
-//            when (action) {
-//                Action.ADD_PLAYER -> {
-//                    println(buf.readUUID())
-//                    println(buf.readString(16))
-//                    val size = buf.readVarInt()
-//                    for (k in 0 until size) {
-//                        println(buf.readString() + ":" + buf.readString())
-//                        if (buf.readBoolean()) {
-//                            println(buf.readString())
-//                        }
-//                    }
-//                    println("game:${buf.readVarInt()}")
-//                    println("ping:${buf.readVarInt()}")
-//                    if (buf.readBoolean()) {
-//                        val chat = ChatGsonSerializer.jsonToChat(buf.readString())
-//                        println("nick:${chat.getFormattedText()}")
-//                    }
-//                }
-//                Action.UPDATE_LATENCY -> {
-//                    println(buf.readUUID())
-//                    println(buf.readVarInt())
-//                }
-//                Action.REMOVE_PLAYER -> {
-//                    println(buf.readUUID())
-//                }
-//                Action.UPDATE_GAME_MODE -> {
-//                    println(buf.readUUID())
-//                    println(buf.readVarInt())
-//                }
-//                Action.UPDATE_DISPLAY_NAME -> {
-//                    println(buf.readUUID())
-//                    if (buf.readBoolean()) {
-//                        val chat = ChatGsonSerializer.jsonToChat(buf.readString())
-//                        println(chat.getFormattedText())
-//                    }
-//                }
-//            }
-//        }
-        return PlayerListItemPacket(action, buf)
-//
-//            when (action) {
-//                Action.ADD_PLAYER -> {
-//                    gameprofile = GameProfile(buf.readUniqueId(), buf.readString(16))
-//                    val l = buf.readVarInt()
-//                    var i1 = 0
-//                    while (i1 < l) {
-//                        val s = buf.readString(32767)
-//                        val s1 = buf.readString(32767)
-//                        if (buf.readBoolean()) {
-//                            gameprofile.getProperties().put(s, Property(s, s1, buf.readString(32767)))
-//                        } else {
-//                            gameprofile.getProperties().put(s, Property(s, s1))
-//                        }
-//                        ++i1
-//                    }
-//                    gametype = GameType.getByID(buf.readVarInt())
-//                    k = buf.readVarInt()
-//                    if (buf.readBoolean()) {
-//                        itextcomponent = buf.readTextComponent()
-//                    }
-//                }
-//                Action.UPDATE_GAME_MODE -> {
-//                    gameprofile = GameProfile(buf.readUniqueId(), null as String)
-//                    gametype = GameType.getByID(buf.readVarInt())
-//                }
-//                Action.UPDATE_LATENCY -> {
-//                    gameprofile = GameProfile(buf.readUniqueId(), null as String?)
-//                    k = buf.readVarInt()
-//                }
-//                Action.UPDATE_DISPLAY_NAME -> {
-//                    gameprofile = GameProfile(buf.readUniqueId(), null as String?)
-//                    if (buf.readBoolean()) {
-//                        itextcomponent = buf.readTextComponent()
-//                    }
-//                }
-//                Action.REMOVE_PLAYER -> gameprofile =
-//                    GameProfile(buf.readUniqueId(), null as String?)
-//            }
-//
-//            this.players.add(
-//                net.minecraft.network.play.server.SPacketPlayerListItem.AddPlayerData(
-//                    gameprofile,
-//                    k,
-//                    gametype,
-//                    itextcomponent
-//                )
-//            )
-//        }
-//        return PlayerListItemPacket(action = action, buf = buf)
+        val i = buf.readVarInt()
+        val players = mutableListOf<PlayerInfo>()
+        for (j in 0 until i) {
+            val uuid = buf.readUUID()
+            val playerInfo = when (action) {
+                Action.ADD_PLAYER -> {
+                    val name = buf.readString(16)
+                    val size = buf.readVarInt()
+                    val propertyList = mutableListOf<PlayerInfo.Property>()
+                    for (k in 0 until size) {
+                        val propertyName = buf.readString()
+                        val propertyValue = buf.readString()
+                        val property = if (buf.readBoolean()) {
+                            PlayerInfo.Property(propertyName, propertyValue, true, buf.readString())
+                        } else {
+                            PlayerInfo.Property(propertyName, propertyValue)
+                        }
+                        propertyList.add(property)
+                    }
+                    val gameMode = buf.readEnumValue(GameMode::class.java)
+                    val ping = buf.readVarInt()
+                    val hasDisplayName = buf.readBoolean()
+                    if (hasDisplayName) {
+                        val chat = ChatGsonSerializer.jsonToChat(buf.readString())
+                        val nickname = chat.getFormattedText()
+                        PlayerInfo(uuid, name, size, propertyList, ping, gameMode, hasDisplayName, nickname)
+                    } else PlayerInfo(uuid, name, size, propertyList, ping, gameMode, hasDisplayName)
+
+
+                }
+                Action.UPDATE_LATENCY -> {
+                    val ping = buf.readVarInt()
+                    PlayerInfo(uuid, ping = ping)
+                }
+                Action.REMOVE_PLAYER -> {
+                    PlayerInfo(uuid)
+                }
+                Action.UPDATE_GAME_MODE -> {
+                    val gameMode = buf.readEnumValue(GameMode::class.java)
+                    PlayerInfo(uuid, gameMode = gameMode)
+                }
+                Action.UPDATE_DISPLAY_NAME -> {
+                    if (buf.readBoolean()) {
+                        val chat = ChatGsonSerializer.jsonToChat(buf.readString())
+                        PlayerInfo(uuid, hasDisplayName = true, displayName = chat.getFormattedText())
+                    } else PlayerInfo(uuid, hasDisplayName = false)
+                }
+            }
+            players.add(playerInfo)
+        }
+        return PlayerListItemPacket(action, i, players)
     }
+
 
 }
 
+/**
+ * [ADD_PLAYER] 向TAB菜单添加玩家
+ *
+ * [UPDATE_GAME_MODE] 更新TAB菜单内玩家的gameMode
+ *
+ * [UPDATE_LATENCY] 更新TAB菜单内玩家的ping
+ *
+ * [UPDATE_DISPLAY_NAME] 更新TAB菜单内玩家的nick
+ *
+ * [REMOVE_PLAYER] 删除TAB菜单内的玩家
+ */
 @Serializable
 enum class Action(val id: Int) {
     ADD_PLAYER(0),
@@ -126,3 +108,36 @@ enum class Action(val id: Int) {
     UPDATE_DISPLAY_NAME(3),
     REMOVE_PLAYER(4);
 }
+
+@Serializable
+data class PlayerInfo(
+    @Contextual
+    val UUID: UUID,
+    val name: String? = null,
+    val numberOfProperty: Int? = null,
+    val properties: List<Property>? = null,
+    var ping: Int? = null,
+    var gameMode: GameMode? = null,
+    var hasDisplayName: Boolean? = null,
+    var displayName: String? = null
+) {
+
+    @Serializable
+    data class Property(
+        val name: String,
+        val value: String,
+        val isSigned: Boolean = false,
+        val signature: String? = null
+    )
+
+    override fun toString(): String {
+        return if (hasDisplayName == true) {
+            "PlayerInfo(UUID=$UUID, name=$name, numberOfProperty=$numberOfProperty, ping=$ping, gameMode=$gameMode, hasDisplayName=$hasDisplayName, displayName=$displayName)"
+        } else {
+            "PlayerInfo(UUID=$UUID, name=$name, numberOfProperty=$numberOfProperty, ping=$ping, gameMode=$gameMode)"
+        }
+
+    }
+}
+
+

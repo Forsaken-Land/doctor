@@ -25,36 +25,6 @@ class ForgePacketHandler(
 
     private val logger: Logger = LoggerFactory.getLogger(ForgePacketHandler::class.java)
 
-    //    override fun channelRead0(ctx: ChannelHandlerContext, msg: Packet) {
-//        var handled = false
-//        when (msg) {
-//            is CustomPayloadPacket -> {
-//                if (!msg.processed && channelRegistry.channels.contains(msg.channel)) {
-//                    val packet: ChannelPacket
-//                    try {
-//                        val decoder = channelRegistry.channelPacketMap(PacketDirection.S2C, ctx.forgeProtocolState())
-//                            .decoder<ChannelPacket>(msg.channel)
-//                        packet = decoder.decoder(msg.rawData!!)
-//                        emitter.emit(PacketEvent(packet.javaClass.kotlin), packet)
-//                        emitter.emit(
-//                            WrappedPacketEvent(packet.javaClass.kotlin),
-//                            WrappedPacketEventArgs(ctx, packet)
-//                        )
-//                        ctx.fireChannelReadComplete()
-//                        handled = true
-//                    } catch (e: Exception) {
-//                        logger.warn(e.message)
-//                        return
-//                    }
-//                    logger.debug("协议包解码:channel=${msg.channel} $packet")
-//                }
-//            }
-//        }
-//        //包没有处理，交给下一个codec
-//        if (!handled) {
-//            ctx.fireChannelRead(msg)
-//        }
-//    }
     override fun encode(ctx: ChannelHandlerContext, msg: ChannelPacket, out: MutableList<Any>) {
         val buf = ctx.alloc().buffer()
         try {
