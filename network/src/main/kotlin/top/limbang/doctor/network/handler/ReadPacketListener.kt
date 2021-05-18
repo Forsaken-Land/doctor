@@ -51,6 +51,9 @@ inline fun <reified T : Packet> EventEmitter.onPacket(crossinline handler: Wrapp
     }
 }
 
+/**
+ * ### 监听指定数据包并回复数据包
+ */
 inline fun <reified T : Packet> EventEmitter.replyPacket(crossinline reply: (T) -> Packet?): EventEmitter {
     this.on(WrappedPacketEvent(T::class)) {
         val rep = reply(it.packet)

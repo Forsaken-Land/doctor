@@ -1,17 +1,24 @@
 package top.limbang.doctor.protocol.definition.play.client
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
+import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.entity.nbt.NbtBase
+import top.limbang.doctor.protocol.extension.readNbt
+import top.limbang.doctor.protocol.extension.readVarInt
 
 
 /**
- * @author Doctor_Yin
- * @date 2021/5/1
- * @time 23:00
+ * ### Chunk Data
+ * The server only sends skylight information for chunk pillars in the Overworld, it's up to the client to know in which dimension the player is currently located. You can also infer this information from the primary bitmask and the amount of uncompressed bytes sent. This packet also sends all block entities in the chunk (though sending them is not required; it is still legal to send them with Block Entity Data later).
+ * - [chunkX] Chunk coordinate (block coordinate divided by 16, rounded down).
+ * - [chunkZ] Chunk coordinate (block coordinate divided by 16, rounded down).
+ * - [fullChunk] See Chunk Format.
+ *
+ *
+ *
+ *
  */
 @Serializable
 data class ChunkDataPacket(
