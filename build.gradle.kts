@@ -3,8 +3,8 @@ plugins {
     kotlin("jvm") version kotlinVersion
 }
 
-group = "top.limbang.doctor"
-version = "1.0-SNAPSHOT"
+group = "top.limbang"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
