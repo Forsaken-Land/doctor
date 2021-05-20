@@ -1,10 +1,12 @@
 plugins {
     val kotlinVersion = "1.4.32"
     kotlin("jvm") version kotlinVersion
+    `maven-publish`
 }
 
 group = "top.limbang"
-version = "1.0.0"
+val projectVersion: String by project
+version = projectVersion
 
 repositories {
     mavenCentral()
@@ -14,6 +16,7 @@ subprojects {
     apply {
         plugin("org.jetbrains.kotlin.jvm")
     }
+
 
     dependencies {
         val kotlinVersion = "1.4.32"
@@ -31,3 +34,23 @@ subprojects {
         testImplementation("ch.qos.logback:logback-classic:1.2.3")
     }
 }
+publishing {
+    val gitLabPrivateToken: String by project
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
+    repositories {
+        maven(url = "https://git.blackyin.xyz:8443/api/v4/projects/34/packages/maven") {
+            credentials(HttpHeaderCredentials::class.java) {
+                name = "Private-Token"
+                value = gitLabPrivateToken
+            }
+            authentication {
+                create<HttpHeaderAuthentication>("header")
+            }
+        }
+    }
+}
+
