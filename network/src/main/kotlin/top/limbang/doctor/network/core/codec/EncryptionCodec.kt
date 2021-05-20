@@ -1,4 +1,4 @@
-package top.limbang.minecraft.netty.handler
+package top.limbang.doctor.network.core.codec
 
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled

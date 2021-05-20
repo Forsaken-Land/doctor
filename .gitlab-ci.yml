@@ -10,7 +10,7 @@ variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
-.build:
+build:
   stage: build jar
   retry: 2
   script: gradle build
@@ -18,6 +18,12 @@ before_script:
 deploy:
   stage: deploy maven
   script:
-    - echo $CI_COMMIT_TAG
+    - TAG=$CI_COMMIT_TAG
+    - VERSION=${TAG:1}
+    - echo kotlin.code.style=official > ./gradle.properties
+    - echo gitLabPrivateToken=$PRIVATE_TOKEN >> ./gradle.properties
+    - echo projectVersion=$VERSION >> ./gradle.properties
+    - cat ./gradle.properties
+    - gradle publish
   rules:
     - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9]+.[0-9]+/'
