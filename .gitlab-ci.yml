@@ -10,7 +10,7 @@ variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
-build:
+.build:
   stage: build jar
   retry: 2
   script: gradle build
