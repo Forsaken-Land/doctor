@@ -45,7 +45,7 @@ publishing {
     repositories {
         val CI_JOB_TOKEN: String by project
         maven {
-            url = uri("https://git.blackyin.xyz:8443/api/v4/groups/10/packages/maven")
+            url = uri("https://git.blackyin.xyz:8443/api/v4/projects/35/packages/maven")
             name = "GitLab"
             credentials(HttpHeaderCredentials::class.java) {
                 name = "Job-Token"
