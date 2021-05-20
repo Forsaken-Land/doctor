@@ -27,3 +27,4 @@ deploy:
     - gradle publish
   rules:
     - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9]+.[0-9]+/'
+  retry: 2
