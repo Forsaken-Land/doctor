@@ -21,6 +21,7 @@ repositories {
             create<HttpHeaderAuthentication>("header")
         }
     }
+    maven("https://maven.aliyun.com/repository/public")
     mavenCentral()
 }
 
