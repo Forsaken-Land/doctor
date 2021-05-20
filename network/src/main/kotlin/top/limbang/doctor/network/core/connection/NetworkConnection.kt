@@ -9,12 +9,12 @@ import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.plugin.IPluginManager
 import top.limbang.doctor.network.api.AbstractConnection
 import top.limbang.doctor.network.core.codec.CompressionCodec
+import top.limbang.doctor.network.core.codec.EncryptionCodec
 import top.limbang.doctor.network.hooks.BeforePacketSendHook
 import top.limbang.doctor.network.hooks.BeforePacketSendHookOperation
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.ProtocolState
-import top.limbang.minecraft.netty.handler.EncryptionCodec
 import javax.crypto.SecretKey
 
 /**

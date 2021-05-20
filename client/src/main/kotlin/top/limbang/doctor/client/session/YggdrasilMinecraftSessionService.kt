@@ -7,7 +7,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.yggdrasil.*
 import top.limbang.doctor.network.core.HttpClient
-import top.limbang.minecraft.entity.yggdrasil.YggdrasilError
 
 /**
  * ### 会话

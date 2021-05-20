@@ -1,13 +1,19 @@
 plugins {
     val kotlinVersion = "1.4.32"
     kotlin("jvm") version kotlinVersion
+    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 group = "top.limbang"
-version = "1.0.0"
+val projectVersion: String by project
+version = projectVersion
 
 repositories {
     mavenCentral()
+}
+
+dependencies{
+    implementation(project(":client"))
 }
 
 subprojects {
@@ -31,3 +37,5 @@ subprojects {
         testImplementation("ch.qos.logback:logback-classic:1.2.3")
     }
 }
+
+
