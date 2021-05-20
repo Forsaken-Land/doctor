@@ -9,7 +9,7 @@ val projectVersion: String by project
 version = projectVersion
 
 repositories {
-
+    maven("https://maven.aliyun.com/repository/gradle-plugin")
     maven("https://maven.aliyun.com/repository/public")
     mavenCentral()
 }
