@@ -42,7 +42,7 @@ publishing {
         }
     }
     repositories {
-        maven(url = "https://git.blackyin.xyz:8443/api/v4/projects/34/packages/maven") {
+        maven(url = "https://git.blackyin.xyz:8443/api/v4/projects/30/packages/maven") {
             credentials(HttpHeaderCredentials::class.java) {
                 name = "Private-Token"
                 value = gitLabPrivateToken
