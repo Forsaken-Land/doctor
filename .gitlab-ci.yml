@@ -21,7 +21,7 @@ deploy:
     - TAG=$CI_COMMIT_TAG
     - VERSION=${TAG:1}
     - echo kotlin.code.style=official > ./gradle.properties
-    - echo gitLabPrivateToken=$PRIVATE_TOKEN >> ./gradle.properties
+    - echo CI_JOB_TOKEN=$CI_JOB_TOKEN >> ./gradle.properties
     - echo projectVersion=$VERSION >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
