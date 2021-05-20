@@ -36,19 +36,21 @@ subprojects {
         testImplementation("ch.qos.logback:logback-classic:1.2.3")
     }
 }
-publishing {
 
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
     repositories {
-        val CI_JOB_TOKEN: String by project
+        val user: String by project
+        val passwd: String by project
         maven {
-            url = uri("https://git.blackyin.xyz:8443/api/v4/groups/10/packages/maven")
-            name = "GitLab"
-            credentials(HttpHeaderCredentials::class.java) {
-                name = "Job-Token"
-                value = System.getenv(CI_JOB_TOKEN)
-            }
-            authentication {
-                create<HttpHeaderAuthentication>("header")
+            url = uri("http://web.blackyin.top:8015/repository/maven-releases/")
+            credentials {
+                username = user
+                password = passwd
             }
         }
     }
