@@ -2,12 +2,12 @@ package top.limbang.doctor.protocol.definition.play.client
 
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
+import kotlinx.io.core.Closeable
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
-import top.limbang.doctor.protocol.entity.extra.CustomPayloadType
 import top.limbang.doctor.protocol.extension.readString
 import top.limbang.doctor.protocol.extension.writeString
 
@@ -19,21 +19,18 @@ import top.limbang.doctor.protocol.extension.writeString
 @Serializable
 data class CustomPayloadPacket(
     val channel: String,
-    val data: Map<String, @Contextual Any>,
     @Contextual
-    val rawData: ByteBuf? = null,
+    val data: ByteBuf,
     val processed: Boolean = false
-) : Packet {
-    constructor(
-        type: CustomPayloadType,
-        data: Map<String, Any>
-    ) : this(type.channelName, data, processed = true) {
-
+) : Packet, Closeable {
+    override fun close() {
+        try {
+            while (!data.release()) {
+            }
+        } catch (e: Exception) {
+        }
     }
-}
 
-fun CustomPayloadPacket.type(): CustomPayloadType {
-    return CustomPayloadType.get(this.channel)
 }
 
 class CustomPayloadDecoder : PacketDecoder<CustomPayloadPacket> {
@@ -41,24 +38,15 @@ class CustomPayloadDecoder : PacketDecoder<CustomPayloadPacket> {
         val channel = buf.readString()
         val byteBuf = Unpooled.buffer(buf.readableBytes())
         buf.readBytes(byteBuf)
-        val data = HashMap<String, Any>()
-        val type = CustomPayloadType.get(channel)
-        if (type != CustomPayloadType.UNKNOWN) {
-            type.readPacket(byteBuf, data)
-            return CustomPayloadPacket(channel, data, processed = true)
-        }
-        return CustomPayloadPacket(channel, emptyMap(), byteBuf)
+        return CustomPayloadPacket(channel, byteBuf)
     }
-
 }
 
 class CustomPayloadEncoder : PacketEncoder<CustomPayloadPacket> {
     override fun encode(buf: ByteBuf, packet: CustomPayloadPacket): ByteBuf {
         buf.writeString(packet.channel)
-//        val data = Unpooled.buffer()
-//        CustomPayloadType.get(packet.channel).writePacket(data, packet.data)
-        buf.writeBytes(packet.rawData)
-        packet.rawData?.release()
+        buf.writeBytes(packet.data)
+        packet.close()
         return buf
     }
 }

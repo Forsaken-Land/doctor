@@ -33,7 +33,7 @@ class ForgePacketHandler(
             val channel =
                 channelRegistry.channelPacketMap(PacketDirection.C2S, ctx.forgeProtocolState()).packetKey(msg.javaClass)
             encoder.encode(buf, msg)
-            out.add(CustomPayloadPacket(channel, hashMapOf(), buf))
+            out.add(CustomPayloadPacket(channel, buf))
             logger.debug("协议包编码:channel=$channel $msg")
         } catch (e: Exception) {
             logger.warn(e.message)
@@ -49,8 +49,8 @@ class ForgePacketHandler(
                     val decoder = channelRegistry.channelPacketMap(PacketDirection.S2C, ctx.forgeProtocolState())
                         .decoder<ChannelPacket>(msg.channel)
 
-                    packet = decoder.decoder(msg.rawData!!)
-                        msg.rawData?.release()
+                    packet = decoder.decoder(msg.data)
+                    msg.close()
 //                        emitter.emit(PacketEvent(packet.javaClass.kotlin), packet)
                     emitPacketEvent(emitter, packet, ctx)
                     ctx.fireChannelReadComplete()
