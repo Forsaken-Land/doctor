@@ -4,6 +4,7 @@ import top.limbang.doctor.core.api.plugin.IPluginManager
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.play.client.*
 import top.limbang.doctor.protocol.definition.play.server.CChatEncoder
+import top.limbang.doctor.protocol.definition.play.server.CTabCompleteEncoder
 import top.limbang.doctor.protocol.hook.PacketRegistryHook
 import top.limbang.doctor.protocol.registry.IPacketRegistry
 import top.limbang.doctor.protocol.registry.PacketRegistryImpl
@@ -30,6 +31,8 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x0F, ChatDecoder())
                 register(0x18, CustomPayloadDecoder())
                 register(0x2E, PlayerListItemDecoder())
+                register(0x20, ChunkDataDecoder())
+                register(0x0E, STabCompleteDecoder())
             }
             whenC2S {
                 register(0x0B, KeepAliveEncoder())
@@ -38,6 +41,7 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x02, CChatEncoder())
                 register(0x09, CustomPayloadEncoder())
                 register(0x03, ClientStatusEncoder())
+                register(0x01, CTabCompleteEncoder())
             }
         }
         pluginManager.invokeHook(PacketRegistryHook::class.java, this, true)

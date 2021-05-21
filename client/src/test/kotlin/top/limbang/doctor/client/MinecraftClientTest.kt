@@ -3,15 +3,16 @@ package top.limbang.doctor.client
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.running.TpsUtils
+import top.limbang.doctor.client.utils.sendAndWait
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.protocol.definition.play.client.*
+import top.limbang.doctor.protocol.definition.play.server.CTabCompletePacket
 import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
 import java.io.FileInputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-
 
 
 fun main() {
@@ -94,6 +95,7 @@ fun main() {
 
     val tps = TpsUtils(client)
 
+
     while (true) {
         when (val msg = readLine()) {
             "tps" -> {
@@ -113,7 +115,25 @@ fun main() {
                 }
 
             }
-            else -> client.sendMessage(msg!!)
+
+            else -> {
+                if (!msg.isNullOrBlank()) {
+                    if (msg.startsWith("/")) {
+                        val resp = client.connection.sendAndWait<STabCompletePacket>(CTabCompletePacket(msg))
+                        if (resp.matches.isNotEmpty()) {
+                            val words = msg.split(' ')
+                            val rest = if (words.size > 1) words.subList(0, words.size - 1) else emptyList()
+                            val result = rest.toMutableList().also { it.add(resp.matches.first()) }.joinToString(" ")
+                            logger.info("自动补全命令：${result}")
+                            client.sendMessage(result)
+                        } else {
+                            client.sendMessage(msg)
+                        }
+                    } else {
+                        client.sendMessage(msg)
+                    }
+                }
+            }
         }
 
     }

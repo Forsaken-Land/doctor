@@ -1,11 +1,12 @@
 package top.limbang.doctor.protocol.definition.play.client
 
 import io.netty.buffer.ByteBuf
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import net.querz.nbt.tag.CompoundTag
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
-import top.limbang.doctor.protocol.entity.nbt.NbtBase
-import top.limbang.doctor.protocol.extension.readNbt
+import top.limbang.doctor.protocol.extension.readCompoundTag
 import top.limbang.doctor.protocol.extension.readVarInt
 
 
@@ -20,14 +21,15 @@ import top.limbang.doctor.protocol.extension.readVarInt
  *
  *
  */
+@Suppress("ArrayInDataClass")
 @Serializable
 data class ChunkDataPacket(
     val chunkX: Int,
     val chunkZ: Int,
     val fullChunk: Boolean,
     val availableSections: Int,
-    val heightmaps: NbtBase,
-    val size: Int
+    var buffer: ByteArray,
+    var tileEntityTags: MutableList<@Contextual CompoundTag>
 ) : Packet
 
 class ChunkDataDecoder : PacketDecoder<ChunkDataPacket> {
@@ -35,16 +37,24 @@ class ChunkDataDecoder : PacketDecoder<ChunkDataPacket> {
         val chunkX = buf.readInt()
         val chunkZ = buf.readInt()
         val fullChunk = buf.readBoolean()
-        val primaryBitMask = buf.readVarInt()
-        val tag = buf.readNbt()
-        val size = buf.readVarInt()
+        val availableSections = buf.readVarInt()
+        val bufferSize = buf.readVarInt()
+        val buffer = ByteArray(bufferSize)
+        buf.readBytes(buffer)
+        val tagSize = buf.readVarInt()
+        val tileEntityTags: MutableList<CompoundTag> = arrayListOf()
+
+        for (k in 0 until tagSize) {
+            tileEntityTags.add(buf.readCompoundTag())
+        }
+
         return ChunkDataPacket(
             chunkX = chunkX,
             chunkZ = chunkZ,
             fullChunk = fullChunk,
-            availableSections = primaryBitMask,
-            heightmaps = tag,
-            size = size
+            availableSections = availableSections,
+            buffer = buffer,
+            tileEntityTags = tileEntityTags
         )
     }
 }
