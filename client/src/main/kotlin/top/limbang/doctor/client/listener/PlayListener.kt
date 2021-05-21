@@ -30,7 +30,7 @@ class PlayListener : EventListener {
         }
 
         emitter.onPacket<CustomPayloadPacket> {
-            packet.rawData?.release()
+            packet.close()
         }
 
     }
