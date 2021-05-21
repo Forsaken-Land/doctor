@@ -63,7 +63,7 @@ class ProtocolPacketCodec(
     }
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
-        logger.error(cause.message)
+        logger.error("解析包失败", cause)
         ctx.close()
     }
 }

@@ -1,7 +1,10 @@
 package top.limbang.doctor.protocol.extension
 
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.entity.nbt.NbtBase
+import io.netty.buffer.ByteBufInputStream
+import net.querz.nbt.io.NBTDeserializer
+import net.querz.nbt.tag.CompoundTag
+import top.limbang.doctor.protocol.entity.math.BlockPos
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -116,8 +119,17 @@ fun ByteBuf.writeString(value: String) {
     writeBytes(bytes)
 }
 
-fun ByteBuf.readNbt(): NbtBase {
-    TODO()
+fun ByteBuf.readCompoundTag(): CompoundTag {
+    val i = this.readerIndex()
+    val length = this.readByte()
+
+    return if (length == 0.toByte()) {
+        throw IOException("无法读取Nbt： 数据长度为0")
+    } else {
+        this.readerIndex(i)
+        val stream = ByteBufInputStream(this)
+        NBTDeserializer(false).fromStream(stream).tag as CompoundTag
+    }
 }
 
 fun <T : Enum<T>> ByteBuf.readEnumValue(enumClass: Class<T>): T {
@@ -128,3 +140,11 @@ fun ByteBuf.readUUID(): UUID {
     return UUID(readLong(), readLong())
 }
 
+fun ByteBuf.readBlockPos(): BlockPos {
+    return BlockPos.fromLong(this.readLong())
+}
+
+fun ByteBuf.writeBlockPos(pos: BlockPos): ByteBuf {
+    this.writeLong(pos.toLong())
+    return this
+}

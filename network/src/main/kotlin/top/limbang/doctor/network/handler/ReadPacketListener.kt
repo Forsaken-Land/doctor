@@ -158,3 +158,5 @@ class PacketEvent<T : Packet>(val type: KClass<T>) : Event<T> {
         return type.hashCode()
     }
 }
+
+inline fun <reified T : Packet> packetEvent() = PacketEvent(T::class)

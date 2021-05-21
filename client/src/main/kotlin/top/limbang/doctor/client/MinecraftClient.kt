@@ -36,6 +36,8 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     private var sessionServerUrl = "https://sessionserver.mojang.com"
     private lateinit var networkManager: NetworkManager
 
+
+    val connection get() = networkManager.connection
     /**
      * ### 设置在线登录
      */
