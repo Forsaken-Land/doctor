@@ -58,8 +58,9 @@ allprojects {
         repositories {
             val user: String by project
             val passwd: String by project
+            val mavenUrl: String by project
             maven {
-                url = uri("http://web.blackyin.top:8015/repository/maven-releases")
+                url = uri(mavenUrl)
                 credentials {
                     username = user
                     password = passwd
