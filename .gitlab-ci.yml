@@ -2,6 +2,7 @@ image: gradle:7.0.0-jdk16
 cache:
   paths:
     - /home/gradle/.gradle
+    - ./build
 stages:
   - build jar
   - deploy maven
@@ -21,9 +22,12 @@ deploy:
     - TAG=$CI_COMMIT_TAG
     - VERSION=${TAG:1}
     - echo kotlin.code.style=official > ./gradle.properties
-    - echo gitLabPrivateToken=$PRIVATE_TOKEN >> ./gradle.properties
+    - echo user=$USERNAME >> ./gradle.properties
+    - echo passwd=$PASSWORD >> ./gradle.properties
     - echo projectVersion=$VERSION >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9]+.[0-9]+/'
+    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ && $CI_COMMIT_BRANCH == "product"'
+  retry: 2
+
