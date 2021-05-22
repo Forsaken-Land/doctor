@@ -1,4 +1,4 @@
-image: gradle:7.0.0-jdk16
+image: gradle:7.0.0-jdk11
 cache:
   paths:
     - /home/gradle/.gradle
