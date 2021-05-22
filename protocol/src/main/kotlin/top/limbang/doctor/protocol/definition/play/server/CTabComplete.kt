@@ -23,7 +23,7 @@ data class CTabCompletePacket(
 
 class CTabCompleteEncoder : PacketEncoder<CTabCompletePacket> {
     override fun encode(buf: ByteBuf, packet: CTabCompletePacket): ByteBuf {
-        buf.writeString(substring(packet.message, 0, 32767))
+        buf.writeString(packet.message.substring(0, 32767))
         buf.writeBoolean(packet.hasTargetBlock)
         val flag = packet.targetBlock != null
         buf.writeBoolean(flag)
