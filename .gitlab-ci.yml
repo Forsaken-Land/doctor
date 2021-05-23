@@ -96,8 +96,13 @@ deployjdk8snapshots:
     - echo mavenUrl=$SNAPSHOTSURLURL >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
-  rules:
-    - if: '$CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9].[0-9]+/ '
+  except:
+    - product
+    - dev
+    - master
+  only:
+    variables:
+      - $CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9].[0-9]+/
   retry: 2
   tags:
     - jdk8
@@ -114,8 +119,13 @@ deployjdk11snapshots:
     - echo mavenUrl=$SNAPSHOTSURLURL >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
-  rules:
-    - if: '$CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ '
+  except:
+    - product
+    - dev
+    - master
+  only:
+    variables:
+      - $CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9].[0-9]+/
   retry: 2
   tags:
     - jdk11
@@ -132,7 +142,12 @@ deployjdk11snapshots:
     - echo mavenUrl=$SNAPSHOTSURLURL >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
-  rules:
-    - if: '$CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9]+.[0-9]+/'
+  except:
+    - product
+    - dev
+    - master
+  only:
+    variables:
+      - $CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9].[0-9]+/
   retry: 2
 
