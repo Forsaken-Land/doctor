@@ -45,7 +45,7 @@ deployjdk8:
     - cat ./gradle.properties
     - gradle publish
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9].[0-9]+/ && $CI_COMMIT_BRANCH =~ "product"'
+    - if: '$CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9].[0-9]+/ && $CI_COMMIT_BRANCH == "product"'
   retry: 2
   tags:
     - jdk8
@@ -63,7 +63,7 @@ deployjdk11:
     - cat ./gradle.properties
     - gradle publish
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ && $CI_COMMIT_BRANCH =~ "product"'
+    - if: '$CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ && $CI_COMMIT_BRANCH == "product"'
   retry: 2
   tags:
     - jdk11
@@ -81,7 +81,7 @@ deployjdk11:
     - cat ./gradle.properties
     - gradle publish
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ && $CI_COMMIT_BRANCH =~ "product"'
+    - if: '$CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ && $CI_COMMIT_BRANCH == "product"'
   retry: 2
 deployjdk8snapshots:
   image: gradle:7.0.0-jdk8
@@ -97,7 +97,7 @@ deployjdk8snapshots:
     - cat ./gradle.properties
     - gradle publish
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9].[0-9]+/ '
+    - if: '$CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9].[0-9]+/ '
   retry: 2
   tags:
     - jdk8
@@ -115,7 +115,7 @@ deployjdk11snapshots:
     - cat ./gradle.properties
     - gradle publish
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ '
+    - if: '$CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ '
   retry: 2
   tags:
     - jdk11
@@ -133,6 +133,6 @@ deployjdk11snapshots:
     - cat ./gradle.properties
     - gradle publish
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ '
+    - if: '$CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9]+.[0-9]+/'
   retry: 2
 
