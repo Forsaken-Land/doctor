@@ -1,7 +1,6 @@
 package top.limbang.doctor.protocol.definition.play.server
 
 import io.netty.buffer.ByteBuf
-import jdk.nashorn.internal.objects.NativeString.substring
 import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketEncoder
