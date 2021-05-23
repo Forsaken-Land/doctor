@@ -90,12 +90,12 @@ deployjdk8snapshots:
   image: gradle:7.0.0-jdk8
   stage: deploy maven
   script:
-    - TAG=$CI_COMMIT_TAG
-    - VERSION=${TAG:1}
+    - TAG=${$CI_COMMIT_TAG:1}
+    - VERSION=${TAG%%-*}
     - echo kotlin.code.style=official > ./gradle.properties
     - echo user=$USERNAME >> ./gradle.properties
     - echo passwd=$PASSWORD >> ./gradle.properties
-    - echo projectVersion=$VERSION-jdk8 >> ./gradle.properties
+    - echo projectVersion=$VERSION-jdk8-SNAPSHOT >> ./gradle.properties
     - echo mavenUrl=$SNAPSHOTSURLURL >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
@@ -105,7 +105,7 @@ deployjdk8snapshots:
     - master
   only:
     variables:
-      - $CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9].[0-9]+/
+      - $CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9].[0-9]-SNAPSHOT/
   retry: 2
   tags:
     - jdk8
@@ -113,12 +113,12 @@ deployjdk11snapshots:
   image: gradle:7.0.0-jdk11
   stage: deploy maven
   script:
-    - TAG=$CI_COMMIT_TAG
-    - VERSION=${TAG:1}
+    - TAG=${$CI_COMMIT_TAG:1}
+    - VERSION=${TAG%%-*}
     - echo kotlin.code.style=official > ./gradle.properties
     - echo user=$USERNAME >> ./gradle.properties
     - echo passwd=$PASSWORD >> ./gradle.properties
-    - echo projectVersion=$VERSION-jdk11 >> ./gradle.properties
+    - echo projectVersion=$VERSION-jdk11-SNAPSHOT >> ./gradle.properties
     - echo mavenUrl=$SNAPSHOTSURLURL >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
@@ -136,12 +136,12 @@ deployjdk11snapshots:
   image: gradle:7.0.0-jdk16
   stage: deploy maven
   script:
-    - TAG=$CI_COMMIT_TAG
-    - VERSION=${TAG:1}
+    - TAG=${$CI_COMMIT_TAG:1}
+    - VERSION=${TAG%%-*}
     - echo kotlin.code.style=official > ./gradle.properties
     - echo user=$USERNAME >> ./gradle.properties
     - echo passwd=$PASSWORD >> ./gradle.properties
-    - echo projectVersion=$VERSION-jdk16 >> ./gradle.properties
+    - echo projectVersion=$VERSION-jdk16-SNAPSHOT >> ./gradle.properties
     - echo mavenUrl=$SNAPSHOTSURLURL >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
