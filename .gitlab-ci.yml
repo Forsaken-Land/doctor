@@ -40,10 +40,11 @@ deployjdk8:
     - echo user=$USERNAME >> ./gradle.properties
     - echo passwd=$PASSWORD >> ./gradle.properties
     - echo projectVersion=$VERSION-jdk8 >> ./gradle.properties
+    - echo mavenUrl=$URL >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ && $CI_COMMIT_BRANCH =~ "product"'
+    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9].[0-9]+/ && $CI_COMMIT_BRANCH =~ "product"'
   retry: 2
   tags:
     - jdk8
@@ -57,6 +58,7 @@ deployjdk11:
     - echo user=$USERNAME >> ./gradle.properties
     - echo passwd=$PASSWORD >> ./gradle.properties
     - echo projectVersion=$VERSION-jdk11 >> ./gradle.properties
+    - echo mavenUrl=$URL >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
   rules:
@@ -74,6 +76,7 @@ deployjdk11:
     - echo user=$USERNAME >> ./gradle.properties
     - echo passwd=$PASSWORD >> ./gradle.properties
     - echo projectVersion=$VERSION-jdk16 >> ./gradle.properties
+    - echo mavenUrl=$URL >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
   rules:
