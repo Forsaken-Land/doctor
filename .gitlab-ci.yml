@@ -1,22 +1,33 @@
-image: gradle:7.0.0-jdk11
 cache:
   paths:
     - /home/gradle/.gradle
     - ./build
 stages:
-  - build jar
+  - build
   - deploy maven
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
-build:
-  stage: build jar
+buildjdk8:
+  image: gradle:7.0.0-jdk8
+  stage: build
+  retry: 2
+  script: gradle build
+buildjdk11:
+  image: gradle:7.0.0-jdk11
+  stage: build
+  retry: 2
+  script: gradle build
+buildjdk16:
+  image: gradle:7.0.0-jdk16
+  stage: build
   retry: 2
   script: gradle build
 
-deploy:
+deployjdk8:
+  image: gradle:7.0.0-jdk8
   stage: deploy maven
   script:
     - TAG=$CI_COMMIT_TAG
@@ -24,7 +35,37 @@ deploy:
     - echo kotlin.code.style=official > ./gradle.properties
     - echo user=$USERNAME >> ./gradle.properties
     - echo passwd=$PASSWORD >> ./gradle.properties
-    - echo projectVersion=$VERSION >> ./gradle.properties
+    - echo projectVersion=$VERSION-jdk8 >> ./gradle.properties
+    - cat ./gradle.properties
+    - gradle publish
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ && $CI_COMMIT_BRANCH =~ "product"'
+  retry: 2
+deployjdk11:
+  image: gradle:7.0.0-jdk11
+  stage: deploy maven
+  script:
+    - TAG=$CI_COMMIT_TAG
+    - VERSION=${TAG:1}
+    - echo kotlin.code.style=official > ./gradle.properties
+    - echo user=$USERNAME >> ./gradle.properties
+    - echo passwd=$PASSWORD >> ./gradle.properties
+    - echo projectVersion=$VERSION-jdk11 >> ./gradle.properties
+    - cat ./gradle.properties
+    - gradle publish
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^[v][0-9][0-9]?.[0-9]+.[0-9]+/ && $CI_COMMIT_BRANCH =~ "product"'
+  retry: 2
+deployjdk16:
+  image: gradle:7.0.0-jdk16
+  stage: deploy maven
+  script:
+    - TAG=$CI_COMMIT_TAG
+    - VERSION=${TAG:1}
+    - echo kotlin.code.style=official > ./gradle.properties
+    - echo user=$USERNAME >> ./gradle.properties
+    - echo passwd=$PASSWORD >> ./gradle.properties
+    - echo projectVersion=$VERSION-jdk16 >> ./gradle.properties
     - cat ./gradle.properties
     - gradle publish
   rules:
