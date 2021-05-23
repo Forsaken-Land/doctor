@@ -102,7 +102,7 @@ deployjdk8snapshots:
     - master
   only:
     variables:
-      - $CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9].[0-9]*$/
+      - $CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9].[0-9].*$/
   retry: 2
   tags:
     - jdk8
@@ -125,7 +125,7 @@ deployjdk11snapshots:
     - master
   only:
     variables:
-      - $CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9].[0-9]*$/
+      - $CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9].[0-9].*$/
   retry: 2
   tags:
     - jdk11
@@ -148,6 +148,6 @@ deployjdk11snapshots:
     - master
   only:
     variables:
-      - $CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9].[0-9]*$/
+      - $CI_COMMIT_TAG == /^[v][0-9][0-9]?.[0-9].[0-9].*$/
   retry: 2
 
