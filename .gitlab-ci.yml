@@ -10,6 +10,7 @@ variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
+  - echo $CI_COMMIT_BRANCH
 buildjdk8:
   image: gradle:7.0.0-jdk8
   stage: build
