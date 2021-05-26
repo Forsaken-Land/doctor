@@ -1,0 +1,25 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+客户端 ->> 服务器: Handshake (NextState:2)
+客户端 ->> 服务器: LoginStart
+客户端 <<- 服务器: EncryptionRequest
+activate 服务器
+客户端 ->  皮肤站: 客户端登陆验证请求
+activate 皮肤站
+客户端 <-- 皮肤站: 客户端登陆验证响应
+deactivate 皮肤站
+客户端 -->> 服务器: EncryptionResponse
+deactivate 服务器
+客户端 -> 皮肤站: 客户端加入服务器请求
+activate 皮肤站
+客户端 <-- 皮肤站: 成功返回：HTTP 状态 204
+deactivate 皮肤站
+客户端 <<- 服务器: SetCompression
+客户端 <<-- 服务器: LoginSuccess
+客户端 <<- 服务器: LoginPluginRequest
+客户端 -->> 服务器: LoginPluginResponse
+
+@enduml
