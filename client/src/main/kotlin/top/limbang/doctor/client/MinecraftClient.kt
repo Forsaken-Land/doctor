@@ -15,6 +15,7 @@ import top.limbang.doctor.core.plugin.PluginManager
 import top.limbang.doctor.network.core.NetworkManager
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.event.ConnectionEventArgs
+import top.limbang.doctor.network.exception.ConnectionFailedException
 import top.limbang.doctor.network.handler.PacketEvent
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.setProtocolState
@@ -133,6 +134,10 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
                     .once(PacketEvent(ResponsePacket::class)) {
                         net.shutdown()
                         result.setSuccess(it.json)
+                    }
+                    .once(ConnectionEvent.Error){
+                        net.shutdown()
+                        result.setFailure(ConnectionFailedException("连接失败"))
                     }
 
                 net.connect()
