@@ -7,7 +7,6 @@ import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.definition.play.client.Action.*
 import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
-import top.limbang.doctor.protocol.extension.readEnumValue
 import top.limbang.doctor.protocol.extension.readString
 import top.limbang.doctor.protocol.extension.readUUID
 import top.limbang.doctor.protocol.extension.readVarInt
@@ -31,7 +30,7 @@ data class PlayerListItemPacket(
 
 class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
     override fun decoder(buf: ByteBuf): PlayerListItemPacket {
-        val action = buf.readEnumValue(Action::class.java)
+        val action = Action.getById(buf.readVarInt())!!
 
         val i = buf.readVarInt()
         val players = mutableListOf<PlayerInfo>()
@@ -52,7 +51,7 @@ class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
                         }
                         propertyList.add(property)
                     }
-                    val gameMode = buf.readEnumValue(GameMode::class.java)
+                    val gameMode = GameMode.getByMode(buf.readVarInt())!!
                     val ping = buf.readVarInt()
                     val hasDisplayName = buf.readBoolean()
                     if (hasDisplayName) {
@@ -71,7 +70,7 @@ class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
                     PlayerInfo(uuid)
                 }
                 UPDATE_GAME_MODE -> {
-                    val gameMode = buf.readEnumValue(GameMode::class.java)
+                    val gameMode = GameMode.getByMode(buf.readVarInt())!!
                     PlayerInfo(uuid, gameMode = gameMode)
                 }
                 UPDATE_DISPLAY_NAME -> {
@@ -107,6 +106,11 @@ enum class Action(val id: Int) {
     UPDATE_LATENCY(2),
     UPDATE_DISPLAY_NAME(3),
     REMOVE_PLAYER(4);
+
+    companion object {
+        private val VALUES = values()
+        fun getById(value: Int) = VALUES.firstOrNull { it.id == value }
+    }
 }
 
 @Serializable
