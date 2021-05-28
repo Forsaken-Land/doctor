@@ -5,6 +5,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.entity.ForgeFeature
 import top.limbang.doctor.client.factory.NetworkManagerFactory
+import top.limbang.doctor.client.handler.PacketForwardingHandler
 import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
@@ -39,6 +40,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     private var authServerUrl = "https://authserver.mojang.com/authenticate"
     private var sessionServerUrl = "https://sessionserver.mojang.com"
     private lateinit var networkManager: NetworkManager
+    private var protocol: Int = 0
 
 
     val connection get() = networkManager.connection
@@ -109,6 +111,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         networkManager
             .addListener(loginListener)
             .addListener(PlayListener())
+            .addListener(PacketForwardingHandler())
 
         networkManager.connect()
         return this
@@ -130,6 +133,10 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
      */
     fun sendMessage(msg: String) {
         networkManager.sendPacket(CChatPacket(msg))
+    }
+
+    fun getProtocol(): Int {
+        return protocol
     }
 
     companion object {
