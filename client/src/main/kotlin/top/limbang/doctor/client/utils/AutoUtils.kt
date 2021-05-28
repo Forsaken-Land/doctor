@@ -23,6 +23,12 @@ object AutoUtils {
         return obj.getAsJsonObject("version").getAsJsonPrimitive("name").asString!!
     }
 
+    fun autoProtocol(jsonStr: String): Int {
+        val obj = toJsonObj(jsonStr)
+        //原版
+        return obj.getAsJsonObject("version").getAsJsonPrimitive("protocol").asInt
+    }
+
     /**
      * ### 自动识别 Forge 版本，并注册插件
      */

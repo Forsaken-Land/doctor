@@ -1,23 +1,48 @@
 package top.limbang.doctor.protocol.definition.play.client
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
+import top.limbang.doctor.protocol.extension.readString
+import top.limbang.doctor.protocol.extension.readUUID
+import java.util.*
 
+
+interface ChatPacket : Packet {
+    val json: String
+    val type: ChatType
+}
 
 @Serializable
-data class ChatPacket(
-    val json: String,
-    val type: ChatType
-) : Packet
+data class ChatType0Packet(
+    override val json: String,
+    override val type: ChatType
+) : ChatPacket
 
-class ChatDecoder : PacketDecoder<ChatPacket> {
+@Serializable
+data class ChatType1Packet(
+    override val json: String,
+    override val type: ChatType,
+    @Contextual
+    val sender: UUID
+) : ChatPacket
+
+class ChatType0Decoder : PacketDecoder<ChatPacket> {
     override fun decoder(buf: ByteBuf): ChatPacket {
         val json = buf.readString()
         val type = ChatType.byId(buf.readByte())
-        return ChatPacket(json, type)
+        return ChatType0Packet(json, type)
+    }
+}
+
+class ChatType1Decoder : PacketDecoder<ChatPacket> {
+    override fun decoder(buf: ByteBuf): ChatPacket {
+        val json = buf.readString()
+        val type = ChatType.byId(buf.readByte())
+        val uuid = buf.readUUID()
+        return ChatType1Packet(json, type, uuid)
     }
 }
 

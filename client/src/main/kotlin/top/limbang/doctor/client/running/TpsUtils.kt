@@ -6,9 +6,8 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import top.limbang.doctor.client.MinecraftClient
+import top.limbang.doctor.client.event.ChatEvent
 import top.limbang.doctor.client.utils.asObservable
-import top.limbang.doctor.network.handler.PacketEvent
-import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import java.util.concurrent.TimeUnit
 
 /**
@@ -20,13 +19,13 @@ class TpsUtils(
     val client: MinecraftClient
 ) {
     //观察流（基于ChatPacket事件）
-    private val tpsObservable = client.asObservable(PacketEvent(ChatPacket::class))
+    private val tpsObservable = client.asObservable(ChatEvent)
         .filter {
             //过滤Tps消息
-            it.json.contains("commands.forge.tps.summary")
-        }.map { (json) ->
+            it.chatPacket.json.contains("commands.forge.tps.summary")
+        }.map { (_, chatPacket) ->
             //吧tps消息的json解析
-            parseTpsEntity(json)
+            parseTpsEntity(chatPacket.json)
         }.takeUntil {
             //一直解析到Overall
             it.dim == "Overall"

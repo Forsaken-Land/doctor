@@ -29,18 +29,27 @@ data class LoginSuccessPacket(
  *
  * @see LoginSuccessPacket
  */
-class LoginSuccessDecoder : PacketDecoder<LoginSuccessPacket> {
+class LoginSuccess340Decoder : PacketDecoder<LoginSuccessPacket> {
     /**
      * 解码
      *
      * **客户端**
      */
     override fun decoder(buf: ByteBuf): LoginSuccessPacket {
-        val uUID = if (buf.readableBytes() > 32) {
-            UUID.fromString(buf.readString())
-        } else {
-            buf.readUUID()
-        }
+        val uUID = UUID.fromString(buf.readString())
+        val userName = buf.readString()
+        return LoginSuccessPacket(uUID = uUID, userName = userName)
+    }
+}
+
+class LoginSuccessAfter340Decoder : PacketDecoder<LoginSuccessPacket> {
+    /**
+     * 解码
+     *
+     * **客户端**
+     */
+    override fun decoder(buf: ByteBuf): LoginSuccessPacket {
+        val uUID = buf.readUUID()
         val userName = buf.readString()
         return LoginSuccessPacket(uUID = uUID, userName = userName)
     }

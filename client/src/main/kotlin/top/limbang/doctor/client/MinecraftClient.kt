@@ -4,6 +4,7 @@ import io.netty.util.concurrent.Promise
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.factory.NetworkManagerFactory
+import top.limbang.doctor.client.handler.PacketForwardingHandler
 import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
@@ -36,9 +37,11 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     private var authServerUrl = "https://authserver.mojang.com/authenticate"
     private var sessionServerUrl = "https://sessionserver.mojang.com"
     private lateinit var networkManager: NetworkManager
+    private var protocol: Int = 0
 
 
     val connection get() = networkManager.connection
+
     /**
      * ### 设置在线登录
      */
@@ -80,6 +83,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         val jsonStr = ping(host, port).get()
         val suffix = AutoUtils.autoForgeVersion(jsonStr, pluginManager)
         val version = AutoUtils.autoVersion(jsonStr)
+        protocol = AutoUtils.autoProtocol(jsonStr)
 
         // 判断是否设置了名称,有就代码离线登陆
         val loginListener: LoginListener = if (name.isEmpty()) {
@@ -96,6 +100,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         networkManager
             .addListener(loginListener)
             .addListener(PlayListener())
+            .addListener(PacketForwardingHandler())
 
         networkManager.connect()
         return this
@@ -119,6 +124,10 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         networkManager.sendPacket(CChatPacket(msg))
     }
 
+    fun getProtocol(): Int {
+        return protocol
+    }
+
     companion object {
 
         /**
@@ -135,7 +144,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
                         net.shutdown()
                         result.setSuccess(it.json)
                     }
-                    .once(ConnectionEvent.Error){
+                    .once(ConnectionEvent.Error) {
                         net.shutdown()
                         result.setFailure(ConnectionFailedException("连接失败"))
                     }
