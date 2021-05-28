@@ -1,12 +1,14 @@
 package top.limbang.doctor.protocol.definition.login.server
 
+import io.netty.buffer.ByteBuf
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
+import top.limbang.doctor.protocol.extension.readString
+import top.limbang.doctor.protocol.extension.readUUID
+import top.limbang.doctor.protocol.extension.writeString
 import java.util.*
 
 /**
@@ -34,7 +36,11 @@ class LoginSuccessDecoder : PacketDecoder<LoginSuccessPacket> {
      * **客户端**
      */
     override fun decoder(buf: ByteBuf): LoginSuccessPacket {
-        val uUID = UUID.fromString(buf.readString())
+        val uUID = if (buf.readableBytes() > 32) {
+            UUID.fromString(buf.readString())
+        } else {
+            buf.readUUID()
+        }
         val userName = buf.readString()
         return LoginSuccessPacket(uUID = uUID, userName = userName)
     }

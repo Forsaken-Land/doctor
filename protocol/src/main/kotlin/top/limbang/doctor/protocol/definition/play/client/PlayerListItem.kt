@@ -38,7 +38,7 @@ class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
         for (j in 0 until i) {
             val uuid = buf.readUUID()
             val playerInfo = when (action) {
-                Action.ADD_PLAYER -> {
+                ADD_PLAYER -> {
                     val name = buf.readString(16)
                     val size = buf.readVarInt()
                     val propertyList = mutableListOf<PlayerInfo.Property>()
@@ -63,18 +63,18 @@ class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
 
 
                 }
-                Action.UPDATE_LATENCY -> {
+                UPDATE_LATENCY -> {
                     val ping = buf.readVarInt()
                     PlayerInfo(uuid, ping = ping)
                 }
-                Action.REMOVE_PLAYER -> {
+                REMOVE_PLAYER -> {
                     PlayerInfo(uuid)
                 }
-                Action.UPDATE_GAME_MODE -> {
+                UPDATE_GAME_MODE -> {
                     val gameMode = buf.readEnumValue(GameMode::class.java)
                     PlayerInfo(uuid, gameMode = gameMode)
                 }
-                Action.UPDATE_DISPLAY_NAME -> {
+                UPDATE_DISPLAY_NAME -> {
                     if (buf.readBoolean()) {
                         val chat = ChatGsonSerializer.jsonToChat(buf.readString())
                         PlayerInfo(uuid, hasDisplayName = true, displayName = chat.getFormattedText())
