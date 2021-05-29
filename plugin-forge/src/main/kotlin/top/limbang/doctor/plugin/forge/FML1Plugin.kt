@@ -10,7 +10,6 @@ import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.codec.ForgePacketHandler
 import top.limbang.doctor.plugin.forge.handler.ForgeHandshakeListener
 import top.limbang.doctor.plugin.forge.protocol.FML1
-import top.limbang.doctor.protocol.entity.ServiceResponse
 
 /**
  *
