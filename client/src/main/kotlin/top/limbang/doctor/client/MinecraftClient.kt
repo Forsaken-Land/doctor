@@ -3,11 +3,12 @@ package top.limbang.doctor.client
 import io.netty.util.concurrent.Promise
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import top.limbang.doctor.client.entity.ForgeFeature
 import top.limbang.doctor.client.factory.NetworkManagerFactory
 import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
-import top.limbang.doctor.client.utils.AutoUtils
+import top.limbang.doctor.client.utils.ServiceInfoUtils
 import top.limbang.doctor.client.utils.newPromise
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
@@ -19,6 +20,8 @@ import top.limbang.doctor.network.exception.ConnectionFailedException
 import top.limbang.doctor.network.handler.PacketEvent
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.setProtocolState
+import top.limbang.doctor.plugin.forge.FML1Plugin
+import top.limbang.doctor.plugin.forge.FML2Plugin
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.client.HandshakePacket
 import top.limbang.doctor.protocol.definition.play.server.CChatPacket
@@ -39,6 +42,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
 
 
     val connection get() = networkManager.connection
+
     /**
      * ### 设置在线登录
      */
@@ -78,20 +82,29 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     fun start(host: String, port: Int): MinecraftClient {
         val pluginManager = PluginManager(this)
         val jsonStr = ping(host, port).get()
-        val suffix = AutoUtils.autoForgeVersion(jsonStr, pluginManager)
-        val version = AutoUtils.autoVersion(jsonStr)
+        val serviceInfo = ServiceInfoUtils.getServiceInfo(jsonStr)
+
+        // 注册插件
+        if (serviceInfo.forge != null) when (serviceInfo.forge.forgeFeature) {
+            ForgeFeature.FML1 -> pluginManager.registerPlugin(FML1Plugin(serviceInfo.forge.modMap))
+            ForgeFeature.FML2 -> pluginManager.registerPlugin(FML2Plugin(serviceInfo.forge.modMap))
+        }
+
+        val suffix = if (serviceInfo.forge == null) "" else serviceInfo.forge.forgeFeature.getForgeVersion()
 
         // 判断是否设置了名称,有就代码离线登陆
         val loginListener: LoginListener = if (name.isEmpty()) {
             val sessionService = YggdrasilMinecraftSessionService(authServerUrl, sessionServerUrl)
             val session = sessionService.loginYggdrasilWithPassword(username, password)
-            LoginListener(name, session, AutoUtils.getProtocolVersion(jsonStr), sessionService)
+            LoginListener(name, session, serviceInfo.versionNumber, sessionService, suffix)
         } else {
-            LoginListener(name = name, protocolVersion = AutoUtils.getProtocolVersion(jsonStr))
+            LoginListener(name = name, protocolVersion = serviceInfo.versionNumber, suffix = suffix)
         }
 
         networkManager =
-            NetworkManagerFactory.createNetworkManager(host + suffix, port, pluginManager, version, this)
+            NetworkManagerFactory.createNetworkManager(
+                host, port, pluginManager, serviceInfo.versionName, this
+            )
 
         networkManager
             .addListener(loginListener)
@@ -135,7 +148,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
                         net.shutdown()
                         result.setSuccess(it.json)
                     }
-                    .once(ConnectionEvent.Error){
+                    .once(ConnectionEvent.Error) {
                         net.shutdown()
                         result.setFailure(ConnectionFailedException("连接失败"))
                     }
@@ -163,7 +176,6 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
             ).await()
             arg.context!!.setProtocolState(protocolState)
         }
-
 
     }
 }
