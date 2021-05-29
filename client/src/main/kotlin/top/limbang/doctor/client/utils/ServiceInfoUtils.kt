@@ -8,12 +8,10 @@ import top.limbang.doctor.client.entity.ServiceInfo
 /**
  * ### 服务器信息工具类
  */
-object ServiceInfoUtil {
+object ServiceInfoUtils {
 
     fun getServiceInfo(json: String): ServiceInfo {
         val jsonElement = Json.parseToJsonElement(json)
-
-        println(jsonElement)
 
         // 获取版本信息
         val versionObject = jsonElement.jsonObject["version"]!!

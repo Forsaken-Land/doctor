@@ -32,12 +32,14 @@ import top.limbang.doctor.protocol.definition.login.server.SetCompressionPacket
  * - [session] 会话
  * - [protocolVersion] 协议版本
  * - [sessionService] 会话服务
+ * - [suffix] host 后缀
  */
 class LoginListener(
     private val name: String = "",
     var session: Session? = null,
     private val protocolVersion: Int = 340,
-    private val sessionService: YggdrasilMinecraftSessionService = YggdrasilMinecraftSessionService.Default
+    private val sessionService: YggdrasilMinecraftSessionService = YggdrasilMinecraftSessionService.Default,
+    private val suffix : String = ""
 ) : EventListener {
     lateinit var emitter: EventEmitter
     private val logger: Logger = LoggerFactory.getLogger(LoginListener::class.java)
@@ -59,7 +61,7 @@ class LoginListener(
             connection.sendPacket(
                 HandshakePacket(
                     protocolVersion,
-                    connection.host,
+                    connection.host + suffix,
                     connection.port,
                     ProtocolState.LOGIN
                 )

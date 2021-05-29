@@ -5,7 +5,6 @@ import io.netty.buffer.ByteBuf
 import top.limbang.doctor.protocol.extension.*
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
-import top.limbang.doctor.protocol.entity.ServiceResponse
 import top.limbang.doctor.plugin.forge.api.ChannelPacket
 
 /**
@@ -17,18 +16,18 @@ import top.limbang.doctor.plugin.forge.api.ChannelPacket
 data class ModListPacket(
     val discriminator: Byte,
     val numberOfMods: Int,
-    val modList: List<ServiceResponse.Mod>
+    val modList: Map<String, String>
 ) : ChannelPacket {
-    constructor(modList: List<ServiceResponse.Mod>) : this(2, modList.size, modList)
+    constructor(modList: Map<String, String>) : this(2, modList.size, modList)
 }
 
 class ModListEncoder : PacketEncoder<ModListPacket> {
     override fun encode(buf: ByteBuf, packet: ModListPacket): ByteBuf {
         buf.writeByte(packet.discriminator.toInt())
         buf.writeVarInt(packet.numberOfMods)
-        packet.modList.map {
-            buf.writeString(it.modid)
-            buf.writeString(it.version)
+        packet.modList.forEach {
+            buf.writeString(it.key)
+            buf.writeString(it.value)
         }
         return buf
     }
@@ -39,12 +38,11 @@ class ModListDecoder : PacketDecoder<ModListPacket> {
     override fun decoder(buf: ByteBuf): ModListPacket {
         val discriminator = buf.readByte()
         val numberOfMods = buf.readVarInt()
-        val modList: MutableList<ServiceResponse.Mod> = mutableListOf()
+        val modList = mutableMapOf<String, String>()
         for (i in 0 until numberOfMods) {
             val modId = buf.readString()
             val version = buf.readString()
-            val mod = ServiceResponse.Mod(modId, version)
-            modList.add(mod)
+            modList[modId] = version
         }
         return ModListPacket(discriminator = discriminator, numberOfMods = numberOfMods, modList = modList)
     }

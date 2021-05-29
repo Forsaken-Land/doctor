@@ -18,7 +18,7 @@ import top.limbang.doctor.protocol.entity.ServiceResponse
  * @since 2021-05-14
  */
 class FML1Plugin(
-    val modList: List<ServiceResponse.Mod>,
+    val modList: Map<String, String>,
 ) : Plugin,
     EventEmitter by DefaultEventEmitter() {
 
