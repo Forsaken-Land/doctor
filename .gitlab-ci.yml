@@ -14,7 +14,6 @@ variables:
 
 before_script:
   - java -version
-  - ./gradlew clean
   - export GRADLE_USER_HOME=`pwd`/.gradle
   - echo $CI_COMMIT_BRANCH
 
