@@ -8,6 +8,7 @@ import top.limbang.doctor.client.factory.NetworkManagerFactory
 import top.limbang.doctor.client.handler.PacketForwardingHandler
 import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
+import top.limbang.doctor.client.running.PlayerUtils
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
 import top.limbang.doctor.client.utils.ServiceInfoUtils
 import top.limbang.doctor.client.utils.newPromise
@@ -41,6 +42,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     private var sessionServerUrl = "https://sessionserver.mojang.com"
     private lateinit var networkManager: NetworkManager
     private var protocol: Int = 0
+    private lateinit var playerUtils: PlayerUtils
 
 
     val connection get() = networkManager.connection
@@ -115,6 +117,9 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
             .addListener(PacketForwardingHandler())
 
         networkManager.connect()
+
+        playerUtils = PlayerUtils(this)
+
         return this
     }
 
@@ -138,6 +143,10 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
 
     fun getProtocol(): Int {
         return protocol
+    }
+
+    fun getPlayerUtils(): PlayerUtils {
+        return playerUtils
     }
 
     companion object {

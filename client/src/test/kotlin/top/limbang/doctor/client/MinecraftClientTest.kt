@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.event.ChatEvent
 import top.limbang.doctor.client.event.JoinGameEvent
 import top.limbang.doctor.client.event.TabCompleteEvent
-import top.limbang.doctor.client.running.PlayerUtils
 import top.limbang.doctor.client.running.TpsUtils
 import top.limbang.doctor.client.utils.sendAndWait
 import top.limbang.doctor.network.event.ConnectionEvent
@@ -48,6 +47,7 @@ fun main() {
         .sessionServerUrl(sessionServerUrl)
         .start(host, port)
 
+
     client.on(ConnectionEvent.Disconnect) {
         Thread.sleep(2000)
         client.reconnect()
@@ -63,9 +63,9 @@ fun main() {
     }.on(JoinGameEvent) {
         logger.info("登录成功")
     }
-
     val tps = TpsUtils(client)
-    val players = PlayerUtils(client)
+
+
 
 
     while (true) {
@@ -80,7 +80,7 @@ fun main() {
 
 
             "list" -> {
-                val playerTab = players.getPlayers()
+                val playerTab = client.getPlayerUtils().getPlayers()
                 logger.info(playerTab.toString())
                 logger.info("玩家数量:${playerTab.players.size}")
                 logger.info("更新时间:${playerTab.updateTime}")

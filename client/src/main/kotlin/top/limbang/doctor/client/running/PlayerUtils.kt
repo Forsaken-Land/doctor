@@ -34,24 +34,21 @@ class PlayerUtils(
                 Action.UPDATE_GAME_MODE -> {
                     for (player in packet.players) {
                         val thisPlayer =
-                            players[player.UUID]
-                                ?: throw RuntimeException("错误1？${player.name}${player.UUID}") //理论上不会发生此问题
+                            players[player.UUID]!!
                         thisPlayer.gameMode = player.gameMode
                         players[player.UUID] = thisPlayer
                     }
                 }
                 Action.UPDATE_LATENCY -> {
                     for (player in packet.players) {
-                        val thisPlayer = players[player.UUID]
-                            ?: throw RuntimeException("错误3？${player.name}${player.UUID}") //理论上不会发生此问题
+                        val thisPlayer = players[player.UUID]!!
                         thisPlayer.ping = player.ping
                         players[player.UUID] = thisPlayer
                     }
                 }
                 Action.UPDATE_DISPLAY_NAME -> {
                     for (player in packet.players) {
-                        val thisPlayer = players[player.UUID]
-                            ?: throw RuntimeException("错误3？${player.name}${player.UUID}") //理论上不会发生此问题
+                        val thisPlayer = players[player.UUID]!!
                         thisPlayer.hasDisplayName = player.hasDisplayName
                         thisPlayer.displayName = player.displayName
                         players[player.UUID] = thisPlayer
