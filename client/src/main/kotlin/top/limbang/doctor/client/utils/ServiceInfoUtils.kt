@@ -62,7 +62,7 @@ object ServiceInfoUtils {
                 modVersionStr = "version"
             }
             ForgeFeature.FML2 -> {
-                modStr = "forgeData"
+                modStr = "mods"
                 modIdStr = "modId"
                 modVersionStr = "modmarker"
             }
