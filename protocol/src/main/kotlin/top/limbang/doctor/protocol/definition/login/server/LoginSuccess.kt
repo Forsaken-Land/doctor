@@ -1,12 +1,14 @@
 package top.limbang.doctor.protocol.definition.login.server
 
+import io.netty.buffer.ByteBuf
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
+import top.limbang.doctor.protocol.extension.readString
+import top.limbang.doctor.protocol.extension.readUUID
+import top.limbang.doctor.protocol.extension.writeString
 import java.util.*
 
 /**
@@ -27,7 +29,7 @@ data class LoginSuccessPacket(
  *
  * @see LoginSuccessPacket
  */
-class LoginSuccessDecoder : PacketDecoder<LoginSuccessPacket> {
+class LoginSuccess340Decoder : PacketDecoder<LoginSuccessPacket> {
     /**
      * 解码
      *
@@ -35,6 +37,19 @@ class LoginSuccessDecoder : PacketDecoder<LoginSuccessPacket> {
      */
     override fun decoder(buf: ByteBuf): LoginSuccessPacket {
         val uUID = UUID.fromString(buf.readString())
+        val userName = buf.readString()
+        return LoginSuccessPacket(uUID = uUID, userName = userName)
+    }
+}
+
+class LoginSuccessAfter340Decoder : PacketDecoder<LoginSuccessPacket> {
+    /**
+     * 解码
+     *
+     * **客户端**
+     */
+    override fun decoder(buf: ByteBuf): LoginSuccessPacket {
+        val uUID = buf.readUUID()
         val userName = buf.readString()
         return LoginSuccessPacket(uUID = uUID, userName = userName)
     }

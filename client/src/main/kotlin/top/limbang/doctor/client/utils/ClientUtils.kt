@@ -1,5 +1,6 @@
 package top.limbang.doctor.client.utils
 
+import top.limbang.doctor.core.api.event.Event
 import top.limbang.doctor.network.api.Connection
 import top.limbang.doctor.network.handler.packetEvent
 import top.limbang.doctor.protocol.api.Packet
@@ -16,6 +17,12 @@ inline fun <reified T : Packet> Connection.sendAndWait(packet: Packet): T {
     this.sendPacket(packet)
     return this.emitter.asSingle(packetEvent<T>()).blockingGet()
 }
+
+fun <T> Connection.sendAndWait(event: Event<T>, packet: Packet): T {
+    this.sendPacket(packet)
+    return this.emitter.asSingle(event).blockingGet()
+}
+
 
 inline fun <reified T : Packet> Connection.sendAndWait(packet: Packet, timeout: Long): T {
     this.sendPacket(packet)

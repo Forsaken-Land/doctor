@@ -5,8 +5,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.entity.ForgeFeature
 import top.limbang.doctor.client.factory.NetworkManagerFactory
+import top.limbang.doctor.client.handler.PacketForwardingHandler
 import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
+import top.limbang.doctor.client.running.PlayerUtils
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
 import top.limbang.doctor.client.utils.ServiceInfoUtils
 import top.limbang.doctor.client.utils.newPromise
@@ -39,6 +41,8 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     private var authServerUrl = "https://authserver.mojang.com/authenticate"
     private var sessionServerUrl = "https://sessionserver.mojang.com"
     private lateinit var networkManager: NetworkManager
+    private var protocol: Int = 0
+    private lateinit var playerUtils: PlayerUtils
 
 
     val connection get() = networkManager.connection
@@ -83,6 +87,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         val pluginManager = PluginManager(this)
         val jsonStr = ping(host, port).get()
         val serviceInfo = ServiceInfoUtils.getServiceInfo(jsonStr)
+        protocol = serviceInfo.versionNumber
 
         // 注册插件
         if (serviceInfo.forge != null) when (serviceInfo.forge.forgeFeature) {
@@ -109,8 +114,12 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         networkManager
             .addListener(loginListener)
             .addListener(PlayListener())
+            .addListener(PacketForwardingHandler())
 
         networkManager.connect()
+
+        playerUtils = PlayerUtils(this)
+
         return this
     }
 
@@ -130,6 +139,14 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
      */
     fun sendMessage(msg: String) {
         networkManager.sendPacket(CChatPacket(msg))
+    }
+
+    fun getProtocol(): Int {
+        return protocol
+    }
+
+    fun getPlayerUtils(): PlayerUtils {
+        return playerUtils
     }
 
     companion object {

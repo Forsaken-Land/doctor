@@ -1,10 +1,10 @@
 package top.limbang.doctor.protocol.definition.play.client
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
+import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
+import top.limbang.doctor.protocol.extension.readVarInt
 import java.util.*
 
 /**
@@ -19,8 +19,6 @@ enum class Flags(val id: Int) {
     Z(2),
     Y_ROT(3),
     X_ROT(4);
-
-    private val bit: Int = id
 
     companion object {
 
@@ -41,7 +39,7 @@ enum class Flags(val id: Int) {
     }
 
     private fun getMask(): Int {
-        return 1 shl bit
+        return 1 shl id
     }
 }
 
@@ -52,7 +50,7 @@ data class PlayerPositionAndLookPacket(
     val z: Double,
     val yaw: Float,
     val pitch: Float,
-    val flags: Set<Flags>?,
+    val flags: Set<Flags>?,//TODO 不确定
     val teleportId: Int
 ) : Packet {
     constructor(buf: ByteBuf) : this(

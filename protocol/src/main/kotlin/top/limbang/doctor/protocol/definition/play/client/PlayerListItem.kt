@@ -7,7 +7,6 @@ import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.definition.play.client.Action.*
 import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
-import top.limbang.doctor.protocol.extension.readEnumValue
 import top.limbang.doctor.protocol.extension.readString
 import top.limbang.doctor.protocol.extension.readUUID
 import top.limbang.doctor.protocol.extension.readVarInt
@@ -31,14 +30,14 @@ data class PlayerListItemPacket(
 
 class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
     override fun decoder(buf: ByteBuf): PlayerListItemPacket {
-        val action = buf.readEnumValue(Action::class.java)
+        val action = Action.getById(buf.readVarInt())!!
 
         val i = buf.readVarInt()
         val players = mutableListOf<PlayerInfo>()
         for (j in 0 until i) {
             val uuid = buf.readUUID()
             val playerInfo = when (action) {
-                Action.ADD_PLAYER -> {
+                ADD_PLAYER -> {
                     val name = buf.readString(16)
                     val size = buf.readVarInt()
                     val propertyList = mutableListOf<PlayerInfo.Property>()
@@ -52,7 +51,7 @@ class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
                         }
                         propertyList.add(property)
                     }
-                    val gameMode = buf.readEnumValue(GameMode::class.java)
+                    val gameMode = GameMode.getByMode(buf.readVarInt())!!
                     val ping = buf.readVarInt()
                     val hasDisplayName = buf.readBoolean()
                     if (hasDisplayName) {
@@ -63,18 +62,18 @@ class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
 
 
                 }
-                Action.UPDATE_LATENCY -> {
+                UPDATE_LATENCY -> {
                     val ping = buf.readVarInt()
                     PlayerInfo(uuid, ping = ping)
                 }
-                Action.REMOVE_PLAYER -> {
+                REMOVE_PLAYER -> {
                     PlayerInfo(uuid)
                 }
-                Action.UPDATE_GAME_MODE -> {
-                    val gameMode = buf.readEnumValue(GameMode::class.java)
+                UPDATE_GAME_MODE -> {
+                    val gameMode = GameMode.getByMode(buf.readVarInt())!!
                     PlayerInfo(uuid, gameMode = gameMode)
                 }
-                Action.UPDATE_DISPLAY_NAME -> {
+                UPDATE_DISPLAY_NAME -> {
                     if (buf.readBoolean()) {
                         val chat = ChatGsonSerializer.jsonToChat(buf.readString())
                         PlayerInfo(uuid, hasDisplayName = true, displayName = chat.getFormattedText())
@@ -107,6 +106,11 @@ enum class Action(val id: Int) {
     UPDATE_LATENCY(2),
     UPDATE_DISPLAY_NAME(3),
     REMOVE_PLAYER(4);
+
+    companion object {
+        private val VALUES = values()
+        fun getById(value: Int) = VALUES.firstOrNull { it.id == value }
+    }
 }
 
 @Serializable

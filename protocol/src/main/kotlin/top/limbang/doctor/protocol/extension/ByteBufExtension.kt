@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBufInputStream
 import net.querz.nbt.io.NBTDeserializer
 import net.querz.nbt.tag.CompoundTag
 import top.limbang.doctor.protocol.entity.math.BlockPos
+import top.limbang.doctor.protocol.utils.ResourceLocation
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -132,9 +133,6 @@ fun ByteBuf.readCompoundTag(): CompoundTag {
     }
 }
 
-fun <T : Enum<T>> ByteBuf.readEnumValue(enumClass: Class<T>): T {
-    return (enumClass.enumConstants as Array<*>)[readVarInt()] as T
-}
 
 fun ByteBuf.readUUID(): UUID {
     return UUID(readLong(), readLong())
@@ -147,4 +145,8 @@ fun ByteBuf.readBlockPos(): BlockPos {
 fun ByteBuf.writeBlockPos(pos: BlockPos): ByteBuf {
     this.writeLong(pos.toLong())
     return this
+}
+
+fun ByteBuf.readResourceLocation(): ResourceLocation {
+    return ResourceLocation(readString())
 }

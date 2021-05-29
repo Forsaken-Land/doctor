@@ -2,16 +2,18 @@ package top.limbang.doctor.client
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import top.limbang.doctor.client.running.PlayerUtils
+import top.limbang.doctor.client.event.ChatEvent
+import top.limbang.doctor.client.event.JoinGameEvent
+import top.limbang.doctor.client.event.TabCompleteEvent
 import top.limbang.doctor.client.running.TpsUtils
 import top.limbang.doctor.client.utils.sendAndWait
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
-import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
-import top.limbang.doctor.protocol.definition.play.client.JoinGamePacket
-import top.limbang.doctor.protocol.definition.play.client.STabCompletePacket
-import top.limbang.doctor.protocol.definition.play.server.CTabCompletePacket
+import top.limbang.doctor.protocol.definition.play.client.STabCompleteType0Packet
+import top.limbang.doctor.protocol.definition.play.client.STabCompleteType1Packet
+import top.limbang.doctor.protocol.definition.play.server.CTabCompleteType0Packet
+import top.limbang.doctor.protocol.definition.play.server.CTabCompleteType1Packet
 import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
 import java.io.FileInputStream
 import java.util.*
@@ -45,24 +47,25 @@ fun main() {
         .sessionServerUrl(sessionServerUrl)
         .start(host, port)
 
+
     client.on(ConnectionEvent.Disconnect) {
         Thread.sleep(2000)
         client.reconnect()
-    }.onPacket<ChatPacket> {
-        if (!packet.json.contains("commands.forge.tps.summary")) {
-            val chat = ChatGsonSerializer.jsonToChat(packet.json)
+    }.on(ChatEvent) {
+        if (!it.chatPacket.json.contains("commands.forge.tps.summary")) {
+            val chat = ChatGsonSerializer.jsonToChat(it.chatPacket.json)
             logger.info(chat.getFormattedText())
         }
 
     }.onPacket<DisconnectPacket> {
         val reason = ChatGsonSerializer.jsonToChat(packet.reason)
         logger.warn(reason.getFormattedText())
-    }.onPacket<JoinGamePacket> {
+    }.on(JoinGameEvent) {
         logger.info("登录成功")
     }
-
     val tps = TpsUtils(client)
-    val players = PlayerUtils(client)
+
+
 
 
     while (true) {
@@ -77,7 +80,7 @@ fun main() {
 
 
             "list" -> {
-                val playerTab = players.getPlayers()
+                val playerTab = client.getPlayerUtils().getPlayers()
                 logger.info(playerTab.toString())
                 logger.info("玩家数量:${playerTab.players.size}")
                 logger.info("更新时间:${playerTab.updateTime}")
@@ -90,16 +93,38 @@ fun main() {
             else -> {
                 if (!msg.isNullOrBlank()) {
                     if (msg.startsWith("/")) {
-                        val resp = client.connection.sendAndWait<STabCompletePacket>(CTabCompletePacket(msg))
-                        if (resp.matches.isNotEmpty()) {
-                            val words = msg.split(' ')
-                            val rest = if (words.size > 1) words.subList(0, words.size - 1) else emptyList()
-                            val result = rest.toMutableList().also { it.add(resp.matches.first()) }.joinToString(" ")
-                            logger.info("自动补全命令：${result}")
-                            client.sendMessage(result)
+                        client.connection
+                        if (client.getProtocol() > 348) {//TODO 找不到分辨方式
+                            val resp =
+                                client.connection.sendAndWait(TabCompleteEvent, CTabCompleteType1Packet(text = msg))
+                            if ((resp.sTabCompletePacket as STabCompleteType1Packet).matches.isNotEmpty()) {
+                                val words = msg.split(' ')
+                                val rest = if (words.size > 1) words.subList(0, words.size - 1) else emptyList()
+                                val result =
+                                    rest.toMutableList()
+                                        .also { it.add((resp.sTabCompletePacket as STabCompleteType1Packet).matches.first().match) }
+                                        .joinToString(" ")
+                                logger.info("自动补全命令：/${result}")
+                                client.sendMessage("/$result")
+                            } else {
+                                client.sendMessage(msg)
+                            }
                         } else {
-                            client.sendMessage(msg)
+                            val resp = client.connection.sendAndWait(TabCompleteEvent, CTabCompleteType0Packet(msg))
+                            if ((resp.sTabCompletePacket as STabCompleteType0Packet).matches.isNotEmpty()) {
+                                val words = msg.split(' ')
+                                val rest = if (words.size > 1) words.subList(0, words.size - 1) else emptyList()
+                                val result =
+                                    rest.toMutableList()
+                                        .also { it.add((resp.sTabCompletePacket as STabCompleteType0Packet).matches.first()) }
+                                        .joinToString(" ")
+                                logger.info("自动补全命令：${result}")
+                                client.sendMessage(result)
+                            } else {
+                                client.sendMessage(msg)
+                            }
                         }
+
                     } else {
                         client.sendMessage(msg)
                     }
