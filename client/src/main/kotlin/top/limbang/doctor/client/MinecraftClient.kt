@@ -85,6 +85,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         val pluginManager = PluginManager(this)
         val jsonStr = ping(host, port).get()
         val serviceInfo = ServiceInfoUtils.getServiceInfo(jsonStr)
+        protocol = serviceInfo.versionNumber
 
         // 注册插件
         if (serviceInfo.forge != null) when (serviceInfo.forge.forgeFeature) {
