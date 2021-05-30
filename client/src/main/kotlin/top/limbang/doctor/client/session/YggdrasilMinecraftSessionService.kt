@@ -92,21 +92,28 @@ open class YggdrasilMinecraftSessionService(
      */
     fun validateYggdrasilSession(session: Session): Session {
         val client = HttpClient()
-        if (client.postJson(
-                "$authServer/validate",
-                json.encodeToString(ValidateRequest(session.accessToken, session.clientToken))
-            ).code != 200
-        ) {
-            val body = json.encodeToString(RefreshRequest(session.accessToken, session.clientToken, true, null))
-            val response = HttpClient.postJson("$authServer/refresh", body)
-            if (response.code != 200) {
-                val errorResponse = json.decodeFromString<YggdrasilError>(response.content)
-                throw AuthenticationException("登录验证出错...: ${errorResponse.errorMessage}")
-            }
-            return json.decodeFromString<AuthenticateResponse>(response.content).toSession()
+        try {
 
+
+            if (client.postJson(
+                    "$authServer/validate",
+                    json.encodeToString(ValidateRequest(session.accessToken, session.clientToken))
+                ).code / 100 != 2
+            ) {
+                val body = json.encodeToString(RefreshRequest(session.accessToken, session.clientToken, true, null))
+                val response = client.postJson("$authServer/refresh", body)
+                if (response.code != 200) {
+                    val errorResponse = json.decodeFromString<YggdrasilError>(response.content)
+                    throw AuthenticationException("登录验证出错...: ${errorResponse.errorMessage}")
+                }
+                return json.decodeFromString<AuthenticateResponse>(response.content).toSession()
+
+            }
+
+            return session
+        }finally {
+            client.close()
         }
-        return session
     }
 
 

@@ -88,10 +88,11 @@ class HttpClient {
 
     companion object {
         fun postJson(url: String, body: String): HttpResponse {
-            return HttpClient().let {
-                val result = it.postJson(url, body)
-                it.close()
-                result
+            val client = HttpClient()
+            try {
+                return client.postJson(url, body)
+            } finally {
+                client.close()
             }
         }
     }

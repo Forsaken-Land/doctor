@@ -1,5 +1,9 @@
 package top.limbang.doctor.core
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.lang.reflect.ParameterizedType
 
 /**
@@ -11,7 +15,7 @@ import java.lang.reflect.ParameterizedType
 /**
  * 某个讨厌泛型警告的强制转换
  */
-fun <T: Any> Any.cast() : T {
+fun <T : Any> Any.cast(): T {
     return this as T
 }
 
@@ -28,4 +32,11 @@ fun <T> tryGetGenericType(cls: Class<*>): Class<T>? {
         }
     }
     return null
+}
+
+fun setTimeout(time: Long, action: () -> Unit): Job {
+    return GlobalScope.launch {
+        delay(time)
+        action()
+    }
 }

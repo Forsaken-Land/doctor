@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package top.limbang.doctor.client.running
 
 import com.google.gson.JsonParseException
@@ -29,13 +31,17 @@ class TpsUtils(
         }.takeUntil {
             //一直解析到Overall
             it.dim == "Overall"
-        }.timeout(5, TimeUnit.SECONDS) // 5秒超时
+        }
         .toList() //结果转换为列表
 
-    fun getTps(): MutableList<TpsEntity> {
+    fun getTps(timeout: Long, unit: TimeUnit): MutableList<TpsEntity> {
         client.sendMessage("/forge tps")
         //订阅一次流
-        return tpsObservable.blockingGet()
+        return tpsObservable.timeout(timeout, unit).blockingGet()
+    }
+
+    fun getTps(): MutableList<TpsEntity> {
+        return getTps(5,TimeUnit.SECONDS)
     }
 
     private fun parseTpsEntity(json: String): TpsEntity {

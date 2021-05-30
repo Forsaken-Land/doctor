@@ -11,6 +11,7 @@ import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
 import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
 import java.io.FileInputStream
 import java.util.*
+import kotlin.concurrent.thread
 
 fun main() {
 
@@ -42,12 +43,16 @@ fun main() {
     }.on(JoinGameEvent) {
         logger.info("登陆成功")
 
+        thread {
             val tps = TpsUtils(client)
             val result = tps.getTps()
             logger.info(result.toString())
             client.stop()
+        }
 
     }.on(ConnectionEvent.Disconnect) {
         logger.info("断开连接")
     }
+
+
 }

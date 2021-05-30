@@ -1,8 +1,10 @@
 package top.limbang.doctor.core.impl.event
 
+import org.slf4j.LoggerFactory
 import top.limbang.doctor.core.api.event.Event
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.event.EventHandler
+import top.limbang.doctor.core.setTimeout
 import java.time.Instant
 
 /**
@@ -11,6 +13,9 @@ import java.time.Instant
  * @since 2021-05-13
  */
 class DefaultEventEmitter : EventEmitter {
+    companion object {
+        val logger = LoggerFactory.getLogger(DefaultEventEmitter::class.java)
+    }
     private val listeners = HashMap<Event<*>, HashSet<EventHandler<*>>>()
     private val onceListeners = HashMap<Event<*>, HashSet<EventHandler<*>>>()
     private val durationListeners = HashMap<Event<*>, HashSet<Pair<Long, EventHandler<*>>>>()
@@ -66,20 +71,21 @@ class DefaultEventEmitter : EventEmitter {
     }
 
     override fun <T> emit(event: Event<T>, args: T): EventEmitter {
+        val timeout = setTimeout(1000 * 5) { logger.warn("事件 $event 执行超过5秒") }
         //普通事件
-        listeners[event]?.forEach {
+        listeners[event]?.toList()?.forEach {
             handleEvent(it, args)
         }
 
         //一次性事件
-        onceListeners[event]?.forEach {
+        onceListeners[event]?.toList()?.forEach {
             handleEvent(it, args)
         }
         onceListeners[event]?.clear()
 
         clearExpire(event)
         //计时事件
-        durationListeners[event]?.forEach {
+        durationListeners[event]?.toList()?.forEach {
             handleEvent(it.second, args)
         }
 
@@ -88,6 +94,7 @@ class DefaultEventEmitter : EventEmitter {
                 it.emit(event, args)
             }
         }
+        timeout.cancel()
         return this
     }
 
