@@ -6,6 +6,11 @@ import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.event.EventHandler
 import top.limbang.doctor.core.setTimeout
 import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
+
+typealias  ConcurrentHashSet<E> = ConcurrentHashMap.KeySetView<E, Boolean>
+
+fun <E> newConcurrentHashSet(): ConcurrentHashSet<E> = ConcurrentHashMap.newKeySet()
 
 /**
  * 事件触发器的默认实现
@@ -16,10 +21,11 @@ class DefaultEventEmitter : EventEmitter {
     companion object {
         val logger = LoggerFactory.getLogger(DefaultEventEmitter::class.java)
     }
-    private val listeners = HashMap<Event<*>, HashSet<EventHandler<*>>>()
-    private val onceListeners = HashMap<Event<*>, HashSet<EventHandler<*>>>()
-    private val durationListeners = HashMap<Event<*>, HashSet<Pair<Long, EventHandler<*>>>>()
-    private val targets = HashSet<EventEmitter>()
+
+    private val listeners = ConcurrentHashMap<Event<*>, ConcurrentHashSet<EventHandler<*>>>()
+    private val onceListeners = ConcurrentHashMap<Event<*>, ConcurrentHashSet<EventHandler<*>>>()
+    private val durationListeners = ConcurrentHashMap<Event<*>, ConcurrentHashSet<Pair<Long, EventHandler<*>>>>()
+    private val targets: ConcurrentHashSet<EventEmitter> = newConcurrentHashSet()
 
     private fun clearExpire() {
         val now = Instant.now().epochSecond
@@ -43,7 +49,7 @@ class DefaultEventEmitter : EventEmitter {
 
     override fun <T> on(event: Event<T>, handler: EventHandler<T>): EventEmitter {
         if (!listeners.containsKey(event)) {
-            listeners[event] = HashSet()
+            listeners[event] = newConcurrentHashSet()
         }
         listeners[event]?.add(handler)
         return this
@@ -51,7 +57,7 @@ class DefaultEventEmitter : EventEmitter {
 
     override fun <T> once(event: Event<T>, handler: EventHandler<T>): EventEmitter {
         if (!onceListeners.containsKey(event)) {
-            onceListeners[event] = HashSet()
+            onceListeners[event] = newConcurrentHashSet()
         }
         onceListeners[event]?.add(handler)
         return this
@@ -59,7 +65,7 @@ class DefaultEventEmitter : EventEmitter {
 
     override fun <T> until(event: Event<T>, until: Instant, handler: EventHandler<T>): DefaultEventEmitter {
         if (!durationListeners.containsKey(event)) {
-            durationListeners[event] = HashSet()
+            durationListeners[event] = newConcurrentHashSet()
         }
         durationListeners[event]?.add(Pair(until.epochSecond, handler))
         return this
