@@ -12,7 +12,7 @@ package top.limbang.doctor.client.entity
  * - [forge] Forge 信息
  * - [modNumber] 模组数
  */
-data class ServiceInfo(
+data class ServerInfo(
     val description: String = "",
     val playerMax: Int = 20,
     val playerOnline: Int = 0,

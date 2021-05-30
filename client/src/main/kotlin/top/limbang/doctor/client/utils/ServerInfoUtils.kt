@@ -3,14 +3,14 @@ package top.limbang.doctor.client.utils
 import kotlinx.serialization.json.*
 import top.limbang.doctor.client.entity.ForgeFeature
 import top.limbang.doctor.client.entity.ForgeInfo
-import top.limbang.doctor.client.entity.ServiceInfo
+import top.limbang.doctor.client.entity.ServerInfo
 
 /**
  * ### 服务器信息工具类
  */
-object ServiceInfoUtils {
+object ServerInfoUtils {
 
-    fun getServiceInfo(json: String): ServiceInfo {
+    fun getServiceInfo(json: String): ServerInfo {
         val jsonElement = Json.parseToJsonElement(json)
 
         // 获取版本信息
@@ -34,7 +34,7 @@ object ServiceInfoUtils {
         // 获取mod数
         val modNumber = forge?.modMap?.size ?: 0
 
-        return ServiceInfo(
+        return ServerInfo(
             description,
             playerMax,
             playerOnline,

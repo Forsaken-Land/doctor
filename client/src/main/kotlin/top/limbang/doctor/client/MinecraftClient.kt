@@ -10,7 +10,7 @@ import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
 import top.limbang.doctor.client.running.PlayerUtils
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
-import top.limbang.doctor.client.utils.ServiceInfoUtils
+import top.limbang.doctor.client.utils.ServerInfoUtils
 import top.limbang.doctor.client.utils.newPromise
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
@@ -86,7 +86,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     fun start(host: String, port: Int): MinecraftClient {
         val pluginManager = PluginManager(this)
         val jsonStr = ping(host, port).get()
-        val serviceInfo = ServiceInfoUtils.getServiceInfo(jsonStr)
+        val serviceInfo = ServerInfoUtils.getServiceInfo(jsonStr)
         protocol = serviceInfo.versionNumber
 
         // 注册插件
