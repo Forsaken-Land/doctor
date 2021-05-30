@@ -1,11 +1,17 @@
 package top.limbang.doctor.protocol.definition.login.server
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
+import io.netty.buffer.Unpooled
+import kotlinx.io.core.Closeable
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
+import top.limbang.doctor.protocol.extension.readString
+import top.limbang.doctor.protocol.extension.readVarInt
+import top.limbang.doctor.protocol.extension.writeString
+import top.limbang.doctor.protocol.extension.writeVarInt
 
 /**
  * ### 登录插件请求
@@ -18,8 +24,18 @@ import top.limbang.doctor.protocol.api.PacketEncoder
 data class LoginPluginRequestPacket(
     val messageId: Int,
     val channel: String,
-    val data: ByteArray
-) : Packet
+    @Contextual
+    val data: ByteBuf
+) : Packet, Closeable {
+    override fun close() {
+        try {
+            while (!data.release()) {
+            }
+        } catch (e: Exception) {
+        }
+    }
+
+}
 
 /**
  * ### 登录插件请求解码
@@ -35,9 +51,9 @@ class LoginPluginRequestDecoder : PacketDecoder<LoginPluginRequestPacket> {
     override fun decoder(buf: ByteBuf): LoginPluginRequestPacket {
         val messageId = buf.readVarInt()
         val channel = buf.readString()
-        val data = ByteArray(buf.readableBytes())
-        buf.readBytes(data)
-        return LoginPluginRequestPacket(messageId = messageId, channel = channel, data = data)
+        val byteBuf = Unpooled.buffer(buf.readableBytes())
+        buf.readBytes(byteBuf)
+        return LoginPluginRequestPacket(messageId = messageId, channel = channel, data = byteBuf)
     }
 }
 

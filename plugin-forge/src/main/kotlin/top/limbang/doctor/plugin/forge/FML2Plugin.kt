@@ -4,6 +4,10 @@ import top.limbang.doctor.core.api.IHookProviderRegistry
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.plugin.Plugin
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
+import top.limbang.doctor.network.hooks.InitChannelPipelineHook
+import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
+import top.limbang.doctor.plugin.forge.codec.Forge2PacketHandler
+import top.limbang.doctor.plugin.forge.protocol.FML2
 
 
 /**
@@ -16,6 +20,7 @@ class FML2Plugin(
 ) : Plugin,
     EventEmitter by DefaultEventEmitter() {
 
+    private val channelPacketRegistry = FML2()
 
     override fun created() {
     }
@@ -27,18 +32,18 @@ class FML2Plugin(
      * 注册插件的事件
      */
     override fun registerEvent(emitter: EventEmitter) {
-     //   emitter.addListener(ForgeHandshakeListener(this))
+        //   emitter.addListener(ForgeHandshakeListener(this))
     }
 
     override fun hookProvider(registry: IHookProviderRegistry) {
-//        registry.provider(InitChannelPipelineHook::class.java).addHook {
-//            this.pipeline().addBefore(
-//                "clientHandler", "fml2:clientHandler",
-//                ForgePacketHandler(this@FML2Plugin, FML2()) //TODO: 这个handler逻辑或许得改
-//            )
-//
-//            this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.REGISTER)
-//        }
+        registry.provider(InitChannelPipelineHook::class.java).addHook {
+            this.pipeline().addBefore(
+                "clientHandler", "fml2:clientHandler",
+                Forge2PacketHandler(this@FML2Plugin, channelPacketRegistry) //TODO: 这个handler逻辑或许得改
+            )
+
+            this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.REGISTER)
+        }
 
     }
 

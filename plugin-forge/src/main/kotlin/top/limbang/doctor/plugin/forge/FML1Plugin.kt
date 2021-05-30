@@ -7,7 +7,7 @@ import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.network.handler.ReadPacketListener
 import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
-import top.limbang.doctor.plugin.forge.codec.ForgePacketHandler
+import top.limbang.doctor.plugin.forge.codec.Forge1PacketHandler
 import top.limbang.doctor.plugin.forge.handler.ForgeHandshakeListener
 import top.limbang.doctor.plugin.forge.protocol.FML1
 
@@ -41,7 +41,7 @@ class FML1Plugin(
         registry.provider(InitChannelPipelineHook::class.java).addHook {
             this.pipeline().addBefore(
                 "clientHandler", "fml1:clientHandler",
-                ForgePacketHandler(this@FML1Plugin, channelPacketRegistry) //TODO: 这个handler逻辑或许得改
+                Forge1PacketHandler(this@FML1Plugin, channelPacketRegistry) //TODO: 这个handler逻辑或许得改
             )
 
             this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.REGISTER)

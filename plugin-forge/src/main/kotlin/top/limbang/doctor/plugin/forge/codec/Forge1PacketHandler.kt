@@ -18,12 +18,12 @@ import top.limbang.doctor.protocol.definition.play.client.CustomPayloadPacket
  * @author WarmthDawn
  * @since 2021-05-15
  */
-class ForgePacketHandler(
+class Forge1PacketHandler(
     val emitter: EventEmitter,
     val channelRegistry: IChannelPacketRegistry
 ) : MessageToMessageCodec<Packet, ChannelPacket>() {
 
-    private val logger: Logger = LoggerFactory.getLogger(ForgePacketHandler::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(Forge1PacketHandler::class.java)
 
     override fun encode(ctx: ChannelHandlerContext, msg: ChannelPacket, out: MutableList<Any>) {
         val buf = ctx.alloc().buffer()
