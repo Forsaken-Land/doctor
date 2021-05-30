@@ -77,4 +77,9 @@ data class PlayerTab(
     constructor(updateTime: LocalDateTime, players: Map<@Contextual UUID, PlayerInfo>) : this(
         updateTime.format(DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm:ss")), players
     )
+
+    fun getUpdateTime(): LocalDateTime {
+        return LocalDateTime.parse(updateTime, DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH mm ss"))
+    }
+
 }

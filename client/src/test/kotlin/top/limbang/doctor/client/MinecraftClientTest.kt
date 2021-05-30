@@ -3,13 +3,13 @@ package top.limbang.doctor.client
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.event.ChatEvent
-import top.limbang.doctor.client.event.JoinGameEvent
 import top.limbang.doctor.client.event.TabCompleteEvent
 import top.limbang.doctor.client.running.TpsUtils
 import top.limbang.doctor.client.utils.sendAndWait
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
+import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
 import top.limbang.doctor.protocol.definition.play.client.STabCompleteType0Packet
 import top.limbang.doctor.protocol.definition.play.client.STabCompleteType1Packet
 import top.limbang.doctor.protocol.definition.play.server.CTabCompleteType0Packet
@@ -45,6 +45,7 @@ fun main() {
         .user(username, password)
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
+        .enablePlayerList()
         .start(host, port)
 
 
@@ -60,11 +61,10 @@ fun main() {
     }.onPacket<DisconnectPacket> {
         val reason = ChatGsonSerializer.jsonToChat(packet.reason)
         logger.warn(reason.getFormattedText())
-    }.on(JoinGameEvent) {
+    }.onPacket<PlayerPositionAndLookPacket> {
         logger.info("登录成功")
     }
     val tps = TpsUtils(client)
-
 
 
 
@@ -80,7 +80,7 @@ fun main() {
 
 
             "list" -> {
-                val playerTab = client.getPlayerUtils().getPlayers()
+                val playerTab = client.getPlayerTab()
                 logger.info(playerTab.toString())
                 logger.info("玩家数量:${playerTab.players.size}")
                 logger.info("更新时间:${playerTab.updateTime}")
@@ -94,7 +94,7 @@ fun main() {
                 if (!msg.isNullOrBlank()) {
                     if (msg.startsWith("/")) {
                         client.connection
-                        if (client.getProtocol() > 348) {//TODO 找不到分辨方式
+                        if (client.getProtocol() > 348) { //TODO 找不到分辨方式
                             val resp =
                                 client.connection.sendAndWait(TabCompleteEvent, CTabCompleteType1Packet(text = msg))
                             if ((resp.sTabCompletePacket as STabCompleteType1Packet).matches.isNotEmpty()) {
@@ -133,6 +133,7 @@ fun main() {
         }
 
     }
+
 }
 
 

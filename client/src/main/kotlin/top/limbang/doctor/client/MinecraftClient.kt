@@ -8,6 +8,7 @@ import top.limbang.doctor.client.factory.NetworkManagerFactory
 import top.limbang.doctor.client.handler.PacketForwardingHandler
 import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
+import top.limbang.doctor.client.running.PlayerTab
 import top.limbang.doctor.client.running.PlayerUtils
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
 import top.limbang.doctor.client.utils.ServerInfoUtils
@@ -81,6 +82,14 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     }
 
     /**
+     * ### 设置是否监关闭听玩家列表
+     */
+    fun enablePlayerList(): MinecraftClient {
+        this.playerUtils = PlayerUtils(this)
+        return this
+    }
+
+    /**
      * ### 启动客户端
      */
     fun start(host: String, port: Int): MinecraftClient {
@@ -118,7 +127,6 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
 
         networkManager.connect()
 
-        playerUtils = PlayerUtils(this)
 
         return this
     }
@@ -155,8 +163,13 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         return protocol
     }
 
-    fun getPlayerUtils(): PlayerUtils {
-        return playerUtils
+    fun getPlayerTab(): PlayerTab {
+        if (this::playerUtils.isInitialized) {
+            return playerUtils.getPlayers()
+        } else {
+            throw RuntimeException("未开启玩家列表监听")
+        }
+
     }
 
     companion object {
