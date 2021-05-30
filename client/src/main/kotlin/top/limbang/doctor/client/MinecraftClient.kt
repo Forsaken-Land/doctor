@@ -124,6 +124,16 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     }
 
     /**
+     * ### 停止客户端
+     */
+    fun stop() {
+        if (this::networkManager.isInitialized) {
+            networkManager.shutdown()
+        }
+    }
+
+
+    /**
      * ### 重新连接
      */
     fun reconnect(): MinecraftClient {
