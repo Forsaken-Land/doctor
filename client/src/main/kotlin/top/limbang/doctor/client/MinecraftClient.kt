@@ -115,8 +115,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
             LoginListener(name = name, protocolVersion = serviceInfo.versionNumber, suffix = suffix)
         }
 
-        networkManager =
-            NetworkManagerFactory.createNetworkManager(
+        networkManager = NetworkManagerFactory.createNetworkManager(
                 host, port, pluginManager, serviceInfo.versionName, this
             )
 
@@ -126,7 +125,6 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
             .addListener(PacketForwardingHandler())
 
         networkManager.connect()
-
 
         return this
     }

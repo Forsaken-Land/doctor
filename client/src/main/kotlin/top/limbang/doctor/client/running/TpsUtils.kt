@@ -44,24 +44,26 @@ class TpsUtils(
         return getTps(5,TimeUnit.SECONDS)
     }
 
-    private fun parseTpsEntity(json: String): TpsEntity {
-        var chat = Json.parseToJsonElement(json).jsonObject
-        while (!chat.containsKey("translate")) {
-            if (chat.containsKey("extra")) {
-                chat = chat.get("extra")!!.jsonObject
-            } else {
-                throw JsonParseException("tps格式不正确")
+    companion object {
+        fun parseTpsEntity(json: String): TpsEntity {
+            var chat = Json.parseToJsonElement(json).jsonObject
+            while (!chat.containsKey("translate")) {
+                if (chat.containsKey("extra")) {
+                    chat = chat.get("extra")!!.jsonObject
+                } else {
+                    throw JsonParseException("tps格式不正确")
+                }
             }
-        }
-        val (dim, tickTime, tps) = chat["with"]!!.jsonArray.map {
-            it.jsonPrimitive.content
-        }
+            val (dim, tickTime, tps) = chat["with"]!!.jsonArray.map {
+                it.jsonPrimitive.content
+            }
 
-        return TpsEntity(
-            dim,
-            tickTime.toDouble(),
-            tps.toDouble()
-        )
+            return TpsEntity(
+                dim,
+                tickTime.toDouble(),
+                tps.toDouble()
+            )
+        }
     }
 }
 
