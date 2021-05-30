@@ -1,12 +1,11 @@
 package top.limbang.doctor.protocol.entity.text.translation
 
-import com.google.common.collect.Maps
-import com.google.common.io.Resources
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.HashMap
 
 /**
  *
@@ -15,7 +14,7 @@ import java.util.regex.Pattern
  */
 class LangResources {
     var loaded: Boolean = false
-    private val properties: MutableMap<String, String> = Maps.newHashMap()
+    private val properties: MutableMap<String, String> = HashMap()
     private var unicode = false
 
     fun isUnicode(): Boolean {
@@ -41,7 +40,7 @@ class LangResources {
 
     fun loadLocaleData() {
         properties.clear()
-        val rootPath = File(Resources.getResource("language").toURI())
+        val rootPath = File(javaClass.getResource("/language/")!!.toURI())
         (rootPath.list() ?: emptyArray()).map {
             Paths.get(rootPath.path, it, "lang", "zh_cn.lang").toFile()
         }.filter {

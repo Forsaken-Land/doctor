@@ -2,7 +2,7 @@
 
 package top.limbang.doctor.client.running
 
-import com.google.gson.JsonParseException
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -51,7 +51,7 @@ class TpsUtils(
                 if (chat.containsKey("extra")) {
                     chat = chat.get("extra")!!.jsonObject
                 } else {
-                    throw JsonParseException("tps格式不正确")
+                    throw SerializationException("tps格式不正确")
                 }
             }
             val (dim, tickTime, tps) = chat["with"]!!.jsonArray.map {

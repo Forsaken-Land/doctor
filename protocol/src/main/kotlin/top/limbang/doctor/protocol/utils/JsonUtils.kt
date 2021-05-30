@@ -1,6 +1,6 @@
 package top.limbang.doctor.protocol.utils
 
-import com.google.gson.JsonObject
+import kotlinx.serialization.json.*
 
 /**
  *
@@ -12,12 +12,12 @@ class JsonUtils {
 }
 
 fun JsonObject.stringChild(name: String): String {
-    return this.getAsJsonPrimitive(name).asString
+    return this[name]!!.jsonPrimitive.content
 }
 
 fun JsonObject.stringChildNullable(name: String): String? {
-    return if (this.has(name)) {
-        this.getAsJsonPrimitive(name).asString
+    return if (this.contains(name)) {
+        this[name]?.jsonPrimitive?.contentOrNull
     } else {
         null
     }

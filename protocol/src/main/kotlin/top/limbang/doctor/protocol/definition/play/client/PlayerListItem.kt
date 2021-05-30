@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.definition.play.client.Action.*
-import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
+import top.limbang.doctor.protocol.entity.text.ChatSerializer
 import top.limbang.doctor.protocol.extension.readString
 import top.limbang.doctor.protocol.extension.readUUID
 import top.limbang.doctor.protocol.extension.readVarInt
@@ -55,7 +55,7 @@ class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
                     val ping = buf.readVarInt()
                     val hasDisplayName = buf.readBoolean()
                     if (hasDisplayName) {
-                        val chat = ChatGsonSerializer.jsonToChat(buf.readString())
+                        val chat = ChatSerializer.jsonToChat(buf.readString())
                         val nickname = chat.getFormattedText()
                         PlayerInfo(uuid, name, size, propertyList, ping, gameMode, hasDisplayName, nickname)
                     } else PlayerInfo(uuid, name, size, propertyList, ping, gameMode, hasDisplayName)
@@ -75,7 +75,7 @@ class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
                 }
                 UPDATE_DISPLAY_NAME -> {
                     if (buf.readBoolean()) {
-                        val chat = ChatGsonSerializer.jsonToChat(buf.readString())
+                        val chat = ChatSerializer.jsonToChat(buf.readString())
                         PlayerInfo(uuid, hasDisplayName = true, displayName = chat.getFormattedText())
                     } else PlayerInfo(uuid, hasDisplayName = false)
                 }

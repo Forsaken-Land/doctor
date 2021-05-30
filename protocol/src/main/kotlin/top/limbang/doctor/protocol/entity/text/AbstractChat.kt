@@ -1,6 +1,5 @@
 package top.limbang.doctor.protocol.entity.text
 
-import com.google.common.collect.Iterators
 import top.limbang.doctor.protocol.entity.text.style.Style
 import top.limbang.doctor.protocol.entity.text.style.TextFormatting
 import top.limbang.doctor.protocol.entity.text.style.Type
@@ -68,20 +67,15 @@ abstract class AbstractChat : IChat {
         }
 
 
-    open fun createDeepCopyIterator(components: Iterable<IChat>): Iterator<IChat> {
-        return Iterators
-            .concat(Iterators.transform(components.iterator()) { it!!.iterator() })
-            .let {
-                Iterators.transform(it) { chat ->
-                    chat!!.copy().apply {
-                        style = style.deepCopy()
-                    }
-                }
-            }
+    open fun createDeepCopySequence(components: Iterable<IChat>): Sequence<IChat> {
+        return components.asSequence()
+            .flatten()
+            .map { it.copy().apply { style = style.deepCopy() } }
     }
 
-    override fun iterator(): Iterator<IChat> =
-        Iterators.concat(Iterators.forArray(this), createDeepCopyIterator(this.siblings))
+    override fun iterator(): Iterator<IChat> {
+        return sequenceOf(this).plus(createDeepCopySequence(this.siblings)).iterator()
+    }
 
     override fun getSiblings(): List<IChat> = this.siblings
 

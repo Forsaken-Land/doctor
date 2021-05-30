@@ -3,18 +3,12 @@ package top.limbang.doctor.client
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.event.ChatEvent
-import top.limbang.doctor.client.event.TabCompleteEvent
 import top.limbang.doctor.client.running.TpsUtils
-import top.limbang.doctor.client.utils.sendAndWait
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
 import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
-import top.limbang.doctor.protocol.definition.play.client.STabCompleteType0Packet
-import top.limbang.doctor.protocol.definition.play.client.STabCompleteType1Packet
-import top.limbang.doctor.protocol.definition.play.server.CTabCompleteType0Packet
-import top.limbang.doctor.protocol.definition.play.server.CTabCompleteType1Packet
-import top.limbang.doctor.protocol.entity.text.ChatGsonSerializer
+import top.limbang.doctor.protocol.entity.text.ChatSerializer
 import java.io.FileInputStream
 import java.util.*
 
@@ -54,19 +48,17 @@ fun main() {
         client.reconnect()
     }.on(ChatEvent) {
         if (!it.chatPacket.json.contains("commands.forge.tps.summary")) {
-            val chat = ChatGsonSerializer.jsonToChat(it.chatPacket.json)
+            val chat = ChatSerializer.jsonToChat(it.chatPacket.json)
             logger.info(chat.getFormattedText())
         }
 
     }.onPacket<DisconnectPacket> {
-        val reason = ChatGsonSerializer.jsonToChat(packet.reason)
+        val reason = ChatSerializer.jsonToChat(packet.reason)
         logger.warn(reason.getFormattedText())
     }.onPacket<PlayerPositionAndLookPacket> {
         logger.info("登录成功")
     }
     val tps = TpsUtils(client)
-
-
 
     while (true) {
         when (val msg = readLine()) {
@@ -89,47 +81,52 @@ fun main() {
                 }
 
             }
-
             else -> {
                 if (!msg.isNullOrBlank()) {
-                    if (msg.startsWith("/")) {
-                        client.connection
-                        if (client.getProtocol() > 348) { //TODO 找不到分辨方式
-                            val resp =
-                                client.connection.sendAndWait(TabCompleteEvent, CTabCompleteType1Packet(text = msg))
-                            if ((resp.sTabCompletePacket as STabCompleteType1Packet).matches.isNotEmpty()) {
-                                val words = msg.split(' ')
-                                val rest = if (words.size > 1) words.subList(0, words.size - 1) else emptyList()
-                                val result =
-                                    rest.toMutableList()
-                                        .also { it.add((resp.sTabCompletePacket as STabCompleteType1Packet).matches.first().match) }
-                                        .joinToString(" ")
-                                logger.info("自动补全命令：/${result}")
-                                client.sendMessage("/$result")
-                            } else {
-                                client.sendMessage(msg)
-                            }
-                        } else {
-                            val resp = client.connection.sendAndWait(TabCompleteEvent, CTabCompleteType0Packet(msg))
-                            if ((resp.sTabCompletePacket as STabCompleteType0Packet).matches.isNotEmpty()) {
-                                val words = msg.split(' ')
-                                val rest = if (words.size > 1) words.subList(0, words.size - 1) else emptyList()
-                                val result =
-                                    rest.toMutableList()
-                                        .also { it.add((resp.sTabCompletePacket as STabCompleteType0Packet).matches.first()) }
-                                        .joinToString(" ")
-                                logger.info("自动补全命令：${result}")
-                                client.sendMessage(result)
-                            } else {
-                                client.sendMessage(msg)
-                            }
-                        }
-
-                    } else {
-                        client.sendMessage(msg)
-                    }
+                    client.sendMessage(msg)
                 }
             }
+//
+//            else -> {
+//                if (!msg.isNullOrBlank()) {
+//                    if (msg.startsWith("/")) {
+//                        client.connection
+//                        if (client.getProtocol() > 348) { //TODO 找不到分辨方式
+//                            val resp =
+//                                client.connection.sendAndWait(TabCompleteEvent, CTabCompleteType1Packet(text = msg))
+//                            if ((resp.sTabCompletePacket as STabCompleteType1Packet).matches.isNotEmpty()) {
+//                                val words = msg.split(' ')
+//                                val rest = if (words.size > 1) words.subList(0, words.size - 1) else emptyList()
+//                                val result =
+//                                    rest.toMutableList()
+//                                        .also { it.add((resp.sTabCompletePacket as STabCompleteType1Packet).matches.first().match) }
+//                                        .joinToString(" ")
+//                                logger.info("自动补全命令：/${result}")
+//                                client.sendMessage("/$result")
+//                            } else {
+//                                client.sendMessage(msg)
+//                            }
+//                        } else {
+//                            val resp = client.connection.sendAndWait(TabCompleteEvent, CTabCompleteType0Packet(msg))
+//                            if ((resp.sTabCompletePacket as STabCompleteType0Packet).matches.isNotEmpty()) {
+//                                val words = msg.split(' ')
+//                                val rest = if (words.size > 1) words.subList(0, words.size - 1) else emptyList()
+//                                val result =
+//                                    rest.toMutableList()
+//                                        .also { it.add((resp.sTabCompletePacket as STabCompleteType0Packet).matches.first()) }
+//                                        .joinToString(" ")
+//                                logger.info("自动补全命令：${result}")
+//                                client.sendMessage(result)
+//                            } else {
+//                                client.sendMessage(msg)
+//                            }
+//                        }
+//
+//                    } else {
+//                        client.sendMessage(msg)
+//                    }
+//                }
+//            }
         }
 
     }

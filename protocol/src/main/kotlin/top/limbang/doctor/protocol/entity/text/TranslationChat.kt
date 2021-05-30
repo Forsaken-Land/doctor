@@ -1,6 +1,5 @@
 package top.limbang.doctor.protocol.entity.text
 
-import com.google.common.collect.Iterators
 import top.limbang.doctor.protocol.entity.text.style.Style
 import top.limbang.doctor.protocol.entity.text.translation.I18n
 import java.util.*
@@ -126,7 +125,10 @@ class TranslationChat(
 
     override fun iterator(): Iterator<IChat> {
         tryInit()
-        return Iterators.concat(createDeepCopyIterator(this.children), createDeepCopyIterator(this.siblings))
+        return sequenceOf(
+            createDeepCopySequence(this.children),
+            createDeepCopySequence(this.siblings)
+        ).flatten().iterator()
     }
 
 

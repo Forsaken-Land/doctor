@@ -6,7 +6,6 @@ import top.limbang.doctor.client.event.ChatEvent
 import top.limbang.doctor.client.event.JoinGameEvent
 import top.limbang.doctor.client.running.TpsEntity
 import top.limbang.doctor.client.running.TpsUtils
-import top.limbang.doctor.client.utils.substringBetween
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
 import java.io.FileInputStream
@@ -31,33 +30,6 @@ fun main() {
         .sessionServerUrl(sessionServerUrl)
         .start(host, port)
 
-    val tpsList = mutableListOf<TpsEntity>()
-    client.on(ChatEvent) {
-        if (it.chatPacket.json.contains("commands.forge.tps.summary")) {
-            val tpsEntity = TpsUtils.parseTpsEntity(it.chatPacket.json)
-            tpsList.add(tpsEntity)
-            if (tpsEntity.dim != "Overall") return@on
-
-            var outMsg = "[XX服务器]低于20TPS如下:\n"
-            tpsList.filterIndexed { index, tpsEntity ->
-                val dim = tpsEntity.dim.substringBetween("Dim", "(").trim()
-                outMsg += when {
-                    index == tpsList.size - 1 -> {
-                        "\n全局TPS:${tpsEntity.tps} Tick时间:${tpsEntity.tickTime}\n"
-                    }
-                    tpsEntity.tps < 20 -> "TPS:%-4.4s 维度:%s\n".format(tpsEntity.tps, dim)
-                    else -> ""
-                }
-                true
-            }
-            println(outMsg)
-            client.stop()
-        }
-    }.once(JoinGameEvent) {
-        logger.info("登陆成功")
-    }.onPacket<PlayerPositionAndLookPacket> {
-        client.sendMessage("/forge tps")
-    }
 
 
 }
