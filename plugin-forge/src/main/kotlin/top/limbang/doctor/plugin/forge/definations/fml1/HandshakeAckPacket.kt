@@ -1,11 +1,10 @@
-package top.limbang.doctor.plugin.forge.definations.fml
+package top.limbang.doctor.plugin.forge.definations.fml1
 
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
 import kotlinx.serialization.Serializable
+import top.limbang.doctor.plugin.forge.api.FML1Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
-import top.limbang.doctor.plugin.forge.api.ChannelPacket
 
 /**
  *
@@ -16,7 +15,7 @@ import top.limbang.doctor.plugin.forge.api.ChannelPacket
 data class HandshakeAckPacket(
     val discriminator: Byte = -1,
     val phase: Byte
-) : ChannelPacket
+) : FML1Packet
 
 class HandshakeAckDecoder : PacketDecoder<HandshakeAckPacket> {
     override fun decoder(buf: ByteBuf): HandshakeAckPacket {

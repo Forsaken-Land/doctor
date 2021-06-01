@@ -1,8 +1,8 @@
-package top.limbang.doctor.plugin.forge.definations.fml
+package top.limbang.doctor.plugin.forge.definations.fml1
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.plugin.forge.api.ChannelPacket
+import kotlinx.serialization.Serializable
+import top.limbang.doctor.plugin.forge.api.FML1Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 
 /**
@@ -13,7 +13,7 @@ import top.limbang.doctor.protocol.api.PacketDecoder
 @Serializable
 data class ForgeChannelPacket(
     val string: String
-) : ChannelPacket
+) : FML1Packet
 
 class ForgeChannelDecoder : PacketDecoder<ForgeChannelPacket> {
     override fun decoder(buf: ByteBuf): ForgeChannelPacket {

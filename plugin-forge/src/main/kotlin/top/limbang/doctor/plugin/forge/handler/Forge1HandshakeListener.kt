@@ -7,7 +7,8 @@ import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.plugin.forge.ATTR_FORGE_STATE
 import top.limbang.doctor.plugin.forge.FML1Plugin
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
-import top.limbang.doctor.plugin.forge.definations.fml.*
+import top.limbang.doctor.plugin.forge.definations.fml1.*
+import top.limbang.doctor.plugin.forge.definations.fml2.ModListPacket
 import top.limbang.doctor.plugin.forge.event.ForgeStateChange
 import top.limbang.doctor.plugin.forge.event.ForgeStateChangeEventArgs
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
@@ -17,7 +18,7 @@ import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
  * @date 2021/4/30
  * @time 21:16
  */
-class ForgeHandshakeListener(
+class Forge1HandshakeListener(
     val fmlPlugin: FML1Plugin
 ) : EventListener {
 

@@ -7,6 +7,7 @@ import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.codec.Forge2PacketHandler
+import top.limbang.doctor.plugin.forge.handler.Forge2HandshakeListener
 import top.limbang.doctor.plugin.forge.protocol.FML2
 
 
@@ -32,7 +33,7 @@ class FML2Plugin(
      * 注册插件的事件
      */
     override fun registerEvent(emitter: EventEmitter) {
-        //   emitter.addListener(ForgeHandshakeListener(this))
+           emitter.addListener(Forge2HandshakeListener(this))
     }
 
     override fun hookProvider(registry: IHookProviderRegistry) {

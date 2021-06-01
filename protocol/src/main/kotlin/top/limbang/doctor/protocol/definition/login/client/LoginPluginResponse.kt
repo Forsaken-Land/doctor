@@ -1,11 +1,15 @@
 package top.limbang.doctor.protocol.definition.login.client
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
+import io.netty.buffer.Unpooled
+import kotlinx.io.core.Closeable
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
+import top.limbang.doctor.protocol.extension.readVarInt
+import top.limbang.doctor.protocol.extension.writeVarInt
 
 /**
  * ### 登录插件响应
@@ -18,8 +22,17 @@ import top.limbang.doctor.protocol.api.PacketEncoder
 data class LoginPluginResponsePacket(
     val messageId: Int,
     val successful: Boolean,
-    val data: ByteArray
-) : Packet
+    @Contextual
+    val data: ByteBuf
+) : Packet, Closeable {
+    override fun close() {
+        try {
+            while (!data.release()) {
+            }
+        } catch (e: Exception) {
+        }
+    }
+}
 
 
 /**
@@ -56,7 +69,7 @@ class LoginPluginResponseDecoder : PacketDecoder<LoginPluginResponsePacket> {
     override fun decoder(buf: ByteBuf): LoginPluginResponsePacket {
         val messageId = buf.readVarInt()
         val successful = buf.readBoolean()
-        val data = ByteArray(buf.readableBytes())
+        val data = Unpooled.buffer(buf.readableBytes())
         buf.readBytes(data)
         return LoginPluginResponsePacket(messageId, successful, data)
     }

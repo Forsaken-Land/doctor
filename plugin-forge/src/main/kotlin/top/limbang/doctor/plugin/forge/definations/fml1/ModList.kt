@@ -1,11 +1,14 @@
-package top.limbang.doctor.plugin.forge.definations.fml
+package top.limbang.doctor.plugin.forge.definations.fml1
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
+import kotlinx.serialization.Serializable
+import top.limbang.doctor.plugin.forge.api.FML1Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
-import top.limbang.doctor.plugin.forge.api.ChannelPacket
+import top.limbang.doctor.protocol.extension.readString
+import top.limbang.doctor.protocol.extension.readVarInt
+import top.limbang.doctor.protocol.extension.writeString
+import top.limbang.doctor.protocol.extension.writeVarInt
 
 /**
  * @author Doctor_Yin
@@ -17,7 +20,7 @@ data class ModListPacket(
     val discriminator: Byte,
     val numberOfMods: Int,
     val modList: Map<String, String>
-) : ChannelPacket {
+) : FML1Packet {
     constructor(modList: Map<String, String>) : this(2, modList.size, modList)
 }
 

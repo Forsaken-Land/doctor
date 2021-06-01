@@ -8,7 +8,7 @@ import top.limbang.doctor.network.handler.ReadPacketListener
 import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.codec.Forge1PacketHandler
-import top.limbang.doctor.plugin.forge.handler.ForgeHandshakeListener
+import top.limbang.doctor.plugin.forge.handler.Forge1HandshakeListener
 import top.limbang.doctor.plugin.forge.protocol.FML1
 
 /**
@@ -34,7 +34,7 @@ class FML1Plugin(
      */
     override fun registerEvent(emitter: EventEmitter) {
         emitter.addListener(ReadPacketListener())
-        emitter.addListener(ForgeHandshakeListener(this))
+        emitter.addListener(Forge1HandshakeListener(this))
     }
 
     override fun hookProvider(registry: IHookProviderRegistry) {

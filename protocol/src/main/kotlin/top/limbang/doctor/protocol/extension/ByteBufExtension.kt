@@ -150,3 +150,8 @@ fun ByteBuf.writeBlockPos(pos: BlockPos): ByteBuf {
 fun ByteBuf.readResourceLocation(): ResourceLocation {
     return ResourceLocation(readString())
 }
+
+fun ByteBuf.writeResourceLocation(resourceLocation: ResourceLocation): ByteBuf {
+    writeString("${resourceLocation.namespace}:${resourceLocation.path}")
+    return this
+}

@@ -19,7 +19,7 @@ fun createProtocol(name: String, pluginManager: IPluginManager): IPacketRegistry
     return when (name) {
         "1.12.2" -> MinecraftClientProtocol_v1_12_2(pluginManager)
 
-        "1.16.2" -> MinecraftClientProtocol_v1_16_2(pluginManager)
+        "1.16.2", "1.16.5" -> MinecraftClientProtocol_v1_16_2(pluginManager)
 
         else -> {
             throw ProtocolException("找不到协议$name")

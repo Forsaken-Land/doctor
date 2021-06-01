@@ -2,7 +2,7 @@ package top.limbang.doctor.plugin.forge.protocol
 
 import top.limbang.doctor.plugin.forge.api.ForgeProtocol
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
-import top.limbang.doctor.plugin.forge.definations.fml.*
+import top.limbang.doctor.plugin.forge.definations.fml1.*
 import top.limbang.doctor.plugin.forge.registry.ChannelPacketRegistryImpl
 import top.limbang.doctor.plugin.forge.registry.IChannelPacketRegistry
 import top.limbang.doctor.protocol.core.PacketDirection

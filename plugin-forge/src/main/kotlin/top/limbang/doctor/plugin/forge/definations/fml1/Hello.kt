@@ -1,11 +1,12 @@
-package top.limbang.doctor.plugin.forge.definations.fml
+package top.limbang.doctor.plugin.forge.definations.fml1
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
+import kotlinx.serialization.Serializable
+import top.limbang.doctor.plugin.forge.api.ChannelPacket
+import top.limbang.doctor.plugin.forge.api.FML1Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
-import top.limbang.doctor.plugin.forge.api.ChannelPacket
+import top.limbang.doctor.protocol.extension.readVarInt
 
 /**
  * @author Doctor_Yin
@@ -22,7 +23,7 @@ data class HelloServerPacket(
     val discriminator: Byte,
     val FMLProtocolVersion: Byte,
     val overrideDimension: Int
-) : ChannelPacket
+) : FML1Packet
 
 class HelloServerDecoder : PacketDecoder<HelloServerPacket> {
     override fun decoder(buf: ByteBuf): HelloServerPacket {

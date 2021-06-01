@@ -1,11 +1,11 @@
-package top.limbang.doctor.plugin.forge.definations.fml
+package top.limbang.doctor.plugin.forge.definations.fml1
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
+import kotlinx.serialization.Serializable
+import top.limbang.doctor.plugin.forge.api.FML1Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
-import top.limbang.doctor.plugin.forge.api.ChannelPacket
+import top.limbang.doctor.protocol.extension.writeString
 
 /**
  * @author Doctor_Yin
@@ -21,7 +21,7 @@ import top.limbang.doctor.plugin.forge.api.ChannelPacket
 @Serializable
 data class RegisterPacket(
     val channels: List<String>
-) : ChannelPacket
+) : FML1Packet
 
 class RegisterEncoder : PacketEncoder<RegisterPacket> {
     override fun encode(buf: ByteBuf, packet: RegisterPacket): ByteBuf {

@@ -6,7 +6,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.network.handler.emitPacketEvent
-import top.limbang.doctor.plugin.forge.api.ChannelPacket
+import top.limbang.doctor.plugin.forge.api.FML1Packet
 import top.limbang.doctor.plugin.forge.forgeProtocolState
 import top.limbang.doctor.plugin.forge.registry.IChannelPacketRegistry
 import top.limbang.doctor.protocol.api.Packet
@@ -21,11 +21,11 @@ import top.limbang.doctor.protocol.definition.play.client.CustomPayloadPacket
 class Forge1PacketHandler(
     val emitter: EventEmitter,
     val channelRegistry: IChannelPacketRegistry
-) : MessageToMessageCodec<Packet, ChannelPacket>() {
+) : MessageToMessageCodec<Packet, FML1Packet>() {
 
     private val logger: Logger = LoggerFactory.getLogger(Forge1PacketHandler::class.java)
 
-    override fun encode(ctx: ChannelHandlerContext, msg: ChannelPacket, out: MutableList<Any>) {
+    override fun encode(ctx: ChannelHandlerContext, msg: FML1Packet, out: MutableList<Any>) {
         val buf = ctx.alloc().buffer()
         try {
             val encoder = channelRegistry.channelPacketMap(PacketDirection.C2S, ctx.forgeProtocolState())
@@ -44,10 +44,10 @@ class Forge1PacketHandler(
     override fun decode(ctx: ChannelHandlerContext, msg: Packet, out: MutableList<Any>) {
         if (msg is CustomPayloadPacket) {
             if (!msg.processed && channelRegistry.channels.contains(msg.channel)) {
-                val packet: ChannelPacket
+                val packet: FML1Packet
                 try {
                     val decoder = channelRegistry.channelPacketMap(PacketDirection.S2C, ctx.forgeProtocolState())
-                        .decoder<ChannelPacket>(msg.channel)
+                        .decoder<FML1Packet>(msg.channel)
 
                     packet = decoder.decoder(msg.data)
                     msg.close()
