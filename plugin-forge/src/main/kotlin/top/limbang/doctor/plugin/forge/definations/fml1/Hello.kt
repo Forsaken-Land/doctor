@@ -2,7 +2,6 @@ package top.limbang.doctor.plugin.forge.definations.fml1
 
 import io.netty.buffer.ByteBuf
 import kotlinx.serialization.Serializable
-import top.limbang.doctor.plugin.forge.api.ChannelPacket
 import top.limbang.doctor.plugin.forge.api.FML1Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
@@ -49,7 +48,7 @@ data class HelloClientPacket(
     val channel: String = "FML|HS",
     val discriminator: Byte,
     val FMLProtocolVersion: Byte
-) : ChannelPacket {
+) : FML1Packet {
     constructor() : this("FML|HS", 1, 2)
 }
 
