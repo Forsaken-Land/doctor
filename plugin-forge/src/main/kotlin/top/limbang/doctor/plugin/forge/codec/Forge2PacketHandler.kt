@@ -69,6 +69,7 @@ class Forge2PacketHandler(
                 val packerId = buf.readVarInt()
                 val packetDecoder = fmL2PacketRegistry.fml2PacketMap(PacketDirection.S2C).decoder<FML2Packet>(packerId)
                 val packetInPacket = packetDecoder.decoder(buf)
+                buf.release()
                 packetInPacket.messageId = msg.messageId
                 logger.debug("FML2协议包解码:packetId=${packerId} $packetInPacket")
                 emitPacketEvent(emitter, packetInPacket, ctx)

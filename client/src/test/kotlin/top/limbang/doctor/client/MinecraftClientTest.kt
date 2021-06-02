@@ -47,11 +47,10 @@ fun main() {
         Thread.sleep(2000)
         client.reconnect()
     }.on(ChatEvent) {
-        logger.info(it.chatPacket.json)
-//        if (!it.chatPacket.json.contains("commands.forge.tps.summary")) {
+        if (!it.chatPacket.json.contains("commands.forge.tps.summary")) {
             val chat = ChatSerializer.jsonToChat(it.chatPacket.json)
             logger.info(chat.getFormattedText())
-//        }
+        }
 
     }.onPacket<DisconnectPacket> {
         val reason = ChatSerializer.jsonToChat(packet.reason)
