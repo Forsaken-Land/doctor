@@ -50,7 +50,7 @@ class Forge2PacketHandler(
             //写FML2包长度
             outBuf.writeVarInt(buf.readableBytes())
             outBuf.writeBytes(buf)
-
+            buf.release()
             out.add(LoginPluginResponsePacket(msg.messageId, true, outBuf))
             logger.debug("FML2协议包编码:id=$packetId $msg")
         } catch (e: Exception) {
