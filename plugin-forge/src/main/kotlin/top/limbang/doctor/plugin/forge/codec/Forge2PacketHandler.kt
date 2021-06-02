@@ -90,6 +90,7 @@ class Forge2PacketHandler(
         val remainingPacketLength = msg.readVarInt()
         val newBuf = ctx.alloc().buffer(remainingPacketLength)
         msg.readBytes(newBuf, remainingPacketLength)
+        msg.release()
         return newBuf
     }
 
