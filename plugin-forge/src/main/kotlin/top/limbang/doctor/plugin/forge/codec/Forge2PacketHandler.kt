@@ -61,28 +61,22 @@ class Forge2PacketHandler(
     }
 
     override fun decode(ctx: ChannelHandlerContext, msg: Packet, out: MutableList<Any>) {
-        if (msg is LoginPluginRequestPacket) {
+        if (msg is LoginPluginRequestPacket && msg.channel == "fml:loginwrapper") {
             try {
-                if (msg.channel == "fml:loginwrapper") {
-                    val packet: FML2Packet
-                    val decoder = LoginWrapperDecoder()
-                    packet = decoder.decoder(msg.data)
-                    val buf = readVarIntLengthBasedFrame(ctx, packet.data)
-                    val packerId = buf.readVarInt()
-                    val packetDecoder =
-                        fmL2PacketRegistry.fml2PacketMap(PacketDirection.S2C)
-                            .decoder<FML2Packet>(packerId)
-                    val packetInPacket = packetDecoder.decoder(buf)
-                    packetInPacket.messageId = msg.messageId
-                    logger.debug("FML2协议包解码:packetId=${packerId} $packetInPacket")
-                    emitPacketEvent(emitter, packetInPacket, ctx)
-                    ctx.fireChannelReadComplete()
-                    msg.close()
-                    packet.close()
-                    return
-                } else {
-                    logger.info("LoginPluginRequest协议包需要解码:channel=${msg.channel}")
-                }
+                val packet: FML2Packet
+                val decoder = LoginWrapperDecoder()
+                packet = decoder.decoder(msg.data)
+                val buf = readVarIntLengthBasedFrame(ctx, packet.data)
+                val packerId = buf.readVarInt()
+                val packetDecoder = fmL2PacketRegistry.fml2PacketMap(PacketDirection.S2C).decoder<FML2Packet>(packerId)
+                val packetInPacket = packetDecoder.decoder(buf)
+                packetInPacket.messageId = msg.messageId
+                logger.debug("FML2协议包解码:packetId=${packerId} $packetInPacket")
+                emitPacketEvent(emitter, packetInPacket, ctx)
+                ctx.fireChannelReadComplete()
+                msg.close()
+                packet.close()
+                return
             } catch (e: Exception) {
                 logger.warn(e.message)
                 return
