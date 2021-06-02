@@ -1,10 +1,8 @@
 package top.limbang.doctor.plugin.forge.protocol
 
-import top.limbang.doctor.plugin.forge.api.ForgeProtocol
-import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.definations.fml2.*
-import top.limbang.doctor.plugin.forge.registry.ChannelPacketRegistryImpl
-import top.limbang.doctor.plugin.forge.registry.IChannelPacketRegistry
+import top.limbang.doctor.plugin.forge.registry.FML2PacketRegistryImpl
+import top.limbang.doctor.plugin.forge.registry.IFML2PacketRegistry
 import top.limbang.doctor.protocol.core.PacketDirection
 
 /**
@@ -13,32 +11,22 @@ import top.limbang.doctor.protocol.core.PacketDirection
  * @since 2021/5/16 下午9:51
  */
 class FML2 :
-    ForgeProtocol,
-    IChannelPacketRegistry by
-    ChannelPacketRegistryImpl(
-        listOf("REGISTER", "FML|HS", "FORGE")
-    ) {
+    IFML2PacketRegistry by
+    FML2PacketRegistryImpl() {
     init {
-        channelPacketMap(PacketDirection.S2C, ForgeProtocolState.REGISTER).register(
-            "fml:loginwrapper", LoginWrapperDecoder()
-        )
-        channelPacketMap(PacketDirection.C2S, ForgeProtocolState.REGISTER).register(
-            "fml:loginwrapper", LoginWrapperEncoder()
-        )
-        channelPacketMap(PacketDirection.S2C, ForgeProtocolState.REGISTER).register(
-            "1", ModListDecoder()
-        )
-        channelPacketMap(PacketDirection.S2C, ForgeProtocolState.REGISTER).register(
-            "3", ServerRegisterDecoder()
-        )
-        channelPacketMap(PacketDirection.C2S, ForgeProtocolState.REGISTER).register(
-            "2", ModListEncoder()
-        )
-        channelPacketMap(PacketDirection.C2S, ForgeProtocolState.REGISTER).register(
-            "99", AcknowledgementEncoder()
-        )
-        channelPacketMap(PacketDirection.S2C, ForgeProtocolState.REGISTER).register(
-            "4", ConfigurationDataDecoder()
-        )
+        fml2PacketMap(PacketDirection.S2C)
+            .register(
+                1, ModListDecoder()
+            ).register(
+                3, ServerRegisterDecoder()
+            ).register(
+                4, ConfigurationDataDecoder()
+            )
+        fml2PacketMap(PacketDirection.C2S)
+            .register(
+                2, ModListEncoder()
+            ).register(
+                99, AcknowledgementEncoder()
+            )
     }
 }

@@ -8,9 +8,10 @@ import org.slf4j.LoggerFactory
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.network.handler.emitPacketEvent
 import top.limbang.doctor.plugin.forge.api.FML2Packet
+import top.limbang.doctor.plugin.forge.definations.fml2.LoginWrapperDecoder
+import top.limbang.doctor.plugin.forge.definations.fml2.LoginWrapperEncoder
 import top.limbang.doctor.plugin.forge.definations.fml2.LoginWrapperPacket
-import top.limbang.doctor.plugin.forge.forgeProtocolState
-import top.limbang.doctor.plugin.forge.registry.IChannelPacketRegistry
+import top.limbang.doctor.plugin.forge.registry.IFML2PacketRegistry
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.core.PacketDirection
 import top.limbang.doctor.protocol.definition.login.client.LoginPluginResponsePacket
@@ -25,7 +26,7 @@ import top.limbang.doctor.protocol.extension.writeVarInt
  */
 class Forge2PacketHandler(
     val emitter: EventEmitter,
-    val channelRegistry: IChannelPacketRegistry
+    val fmL2PacketRegistry: IFML2PacketRegistry
 ) : MessageToMessageCodec<Packet, FML2Packet>() {
 
     private val logger: Logger = LoggerFactory.getLogger(Forge1PacketHandler::class.java)
@@ -34,21 +35,25 @@ class Forge2PacketHandler(
         val buf = ctx.alloc().buffer()
         val outBuf = ctx.alloc().buffer()
         try {
-            val packetEncoder = channelRegistry.channelPacketMap(PacketDirection.C2S, ctx.forgeProtocolState())
-                .encoder(msg.javaClass)
-            val packetId =
-                channelRegistry.channelPacketMap(PacketDirection.C2S, ctx.forgeProtocolState()).packetKey(msg.javaClass)
 
-            packetEncoder.encode(buf, msg)
-            val encoder = channelRegistry.channelPacketMap(PacketDirection.C2S, ctx.forgeProtocolState())
-                .encoder(LoginWrapperPacket::class.java)
+            //写LoginWrapperEncoder包
+            val encoder = LoginWrapperEncoder()
             val loginWrapperPacket = LoginWrapperPacket("fml:handshake", outBuf)
             encoder.encode(outBuf, loginWrapperPacket)
-            outBuf.writeVarInt(buf.readableBytes() + 1)
-            outBuf.writeVarInt(packetId.toInt())
+
+            //写FML2包id+包
+            val packetEncoder = fmL2PacketRegistry.fml2PacketMap(PacketDirection.C2S).encoder(msg.javaClass)
+            val packetId = fmL2PacketRegistry.fml2PacketMap(PacketDirection.C2S).packetKey(msg.javaClass)
+            buf.writeVarInt(packetId)
+            packetEncoder.encode(buf, msg)
+
+            //写FML2包长度
+            outBuf.writeVarInt(buf.readableBytes())
             outBuf.writeBytes(buf)
+
             out.add(LoginPluginResponsePacket(msg.messageId, true, outBuf))
-            logger.debug("Forge协议包编码:id=$packetId $msg")
+            logger.debug("FML2协议包编码:id=$packetId $msg")
+            loginWrapperPacket.close()
         } catch (e: Exception) {
             logger.warn(e.message)
             return
@@ -57,32 +62,32 @@ class Forge2PacketHandler(
 
     override fun decode(ctx: ChannelHandlerContext, msg: Packet, out: MutableList<Any>) {
         if (msg is LoginPluginRequestPacket) {
-            val packet: FML2Packet
             try {
-                val decoder = channelRegistry.channelPacketMap(PacketDirection.S2C, ctx.forgeProtocolState())
-                    .decoder<FML2Packet>(msg.channel)
-                packet = decoder.decoder(msg.data)
-                msg.close()
-                logger.debug("Channel协议包解码:channel=${msg.channel} $packet")
-                if (packet is LoginWrapperPacket) {
+                if (msg.channel == "fml:loginwrapper") {
+                    val packet: FML2Packet
+                    val decoder = LoginWrapperDecoder()
+                    packet = decoder.decoder(msg.data)
                     val buf = readVarIntLengthBasedFrame(ctx, packet.data)
                     val packerId = buf.readVarInt()
-                    val packetDecoder = channelRegistry.channelPacketMap(PacketDirection.S2C, ctx.forgeProtocolState())
-                        .decoder<FML2Packet>(packerId.toString())
+                    val packetDecoder =
+                        fmL2PacketRegistry.fml2PacketMap(PacketDirection.S2C)
+                            .decoder<FML2Packet>(packerId)
                     val packetInPacket = packetDecoder.decoder(buf)
                     packetInPacket.messageId = msg.messageId
-                    logger.debug("Forge协议包解码:packetId=${packerId} $packetInPacket")
+                    logger.debug("FML2协议包解码:packetId=${packerId} $packetInPacket")
                     emitPacketEvent(emitter, packetInPacket, ctx)
                     ctx.fireChannelReadComplete()
+                    msg.close()
+                    packet.close()
                     return
+                } else {
+                    logger.info("LoginPluginRequest协议包需要解码:channel=${msg.channel}")
                 }
-                emitPacketEvent(emitter, packet, ctx)
-                ctx.fireChannelReadComplete()
             } catch (e: Exception) {
                 logger.warn(e.message)
                 return
             }
-            logger.debug("协议包解码:channel=${msg.channel} $packet")
+
         } else ctx.fireChannelRead(msg)
 
 
@@ -94,6 +99,7 @@ class Forge2PacketHandler(
         msg.readBytes(newBuf, remainingPacketLength)
         return newBuf
     }
+
 
 }
 
