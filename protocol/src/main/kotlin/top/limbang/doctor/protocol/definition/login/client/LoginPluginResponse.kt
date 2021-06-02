@@ -50,6 +50,7 @@ class LoginPluginResponseEncoder : PacketEncoder<LoginPluginResponsePacket> {
         buf.writeVarInt(packet.messageId)
         buf.writeBoolean(packet.successful)
         buf.writeBytes(packet.data)
+        packet.close()
         return buf
     }
 
