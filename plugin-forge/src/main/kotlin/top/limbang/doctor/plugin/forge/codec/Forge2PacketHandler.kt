@@ -53,7 +53,6 @@ class Forge2PacketHandler(
 
             out.add(LoginPluginResponsePacket(msg.messageId, true, outBuf))
             logger.debug("FML2协议包编码:id=$packetId $msg")
-            loginWrapperPacket.close()
         } catch (e: Exception) {
             logger.warn(e.message)
             return

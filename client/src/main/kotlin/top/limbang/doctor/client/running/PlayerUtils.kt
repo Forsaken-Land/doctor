@@ -2,6 +2,8 @@ package top.limbang.doctor.client.running
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.MinecraftClient
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.protocol.definition.play.client.Action
@@ -19,6 +21,7 @@ import java.util.*
 class PlayerUtils(
     client: MinecraftClient
 ) {
+    private val logger: Logger = LoggerFactory.getLogger(PlayerUtils::class.java)
     private val players = mutableMapOf<UUID, PlayerInfo>()
     private var playerUpdateTime: LocalDateTime = LocalDateTime.now()
 
@@ -33,25 +36,30 @@ class PlayerUtils(
                 }
                 Action.UPDATE_GAME_MODE -> {
                     for (player in packet.players) {
-                        val thisPlayer =
-                            players[player.UUID]!!
-                        thisPlayer.gameMode = player.gameMode
-                        players[player.UUID] = thisPlayer
+                        val thisPlayer = players[player.UUID]
+                        if (thisPlayer != null) {
+                            thisPlayer.gameMode = player.gameMode
+                            players[player.UUID] = thisPlayer
+                        }
                     }
                 }
                 Action.UPDATE_LATENCY -> {
                     for (player in packet.players) {
-                        val thisPlayer = players[player.UUID]!!
-                        thisPlayer.ping = player.ping
-                        players[player.UUID] = thisPlayer
+                        val thisPlayer = players[player.UUID]
+                        if (thisPlayer != null) {
+                            thisPlayer.ping = player.ping
+                            players[player.UUID] = thisPlayer
+                        }
                     }
                 }
                 Action.UPDATE_DISPLAY_NAME -> {
                     for (player in packet.players) {
-                        val thisPlayer = players[player.UUID]!!
-                        thisPlayer.hasDisplayName = player.hasDisplayName
-                        thisPlayer.displayName = player.displayName
-                        players[player.UUID] = thisPlayer
+                        val thisPlayer = players[player.UUID]
+                        if (thisPlayer != null) {
+                            thisPlayer.hasDisplayName = player.hasDisplayName
+                            thisPlayer.displayName = player.displayName
+                            players[player.UUID] = thisPlayer
+                        }
                     }
                 }
                 Action.REMOVE_PLAYER -> {
