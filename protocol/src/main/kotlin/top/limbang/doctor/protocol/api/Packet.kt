@@ -5,3 +5,6 @@ package top.limbang.doctor.protocol.api
  */
 interface Packet
 interface ChannelPacket : Packet
+interface LoginPlugin : Packet {
+    var messageId: Int
+}
