@@ -2,6 +2,9 @@ package top.limbang.doctor.protocol.version.vanilla
 
 import top.limbang.doctor.core.api.plugin.IPluginManager
 import top.limbang.doctor.protocol.api.ProtocolState
+import top.limbang.doctor.protocol.core.PacketDirection
+import top.limbang.doctor.protocol.definition.channel.RegisterDecoder
+import top.limbang.doctor.protocol.definition.channel.RegisterEncoder
 import top.limbang.doctor.protocol.definition.login.client.EncryptionResponseEncoder
 import top.limbang.doctor.protocol.definition.login.client.LoginPluginResponseEncoder
 import top.limbang.doctor.protocol.definition.login.client.LoginStartEncoder
@@ -13,6 +16,8 @@ import top.limbang.doctor.protocol.definition.play.client.*
 import top.limbang.doctor.protocol.definition.play.server.CChatEncoder
 import top.limbang.doctor.protocol.definition.play.server.CTabCompleteType0Encoder
 import top.limbang.doctor.protocol.hook.PacketRegistryHook
+import top.limbang.doctor.protocol.registry.ChannelPacketRegistryImpl
+import top.limbang.doctor.protocol.registry.IChannelPacketRegistry
 import top.limbang.doctor.protocol.registry.IPacketRegistry
 import top.limbang.doctor.protocol.registry.PacketRegistryImpl
 import top.limbang.doctor.protocol.version.CommonProtocol
@@ -22,6 +27,15 @@ import top.limbang.doctor.protocol.version.CommonProtocol
  *
  * 版本 1.12.2
  */
+class MinecraftClientChannel_v1_12_2 : IChannelPacketRegistry by ChannelPacketRegistryImpl() {
+    init {
+        packetMap(PacketDirection.S2C)
+            .register("REGISTER", RegisterDecoder())
+        packetMap(PacketDirection.C2S)
+            .register("REGISTER", RegisterEncoder())
+    }
+}
+
 class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRegistry by PacketRegistryImpl() {
 
     init {

@@ -4,6 +4,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter
 import io.netty.channel.socket.SocketChannel
 import top.limbang.doctor.network.api.CodecInitializer
 import top.limbang.doctor.network.core.codec.ProtocolPacketCodec
+import top.limbang.doctor.network.core.codec.VanillaChannelPacketCodec
 import top.limbang.doctor.network.core.codec.VarIntLengthBasedFrameCodec
 import top.limbang.doctor.protocol.core.PacketDirection
 
@@ -22,6 +23,10 @@ class DefaultClientCodecInitializer : CodecInitializer {
         ch.pipeline().addLast(
             "protocolPacketCodec",
             ProtocolPacketCodec(manager.protocol, PacketDirection.C2S, PacketDirection.S2C)
+        )
+        ch.pipeline().addLast(
+            "vanillaChannelPacketCodec",
+            VanillaChannelPacketCodec(manager.channelRegistry, PacketDirection.C2S, PacketDirection.S2C)
         )
 //        ch.pipeline().addLast(
 //            "protocolPacketDecoder",

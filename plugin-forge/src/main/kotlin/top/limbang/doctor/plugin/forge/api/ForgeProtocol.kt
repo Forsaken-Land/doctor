@@ -12,7 +12,6 @@ interface ForgeProtocol : IChannelPacketRegistry {
 }
 
 enum class ForgeProtocolState {
-    REGISTER,
     HELLO,
     MODLIST,
     HANDSHAKE,

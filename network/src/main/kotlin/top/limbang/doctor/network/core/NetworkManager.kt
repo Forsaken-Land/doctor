@@ -28,7 +28,9 @@ import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.FutureUtils
 import top.limbang.doctor.protocol.api.Packet
+import top.limbang.doctor.protocol.registry.IChannelPacketRegistry
 import top.limbang.doctor.protocol.registry.IPacketRegistry
+import top.limbang.doctor.protocol.version.createChannel
 import top.limbang.doctor.protocol.version.createProtocol
 
 /**
@@ -41,6 +43,7 @@ class NetworkManager(
     val host: String,
     val port: Int,
     val protocol: IPacketRegistry,
+    val channelRegistry: IChannelPacketRegistry,
     val pluginManager: IPluginManager,
 ) : EventEmitter by event {
     companion object {
@@ -114,13 +117,14 @@ class NetworkManager(
 
 
     class Builder {
-        private var host: String = "localhost";
+        private var host: String = "localhost"
         private var port = 25565
         private var protocolVersion: String = "1.12.2"
         private var emitter: EventEmitter? = null
         private var pluginManager: IPluginManager = DummyPluginManager()
         private var codecInitializer: CodecInitializer = DummyCodecInitializer
         private var protocol: IPacketRegistry? = null
+        private var channelRegistry: IChannelPacketRegistry? = null
 
         fun host(host: String): Builder {
             this.host = host
@@ -163,11 +167,13 @@ class NetworkManager(
 
         fun build(): NetworkManager {
             val protocol = this.protocol ?: createProtocol(protocolVersion, pluginManager)
+            val channelRegistry = this.channelRegistry ?: createChannel(protocolVersion)
             return NetworkManager(
                 emitter ?: DefaultEventEmitter(),
                 host,
                 port,
                 protocol,
+                channelRegistry,
                 pluginManager
             ).also {
                 if (codecInitializer == DummyCodecInitializer) {

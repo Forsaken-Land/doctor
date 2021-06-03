@@ -31,8 +31,7 @@ fun main() {
     val password = pros["password"] as String
     val authServerUrl = pros["authServerUrl"] as String
     val sessionServerUrl = pros["sessionServerUrl"] as String
-//    val players = mutableMapOf<UUID, PlayerInfo>()
-//    var playerUpdateTime = LocalDateTime.now()
+
 
     val client = MinecraftClient()
         //.name(name)
@@ -47,10 +46,10 @@ fun main() {
         Thread.sleep(2000)
         client.reconnect()
     }.on(ChatEvent) {
-        if (!it.chatPacket.json.contains("commands.forge.tps.summary")) {
+//        if (!it.chatPacket.json.contains("commands.forge.tps.summary")) {
             val chat = ChatSerializer.jsonToChat(it.chatPacket.json)
             logger.info(chat.getFormattedText())
-        }
+//        }
 
     }.onPacket<DisconnectPacket> {
         val reason = ChatSerializer.jsonToChat(packet.reason)

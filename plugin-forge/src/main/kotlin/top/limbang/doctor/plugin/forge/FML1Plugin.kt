@@ -44,7 +44,7 @@ class FML1Plugin(
                 Forge1PacketHandler(this@FML1Plugin, channelPacketRegistry) //TODO: 这个handler逻辑或许得改
             )
 
-            this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.REGISTER)
+            this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.HELLO)
         }
 
 //        registry.provider(BeforePacketSendHook::class.java).addHook {

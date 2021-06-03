@@ -11,7 +11,6 @@ import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
 import top.limbang.doctor.protocol.core.PacketDirection
 import top.limbang.doctor.protocol.core.ProtocolException
-import top.limbang.doctor.protocol.definition.play.client.CustomPayloadPacket
 import top.limbang.doctor.protocol.extension.readVarInt
 import top.limbang.doctor.protocol.extension.writeVarInt
 import top.limbang.doctor.protocol.registry.IPacketRegistry
@@ -40,7 +39,7 @@ class ProtocolPacketCodec(
             return
         }
         buf.writeVarInt(packetId)
-        if (msg !is CustomPayloadPacket) logger.debug("协议包编码:packetID=$packetId $msg")
+        logger.debug("协议包编码:packetID=$packetId $msg")
         out.add(packetEncoder.encode(buf, msg))
     }
 
@@ -59,7 +58,7 @@ class ProtocolPacketCodec(
         // 解码数据交给下一步处理
         val packet = packetDecoder.decoder(msg)
         out.add(packet)
-        if (packet !is CustomPayloadPacket) logger.debug("协议包解码:packetID=$packetId $packet")
+        logger.debug("协议包解码:packetID=$packetId $packet")
     }
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {

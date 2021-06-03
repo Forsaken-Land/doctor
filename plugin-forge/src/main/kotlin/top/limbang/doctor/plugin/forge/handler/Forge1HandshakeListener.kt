@@ -21,21 +21,12 @@ class Forge1HandshakeListener(
     val fmlPlugin: FML1Plugin
 ) : EventListener {
 
-    private var channels: List<String> = listOf()
     override fun initListen(emitter: EventEmitter) {
         emitter.onPacket<DisconnectPacket> {
-            setForgeState(ctx.channel(), ForgeProtocolState.REGISTER) //TODO 不确定
-        }
-        emitter.onPacket<RegisterPacket> {
-            channels = packet.channels
-//            registerChannels(channels)
-            setForgeState(ctx.channel(), ForgeProtocolState.HELLO)
+            setForgeState(ctx.channel(), ForgeProtocolState.HELLO) //TODO 应该确定
         }
 
         emitter.onPacket<HelloServerPacket> {
-            setForgeState(ctx.channel(), ForgeProtocolState.REGISTER)
-            connection.sendPacket(RegisterPacket(channels))
-
             setForgeState(ctx.channel(), ForgeProtocolState.HELLO)
             connection.sendPacket(HelloClientPacket())
 

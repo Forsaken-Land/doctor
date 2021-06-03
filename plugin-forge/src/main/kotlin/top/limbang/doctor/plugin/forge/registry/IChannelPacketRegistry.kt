@@ -1,7 +1,7 @@
 package top.limbang.doctor.plugin.forge.registry
 
-import top.limbang.doctor.plugin.forge.api.ChannelPacket
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
+import top.limbang.doctor.protocol.api.ChannelPacket
 import top.limbang.doctor.protocol.core.PacketDirection
 import top.limbang.doctor.protocol.registry.GroupRegistrable
 import top.limbang.doctor.protocol.registry.IPacketMap

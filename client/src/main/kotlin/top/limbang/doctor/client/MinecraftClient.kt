@@ -82,7 +82,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     }
 
     /**
-     * ### 设置是否监关闭听玩家列表
+     * ### 设置开启监听玩家列表
      */
     fun enablePlayerList(): MinecraftClient {
         this.playerUtils = PlayerUtils(this)
@@ -116,8 +116,8 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         }
 
         networkManager = NetworkManagerFactory.createNetworkManager(
-                host, port, pluginManager, serviceInfo.versionName, this
-            )
+            host, port, pluginManager, serviceInfo.versionName, this
+        )
 
         networkManager
             .addListener(loginListener)

@@ -20,8 +20,6 @@ class FML1 :
     ) {
 
     init {
-        channelPacketMap(PacketDirection.S2C, ForgeProtocolState.REGISTER)
-            .register("REGISTER", RegisterDecoder())
         channelPacketMap(PacketDirection.S2C, ForgeProtocolState.HELLO)
             .register("FML|HS", HelloServerDecoder())
         channelPacketMap(PacketDirection.S2C, ForgeProtocolState.MODLIST)
@@ -33,8 +31,7 @@ class FML1 :
         channelPacketMap(PacketDirection.S2C, ForgeProtocolState.HANDSHAKE)
             .register("FORGE", ForgeChannelDecoder())
 
-        channelPacketMap(PacketDirection.C2S, ForgeProtocolState.REGISTER)
-            .register("REGISTER", RegisterEncoder())
+
         channelPacketMap(PacketDirection.C2S, ForgeProtocolState.HELLO)
             .register("FML|HS", HelloClientEncoder())
         channelPacketMap(PacketDirection.C2S, ForgeProtocolState.MODLIST)

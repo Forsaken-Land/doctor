@@ -5,6 +5,7 @@ import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.event.EventListener
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.network.handler.replyPacket
+import top.limbang.doctor.protocol.definition.channel.RegisterPacket
 import top.limbang.doctor.protocol.definition.play.client.*
 
 /**
@@ -12,6 +13,11 @@ import top.limbang.doctor.protocol.definition.play.client.*
  */
 class PlayListener : EventListener {
     override fun initListen(emitter: EventEmitter) {
+
+        //监听通道注册并回复
+        emitter.replyPacket<RegisterPacket> {
+            it
+        }
         // 监听加入游戏包并回复
         emitter.on(JoinGameEvent) {
             it.connection.sendPacket(ClientSettingPacket())
