@@ -10,6 +10,8 @@ import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
 import top.limbang.doctor.client.running.PlayerTab
 import top.limbang.doctor.client.running.PlayerUtils
+import top.limbang.doctor.client.running.TpsEntity
+import top.limbang.doctor.client.running.TpsUtils
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
 import top.limbang.doctor.client.utils.ServerInfoUtils
 import top.limbang.doctor.client.utils.newPromise
@@ -43,7 +45,9 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     private var sessionServerUrl = "https://sessionserver.mojang.com"
     private lateinit var networkManager: NetworkManager
     private var protocol: Int = 0
+    private var isForge: Boolean = false
     private lateinit var playerUtils: PlayerUtils
+    private lateinit var tpsUtils: TpsUtils
 
 
     val connection get() = networkManager.connection
@@ -90,6 +94,15 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     }
 
     /**
+     * ### 开启Forge TPS功能
+     */
+
+    fun enableForgeTps(): MinecraftClient {
+        this.tpsUtils = TpsUtils(this)
+        return this
+    }
+
+    /**
      * ### 启动客户端
      */
     fun start(host: String, port: Int): MinecraftClient {
@@ -97,6 +110,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         val jsonStr = ping(host, port).get()
         val serviceInfo = ServerInfoUtils.getServiceInfo(jsonStr)
         protocol = serviceInfo.versionNumber
+        isForge = serviceInfo.forge != null
 
         // 注册插件
         if (serviceInfo.forge != null) when (serviceInfo.forge.forgeFeature) {
@@ -157,17 +171,32 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         networkManager.sendPacket(CChatPacket(msg))
     }
 
+    /**
+     * ### 获取版本ID
+     */
     fun getProtocol(): Int {
         return protocol
     }
 
+    /**
+     * ### 获取玩家列表
+     */
     fun getPlayerTab(): PlayerTab {
         if (this::playerUtils.isInitialized) {
             return playerUtils.getPlayers()
         } else {
             throw RuntimeException("未开启玩家列表监听")
         }
+    }
 
+    /**
+     * ### 获取forgeTps
+     */
+
+    fun getForgeTps(): List<TpsEntity> {
+        return if (isForge && this::tpsUtils.isInitialized) {
+            tpsUtils.getTps()
+        } else throw RuntimeException("未开启玩家列表/或服务器不是Forge监听")
     }
 
     companion object {

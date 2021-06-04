@@ -3,7 +3,6 @@ package top.limbang.doctor.client
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.event.ChatEvent
-import top.limbang.doctor.client.running.TpsUtils
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
@@ -39,6 +38,7 @@ fun main() {
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
         .enablePlayerList()
+        .enableForgeTps()
         .start(host, port)
 
 
@@ -46,10 +46,10 @@ fun main() {
         Thread.sleep(2000)
         client.reconnect()
     }.on(ChatEvent) {
-//        if (!it.chatPacket.json.contains("commands.forge.tps.summary")) {
+        if (!it.chatPacket.json.contains("commands.forge.tps.summary")) {
             val chat = ChatSerializer.jsonToChat(it.chatPacket.json)
             logger.info(chat.getFormattedText())
-//        }
+        }
 
     }.onPacket<DisconnectPacket> {
         val reason = ChatSerializer.jsonToChat(packet.reason)
@@ -57,13 +57,12 @@ fun main() {
     }.onPacket<PlayerPositionAndLookPacket> {
         logger.info("登录成功")
     }
-    val tps = TpsUtils(client)
 
     while (true) {
         when (val msg = readLine()) {
             "tps" -> {
                 try {
-                    val result = tps.getTps()
+                    val result = client.getForgeTps()
                     logger.info(result.toString())
                 } catch (e: Exception) {
                 }

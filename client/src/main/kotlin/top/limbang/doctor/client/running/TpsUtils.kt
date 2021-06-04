@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 class TpsUtils(
     val client: MinecraftClient
 ) {
-    //观察流（基于ChatPacket事件）
+    //观察流（基于ChatEvent事件）
     private val tpsObservable = client.asObservable(ChatEvent)
         .filter {
             //过滤Tps消息
@@ -41,28 +41,55 @@ class TpsUtils(
     }
 
     fun getTps(): MutableList<TpsEntity> {
-        return getTps(5,TimeUnit.SECONDS)
+        return getTps(5, TimeUnit.SECONDS)
     }
 
     companion object {
+
         fun parseTpsEntity(json: String): TpsEntity {
             var chat = Json.parseToJsonElement(json).jsonObject
             while (!chat.containsKey("translate")) {
                 if (chat.containsKey("extra")) {
-                    chat = chat.get("extra")!!.jsonObject
+                    chat = chat["extra"]!!.jsonObject
                 } else {
                     throw SerializationException("tps格式不正确")
                 }
             }
-            val (dim, tickTime, tps) = chat["with"]!!.jsonArray.map {
-                it.jsonPrimitive.content
+            return when (chat["translate"]!!.jsonPrimitive.content) {
+                "commands.forge.tps.summary" -> {
+                    val (dim, tickTime, tps) = chat["with"]!!.jsonArray.map {
+                        it.jsonPrimitive.content
+                    }
+                    TpsEntity(
+                        dim,
+                        tickTime.toDouble(),
+                        tps.toDouble()
+                    )
+                }
+                "commands.forge.tps.summary.named" -> {
+                    val (dim, _, tickTime, tps) = chat["with"]!!.jsonArray.map {
+                        it.jsonPrimitive.content
+                    }
+                    TpsEntity(
+                        dim,
+                        tickTime.toDouble(),
+                        tps.toDouble()
+                    )
+                }
+                "commands.forge.tps.summary.all" -> {
+                    val (tickTime, tps) = chat["with"]!!.jsonArray.map {
+                        it.jsonPrimitive.content
+                    }
+                    TpsEntity(
+                        "Overall",
+                        tickTime.toDouble(),
+                        tps.toDouble()
+                    )
+                }
+                else -> throw SerializationException("未收录此forge")
             }
 
-            return TpsEntity(
-                dim,
-                tickTime.toDouble(),
-                tps.toDouble()
-            )
+
         }
     }
 }
