@@ -38,7 +38,6 @@ fun main() {
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
         .enablePlayerList()
-        .enableForgeTps()
         .start(host, port)
 
 
@@ -65,6 +64,7 @@ fun main() {
                     val result = client.getForgeTps()
                     logger.info(result.toString())
                 } catch (e: Exception) {
+                    println("123")
                 }
             }
 

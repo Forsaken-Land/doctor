@@ -45,9 +45,9 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     private var sessionServerUrl = "https://sessionserver.mojang.com"
     private lateinit var networkManager: NetworkManager
     private var protocol: Int = 0
-    private var isForge: Boolean = false
     private lateinit var playerUtils: PlayerUtils
     private lateinit var tpsUtils: TpsUtils
+    private var forgeFeature: ForgeFeature? = null
 
 
     val connection get() = networkManager.connection
@@ -93,14 +93,6 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         return this
     }
 
-    /**
-     * ### 开启Forge TPS功能
-     */
-
-    fun enableForgeTps(): MinecraftClient {
-        this.tpsUtils = TpsUtils(this)
-        return this
-    }
 
     /**
      * ### 启动客户端
@@ -110,7 +102,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         val jsonStr = ping(host, port).get()
         val serviceInfo = ServerInfoUtils.getServiceInfo(jsonStr)
         protocol = serviceInfo.versionNumber
-        isForge = serviceInfo.forge != null
+        forgeFeature = serviceInfo.forge?.forgeFeature
 
         // 注册插件
         if (serviceInfo.forge != null) when (serviceInfo.forge.forgeFeature) {
@@ -139,7 +131,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
             .addListener(PacketForwardingHandler())
 
         networkManager.connect()
-
+        this.tpsUtils = TpsUtils(this)
         return this
     }
 
@@ -194,9 +186,16 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
      */
 
     fun getForgeTps(): List<TpsEntity> {
-        return if (isForge && this::tpsUtils.isInitialized) {
+        return if (forgeFeature != null && this::tpsUtils.isInitialized) {
             tpsUtils.getTps()
         } else throw RuntimeException("未开启玩家列表/或服务器不是Forge监听")
+    }
+
+    /**
+     * ### 获取FML特征
+     */
+    fun getForgeFeature(): ForgeFeature? {
+        return this.forgeFeature
     }
 
     companion object {
