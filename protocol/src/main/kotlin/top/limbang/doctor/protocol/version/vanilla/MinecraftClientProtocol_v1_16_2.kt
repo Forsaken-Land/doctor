@@ -44,6 +44,7 @@ class MinecraftClientProtocol_v1_16_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x1F, KeepAliveDecoder())
                 register(0x24, JoinGameType1Decoder())
                 register(0x17, CustomPayloadDecoder())
+                register(0x20, ChunkDataType1Decoder())
                 register(0x0D, ServerDifficultyType1Decoder())
                 register(0x34, PlayerPositionAndLookDecoder())
                 register(0x0E, ChatType1Decoder())

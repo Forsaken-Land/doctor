@@ -67,7 +67,7 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x0F, ChatType0Decoder())
                 register(0x18, CustomPayloadDecoder())
                 register(0x2E, PlayerListItemDecoder())
-                register(0x20, ChunkDataDecoder())
+                register(0x20, ChunkDataType0Decoder())
                 register(0x0E, STabCompleteType0Decoder())
             }
             whenC2S {
