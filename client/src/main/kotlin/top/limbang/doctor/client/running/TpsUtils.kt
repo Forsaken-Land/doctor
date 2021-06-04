@@ -55,41 +55,15 @@ class TpsUtils(
                     throw SerializationException("tps格式不正确")
                 }
             }
-            return when (chat["translate"]!!.jsonPrimitive.content) {
-                "commands.forge.tps.summary" -> {
-                    val (dim, tickTime, tps) = chat["with"]!!.jsonArray.map {
-                        it.jsonPrimitive.content
-                    }
-                    TpsEntity(
-                        dim,
-                        tickTime.toDouble(),
-                        tps.toDouble()
-                    )
-                }
-                "commands.forge.tps.summary.named" -> {
-                    val (dim, _, tickTime, tps) = chat["with"]!!.jsonArray.map {
-                        it.jsonPrimitive.content
-                    }
-                    TpsEntity(
-                        dim,
-                        tickTime.toDouble(),
-                        tps.toDouble()
-                    )
-                }
-                "commands.forge.tps.summary.all" -> {
-                    val (tickTime, tps) = chat["with"]!!.jsonArray.map {
-                        it.jsonPrimitive.content
-                    }
-                    TpsEntity(
-                        "Overall",
-                        tickTime.toDouble(),
-                        tps.toDouble()
-                    )
-                }
-                else -> throw SerializationException("未收录此forge")
+            val (dim, tickTime, tps) = chat["with"]!!.jsonArray.map {
+                it.jsonPrimitive.content
             }
 
-
+            return TpsEntity(
+                dim,
+                tickTime.toDouble(),
+                tps.toDouble()
+            )
         }
     }
 }
