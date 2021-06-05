@@ -3,7 +3,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":protocol"))
     implementation(project(":plugin-forge"))
-    implementation(project(":plugin-forge-laggoggles"))
-    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
-
+    implementation("com.github.Querz:NBT:6.1")
+    implementation("io.netty:netty-all:4.1.56.Final")
 }

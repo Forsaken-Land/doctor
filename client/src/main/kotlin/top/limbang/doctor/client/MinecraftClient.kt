@@ -27,6 +27,10 @@ import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.setProtocolState
 import top.limbang.doctor.plugin.forge.FML1Plugin
 import top.limbang.doctor.plugin.forge.FML2Plugin
+import top.limbang.doctor.plugin.forge.registry.IModPacketRegistry
+import top.limbang.doctor.plugin.forge.registry.ModPacketRegistryImpl
+import top.limbang.doctor.plugin.laggoggles.protocol.Lag
+import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.client.HandshakePacket
 import top.limbang.doctor.protocol.definition.play.server.CChatPacket
@@ -48,6 +52,8 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     private lateinit var playerUtils: PlayerUtils
     private lateinit var tpsUtils: TpsUtils
     private var forgeFeature: ForgeFeature? = null
+    private lateinit var pluginManager: PluginManager
+    private var modPacketRegistry: IModPacketRegistry = ModPacketRegistryImpl()
 
 
     val connection get() = networkManager.connection
@@ -93,12 +99,19 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         return this
     }
 
+    /**
+     * ### 开启Lag mod功能
+     */
+    fun enableLag(): MinecraftClient {
+        this.modPacketRegistry.registerGroup(Lag)
+        return this
+    }
 
     /**
      * ### 启动客户端
      */
     fun start(host: String, port: Int): MinecraftClient {
-        val pluginManager = PluginManager(this)
+        this.pluginManager = PluginManager(this)
         val jsonStr = ping(host, port).get()
         val serviceInfo = ServerInfoUtils.getServiceInfo(jsonStr)
         protocol = serviceInfo.versionNumber
@@ -106,8 +119,8 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
 
         // 注册插件
         if (serviceInfo.forge != null) when (serviceInfo.forge.forgeFeature) {
-            ForgeFeature.FML1 -> pluginManager.registerPlugin(FML1Plugin(serviceInfo.forge.modMap))
-            ForgeFeature.FML2 -> pluginManager.registerPlugin(FML2Plugin(serviceInfo.forge.modMap))
+            ForgeFeature.FML1 -> pluginManager.registerPlugin(FML1Plugin(serviceInfo.forge.modMap, modPacketRegistry))
+            ForgeFeature.FML2 -> pluginManager.registerPlugin(FML2Plugin(serviceInfo.forge.modMap, modPacketRegistry))
         }
 
         val suffix = if (serviceInfo.forge == null) "" else serviceInfo.forge.forgeFeature.getForgeVersion()
@@ -161,6 +174,13 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
      */
     fun sendMessage(msg: String) {
         networkManager.sendPacket(CChatPacket(msg))
+    }
+
+    /**
+     * ### 发送指定包
+     */
+    fun sendPacket(packet: Packet) {
+        networkManager.sendPacket(packet)
     }
 
     /**

@@ -8,7 +8,7 @@ import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.network.handler.emitPacketEvent
 import top.limbang.doctor.plugin.forge.api.FML1Packet
 import top.limbang.doctor.plugin.forge.forgeProtocolState
-import top.limbang.doctor.plugin.forge.registry.IChannelPacketRegistry
+import top.limbang.doctor.plugin.forge.registry.IFML1PacketRegistry
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.core.PacketDirection
 import top.limbang.doctor.protocol.definition.play.client.CustomPayloadPacket
@@ -20,7 +20,7 @@ import top.limbang.doctor.protocol.definition.play.client.CustomPayloadPacket
  */
 class Forge1PacketHandler(
     val emitter: EventEmitter,
-    val channelRegistry: IChannelPacketRegistry
+    val channelRegistry: IFML1PacketRegistry
 ) : MessageToMessageCodec<Packet, FML1Packet>() {
 
     private val logger: Logger = LoggerFactory.getLogger(Forge1PacketHandler::class.java)
@@ -42,24 +42,22 @@ class Forge1PacketHandler(
     }
 
     override fun decode(ctx: ChannelHandlerContext, msg: Packet, out: MutableList<Any>) {
-        if (msg is CustomPayloadPacket) {
-            if (!msg.processed && channelRegistry.channels.contains(msg.channel)) {
-                val packet: FML1Packet
-                try {
-                    val decoder = channelRegistry.channelPacketMap(PacketDirection.S2C, ctx.forgeProtocolState())
-                        .decoder<FML1Packet>(msg.channel)
-
-                    packet = decoder.decoder(msg.data)
-                    msg.close()
+        if (msg is CustomPayloadPacket && !msg.processed && channelRegistry.channels.contains(msg.channel)) {
+            val packet: FML1Packet
+            try {
+                val decoder = channelRegistry.channelPacketMap(PacketDirection.S2C, ctx.forgeProtocolState())
+                    .decoder<FML1Packet>(msg.channel)
+                packet = decoder.decoder(msg.data)
+                msg.close()
 //                        emitter.emit(PacketEvent(packet.javaClass.kotlin), packet)
-                    emitPacketEvent(emitter, packet, ctx)
-                    ctx.fireChannelReadComplete()
-                } catch (e: Exception) {
-                    logger.warn(e.message)
-                    return
-                }
-                logger.debug("协议包解码:channel=${msg.channel} $packet")
-            }//包没有处理，交给下一个codec
+                emitPacketEvent(emitter, packet, ctx)
+                ctx.fireChannelReadComplete()
+            } catch (e: Exception) {
+                logger.warn(e.message)
+                return
+            }
+            logger.debug("协议包解码:channel=${msg.channel} $packet")
+            //包没有处理，交给下一个codec
         } else ctx.fireChannelRead(msg)
 
 

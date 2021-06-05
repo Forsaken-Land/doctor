@@ -8,6 +8,7 @@ import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.plugin.forge.codec.Forge2PacketHandler
 import top.limbang.doctor.plugin.forge.handler.Forge2HandshakeListener
 import top.limbang.doctor.plugin.forge.protocol.FML2
+import top.limbang.doctor.plugin.forge.registry.IModPacketRegistry
 
 
 /**
@@ -17,6 +18,7 @@ import top.limbang.doctor.plugin.forge.protocol.FML2
  */
 class FML2Plugin(
     val modList: Map<String, String>,
+    val modRegistry: IModPacketRegistry
 ) : Plugin,
     EventEmitter by DefaultEventEmitter() {
 

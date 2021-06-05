@@ -3,8 +3,8 @@ package top.limbang.doctor.plugin.forge.protocol
 import top.limbang.doctor.plugin.forge.api.ForgeProtocol
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.definations.fml1.*
-import top.limbang.doctor.plugin.forge.registry.ChannelPacketRegistryImpl
-import top.limbang.doctor.plugin.forge.registry.IChannelPacketRegistry
+import top.limbang.doctor.plugin.forge.registry.FML1PacketRegistryImpl
+import top.limbang.doctor.plugin.forge.registry.IFML1PacketRegistry
 import top.limbang.doctor.protocol.core.PacketDirection
 
 /**
@@ -14,9 +14,9 @@ import top.limbang.doctor.protocol.core.PacketDirection
  */
 class FML1 :
     ForgeProtocol,
-    IChannelPacketRegistry by
-    ChannelPacketRegistryImpl(
-        listOf("REGISTER", "FML|HS", "FORGE")
+    IFML1PacketRegistry by
+    FML1PacketRegistryImpl(
+        listOf("FML|HS", "FORGE")
     ) {
 
     init {

@@ -8,8 +8,10 @@ import top.limbang.doctor.network.handler.ReadPacketListener
 import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.codec.Forge1PacketHandler
+import top.limbang.doctor.plugin.forge.codec.ModPacketHandler
 import top.limbang.doctor.plugin.forge.handler.Forge1HandshakeListener
 import top.limbang.doctor.plugin.forge.protocol.FML1
+import top.limbang.doctor.plugin.forge.registry.IModPacketRegistry
 
 /**
  *
@@ -18,6 +20,7 @@ import top.limbang.doctor.plugin.forge.protocol.FML1
  */
 class FML1Plugin(
     val modList: Map<String, String>,
+    val modRegistry: IModPacketRegistry
 ) : Plugin,
     EventEmitter by DefaultEventEmitter() {
 
@@ -43,6 +46,8 @@ class FML1Plugin(
                 "clientHandler", "fml1:clientHandler",
                 Forge1PacketHandler(this@FML1Plugin, channelPacketRegistry) //TODO: 这个handler逻辑或许得改
             )
+            this.pipeline()
+                .addBefore("clientHandler", "fml1:modHandler", ModPacketHandler(this@FML1Plugin, modRegistry))
 
             this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.HELLO)
         }

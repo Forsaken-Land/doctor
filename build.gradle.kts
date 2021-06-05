@@ -16,6 +16,8 @@ dependencies {
     api(project(":core"))
     api(project(":protocol"))
     api(project(":plugin-forge"))
+    api(project(":plugin-forge-laggoggles"))
+
 }
 
 allprojects {
