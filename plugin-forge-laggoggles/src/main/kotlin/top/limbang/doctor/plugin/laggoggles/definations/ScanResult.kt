@@ -1,8 +1,13 @@
 package top.limbang.doctor.plugin.laggoggles.definations
 
 import io.netty.buffer.ByteBuf
-import kotlinx.serialization.Contextual
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.Json
 import top.limbang.doctor.plugin.laggoggles.api.LagPacket
 import top.limbang.doctor.plugin.laggoggles.entity.Entry
 import top.limbang.doctor.protocol.api.PacketDecoder
@@ -13,6 +18,37 @@ import java.util.*
  * @author Doctor_Yin
  * @since 2021/6/5:13:07
  */
+object AnySerializer : KSerializer<Any> {
+    override fun deserialize(decoder: Decoder): Any {
+        TODO("多余的") //可能以后需要
+    }
+
+
+    override fun serialize(encoder: Encoder, value: Any) {
+        when (value) {
+            is String -> {
+                encoder.encodeString(value)
+            }
+            is Long -> {
+                encoder.encodeLong(value)
+            }
+            is Int -> {
+                encoder.encodeInt(value)
+            }
+            is UUID -> {
+                encoder.encodeString(value.toString())
+            }
+            is Boolean -> {
+                encoder.encodeBoolean(value)
+            }
+        }
+    }
+
+    override val descriptor: SerialDescriptor
+        get() = TODO("多余的")
+
+}
+
 @Serializable
 data class ScanResultPacket(
     val tickCount: Long,
@@ -29,7 +65,7 @@ data class ScanResultPacket(
     @Serializable
     data class ObjectData(
         val type: Type,
-        val data: Map<Entry, @Contextual Any>
+        val data: Map<Entry, @Serializable(AnySerializer::class) Any>
     )
 
     enum class Type {
@@ -70,6 +106,21 @@ class ScanResultDecoder : PacketDecoder<ScanResultPacket> {
             }
             data.add(ScanResultPacket.ObjectData(type, entryMap))
         }
+        println(
+            Json.encodeToString(
+                ScanResultPacket(
+                    tickCount,
+                    hasMore,
+                    endTime,
+                    startTime,
+                    totalTime,
+                    totalFrames,
+                    side,
+                    scanType,
+                    data
+                )
+            )
+        )
         return ScanResultPacket(tickCount, hasMore, endTime, startTime, totalTime, totalFrames, side, scanType, data)
     }
 }
