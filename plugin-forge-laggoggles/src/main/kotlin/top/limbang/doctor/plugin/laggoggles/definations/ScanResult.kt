@@ -3,7 +3,8 @@ package top.limbang.doctor.plugin.laggoggles.definations
 import io.netty.buffer.ByteBuf
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -23,6 +24,7 @@ object AnySerializer : KSerializer<Any> {
         TODO("多余的") //可能以后需要
     }
 
+    override val descriptor = PrimitiveSerialDescriptor("Any", PrimitiveKind.STRING) //不得不写
 
     override fun serialize(encoder: Encoder, value: Any) {
         when (value) {
@@ -43,9 +45,6 @@ object AnySerializer : KSerializer<Any> {
             }
         }
     }
-
-    override val descriptor: SerialDescriptor
-        get() = TODO("多余的")
 
 }
 
