@@ -31,8 +31,8 @@ class ModPacketHandler(
             val encoder = modRegistry.modPacketMap(msg.channel, PacketDirection.C2S).encoder(msg.javaClass)
             val discriminator = modRegistry.modPacketMap(msg.channel, PacketDirection.C2S).packetKey(msg.javaClass)
             val channel = msg.channel
-            encoder.encode(buf, msg)
             buf.writeVarInt(discriminator)
+            encoder.encode(buf, msg)
             out.add(CustomPayloadPacket(channel, buf))
             log.debug("mod包编码: modChannel=$channel discriminator=$discriminator $msg")
         } catch (e: Exception) {
@@ -49,6 +49,7 @@ class ModPacketHandler(
             emitPacketEvent(emitter, packet, ctx)
             log.debug("mod包解码: modChannel=${msg.channel} discriminator=$packetId $packet")
         } catch (e: Exception) {
+            if (msg.channel == "LagGoggles") log.debug("modChannel:${msg.channel} ${e.message}")
             log.trace("modChannel:${msg.channel} ${e.message}")
         }
     }

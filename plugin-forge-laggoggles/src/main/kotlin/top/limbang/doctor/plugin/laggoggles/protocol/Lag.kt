@@ -1,9 +1,7 @@
 package top.limbang.doctor.plugin.laggoggles.protocol
 
 import top.limbang.doctor.plugin.forge.registry.IModPacketRegistry
-import top.limbang.doctor.plugin.laggoggles.definations.RequestScanEncoder
-import top.limbang.doctor.plugin.laggoggles.definations.RequestServerDataEncoder
-import top.limbang.doctor.plugin.laggoggles.definations.ServerDataDecoder
+import top.limbang.doctor.plugin.laggoggles.definations.*
 import top.limbang.doctor.protocol.core.PacketDirection
 import top.limbang.doctor.protocol.registry.ICommonPacketGroup
 
@@ -22,8 +20,8 @@ object Lag : ICommonPacketGroup<IModPacketRegistry> {
 
             modPacketMap("LagGoggles", PacketDirection.S2C)
                 .register(2, ServerDataDecoder())
-//                .register(0, RequestScanDecoder())
-
+                .register(1, ProfileStatusDecoder())
+                .register(0, ScanResultDecoder())
 
         }
 

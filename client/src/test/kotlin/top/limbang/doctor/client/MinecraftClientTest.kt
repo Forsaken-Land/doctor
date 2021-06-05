@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.event.ChatEvent
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
-import top.limbang.doctor.plugin.laggoggles.definations.RequestServerDataPacket
+import top.limbang.doctor.plugin.laggoggles.definations.RequestScanPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
 import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
 import top.limbang.doctor.protocol.entity.text.ChatSerializer
@@ -62,7 +62,7 @@ fun main() {
     while (true) {
         when (val msg = readLine()) {
             "test" -> {
-                client.sendPacket(RequestServerDataPacket())
+                client.sendPacket(RequestScanPacket(20))
             }
             "tps" -> {
                 try {
