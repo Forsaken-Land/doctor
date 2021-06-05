@@ -1,6 +1,7 @@
 package top.limbang.doctor.plugin.laggoggles.definations
 
 import io.netty.buffer.ByteBuf
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import top.limbang.doctor.plugin.laggoggles.api.LagPacket
 import top.limbang.doctor.plugin.laggoggles.entity.Entry
@@ -28,7 +29,7 @@ data class ScanResultPacket(
     @Serializable
     data class ObjectData(
         val type: Type,
-        val data: Map<Entry, String>
+        val data: Map<Entry, @Contextual Any>
     )
 
     enum class Type {
@@ -62,10 +63,10 @@ class ScanResultDecoder : PacketDecoder<ScanResultPacket> {
         for (i in 0 until size) {
             val type = ScanResultPacket.Type.getValue(buf.readInt())
             val length = buf.readInt()
-            val entryMap = TreeMap<Entry, String>()
+            val entryMap = TreeMap<Entry, Any>()
             for (j in 0 until length) {
                 val entry = Entry.getValue(buf.readInt())
-                entryMap[entry] = entry.read(buf).toString()
+                entryMap[entry] = entry.read(buf)
             }
             data.add(ScanResultPacket.ObjectData(type, entryMap))
         }
