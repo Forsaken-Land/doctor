@@ -3,9 +3,9 @@ package top.limbang.doctor.client
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.event.ChatEvent
+import top.limbang.doctor.client.running.mod.LagGogglesUtils
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
-import top.limbang.doctor.plugin.laggoggles.definations.RequestScanPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
 import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
 import top.limbang.doctor.protocol.entity.text.ChatSerializer
@@ -58,11 +58,17 @@ fun main() {
     }.onPacket<PlayerPositionAndLookPacket> {
         logger.info("登录成功")
     }
+    val lag = LagGogglesUtils(client)
 
     while (true) {
         when (val msg = readLine()) {
             "test" -> {
-                client.sendPacket(RequestScanPacket(20))
+                try {
+                    val result = lag.getLag()
+                    logger.info(result.toString())
+                } catch (e: Exception) {
+                    println("1234")
+                }
             }
             "tps" -> {
                 try {

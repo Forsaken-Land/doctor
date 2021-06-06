@@ -19,6 +19,7 @@ object Lag : ICommonPacketGroup<IModPacketRegistry> {
                 .register(3, RequestServerDataEncoder())
 
             modPacketMap("LagGoggles", PacketDirection.S2C)
+                .register(4, MessageDecoder())
                 .register(2, ServerDataDecoder())
                 .register(1, ProfileStatusDecoder())
                 .register(0, ScanResultDecoder())
