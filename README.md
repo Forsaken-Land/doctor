@@ -5,13 +5,14 @@ doctor 一个简单的 `Minecraft` 库
 
 
 
-| 模块         | 功能       | 备注 |
-| ------------ | ---------- | ---- |
-| client       | 客户端     |      |
-| core         | 核心事件   |      |
-| network      | 网络库     |      |
-| protocol     | 协议库     |      |
-| plugin-forge | forge 插件 |      |
+| 模块                     | 功能       | 备注 |
+| ----------------------- | --------- | ---- |
+| client                  | 客户端     |      |
+| core                    | 核心事件   |      |
+| network                 | 网络库     |      |
+| protocol                | 协议库     |      |
+| plugin-forge            | forge 插件 |      |
+| plugin-forge-laggoggles | Lag 插件   |      |
 
 
 
