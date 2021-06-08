@@ -46,8 +46,10 @@ class FML1Plugin(
                 "clientHandler", "fml1:clientHandler",
                 Forge1PacketHandler(this@FML1Plugin, channelPacketRegistry) //TODO: 这个handler逻辑或许得改
             )
-            this.pipeline()
-                .addBefore("clientHandler", "fml1:modHandler", ModPacketHandler(this@FML1Plugin, modRegistry))
+            this.pipeline().addAfter(
+                "fml1:clientHandler", "fml1:modHandler",
+                ModPacketHandler(modRegistry)
+            )
 
             this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.HELLO)
         }

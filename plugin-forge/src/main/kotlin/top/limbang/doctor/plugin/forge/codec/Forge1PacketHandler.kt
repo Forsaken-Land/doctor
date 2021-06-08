@@ -20,7 +20,7 @@ import top.limbang.doctor.protocol.definition.play.client.CustomPayloadPacket
  */
 class Forge1PacketHandler(
     val emitter: EventEmitter,
-    val channelRegistry: IFML1PacketRegistry
+   private val channelRegistry: IFML1PacketRegistry
 ) : MessageToMessageCodec<Packet, FML1Packet>() {
 
     private val logger: Logger = LoggerFactory.getLogger(Forge1PacketHandler::class.java)

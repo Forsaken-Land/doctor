@@ -5,6 +5,7 @@ import io.netty.handler.codec.MessageToMessageCodec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.core.api.event.EventEmitter
+import top.limbang.doctor.network.handler.PacketEvent
 import top.limbang.doctor.network.handler.emitPacketEvent
 import top.limbang.doctor.plugin.forge.api.ModPacket
 import top.limbang.doctor.plugin.forge.registry.IModPacketRegistry
@@ -19,7 +20,6 @@ import top.limbang.doctor.protocol.extension.writeVarInt
  * @since 2021/6/5:20:39
  */
 class ModPacketHandler(
-    val emitter: EventEmitter,
     private val modRegistry: IModPacketRegistry
 ) : MessageToMessageCodec<CustomPayloadPacket, ModPacket>() {
 
@@ -46,8 +46,8 @@ class ModPacketHandler(
             val decoder = modRegistry.modPacketMap(msg.channel, PacketDirection.S2C).decoder<ModPacket>(packetId)
             val packet = decoder.decoder(msg.data)
             msg.close()
-            emitPacketEvent(emitter, packet, ctx)
-            log.debug("mod包解码: modChannel=${msg.channel} discriminator=$packetId $packet")
+            out.add(packet)
+//            log.debug("mod包解码: modChannel=${msg.channel} discriminator=$packetId $packet")
         } catch (e: Exception) {
             if (msg.channel == "LagGoggles") log.debug("modChannel:${msg.channel} ${e.message}")
             log.trace("modChannel:${msg.channel} ${e.message}")
