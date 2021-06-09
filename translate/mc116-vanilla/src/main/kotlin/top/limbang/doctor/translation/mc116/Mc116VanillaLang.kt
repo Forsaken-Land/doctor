@@ -1,6 +1,6 @@
-package top.limbang.doctor.translation.mc112
+package top.limbang.doctor.translation.mc116
 
-import Mc112LangResources
+import Mc116LangResources
 import java.io.File
 import java.util.concurrent.locks.ReentrantLock
 
@@ -9,12 +9,12 @@ import java.util.concurrent.locks.ReentrantLock
  * @author WarmthDawn
  * @since 2021-06-09
  */
-class Mc112VanillaLang : Mc112LangResources() {
+class Mc116VanillaLang : Mc116LangResources() {
     private val lock = ReentrantLock()
     override fun load() {
         lock.lock()
         if (!loaded) {
-            val file = File(javaClass.getResource("/mc112vanillalang/zh_cn.lang")!!.toURI())
+            val file = File(javaClass.getResource("/mc116vanillalang/zh_cn.json")!!.toURI())
             load(file)
             loaded = true
         }

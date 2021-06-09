@@ -10,6 +10,8 @@ import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
 import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
 import top.limbang.doctor.protocol.entity.text.ChatSerializer
+import top.limbang.doctor.translation.core.SingleResourceI18n
+import top.limbang.doctor.translation.mc116.Mc116VanillaLang
 import java.io.FileInputStream
 import java.util.*
 
@@ -33,6 +35,7 @@ fun main() {
     val authServerUrl = pros["authServerUrl"] as String
     val sessionServerUrl = pros["sessionServerUrl"] as String
 
+    SingleResourceI18n.create(Mc116VanillaLang::class.java).setDefault()
 
     val client = MinecraftClient()
         //.name(name)
@@ -43,7 +46,7 @@ fun main() {
 
     if (!client.start(host, port)) return
 
-    client.enableLag()
+//    client.enableLag()
 
     client.on(ConnectionEvent.Disconnect) {
         Thread.sleep(2000)

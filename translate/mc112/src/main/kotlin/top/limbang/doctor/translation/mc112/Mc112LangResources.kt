@@ -8,11 +8,11 @@ import java.util.regex.Pattern
  * @author WarmthDawn
  * @since 2021-05-12
  */
-abstract class Mc112LangResources: IResources {
+abstract class Mc112LangResources : IResources {
     private val properties: MutableMap<String, String> = HashMap()
     override var loaded: Boolean = false
         protected set
-    override var isUnicode = false
+    var isUnicode = false
         protected set
 
     private fun checkUnicode() {

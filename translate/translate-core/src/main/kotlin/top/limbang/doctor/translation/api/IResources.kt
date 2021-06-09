@@ -6,7 +6,6 @@ package top.limbang.doctor.translation.api
  * @since 2021-06-09
  */
 interface IResources {
-    val isUnicode: Boolean
     val loaded: Boolean
 
     operator fun get(key: String): String

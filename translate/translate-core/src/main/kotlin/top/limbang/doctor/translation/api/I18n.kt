@@ -22,6 +22,10 @@ interface I18n {
         }
     }
 
+    fun setDefault() {
+        _default = this
+    }
+
     companion object {
         private var _default: I18n? = null
         private val lock = ReentrantLock()
@@ -43,14 +47,16 @@ interface I18n {
                             ?.let { resources.add(it) }
                         findClass("top.limbang.doctor.translation.mc112.Mc112VanillaLang")
                             ?.let { resources.add(it) }
+                        findClass("top.limbang.doctor.translation.mc116.Mc116VanillaLang")
+                            ?.let { resources.add(it) }
 
-                        _default = when (resources.size) {
+                        when (resources.size) {
                             0 -> DummyI18n
                             1 -> SingleResourceI18n.create(resources[0])
                             else -> MultiResourceI18n().also {
                                 resources.forEach(it::add)
                             }
-                        }
+                        }.setDefault()
 
                     }
                     return _default!!

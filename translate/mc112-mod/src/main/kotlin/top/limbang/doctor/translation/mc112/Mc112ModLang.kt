@@ -15,7 +15,7 @@ class Mc112ModLang : Mc112LangResources() {
     override fun load() {
         lock.lock()
         if (!loaded) {
-            val rootPath = File(javaClass.getResource("/language/")!!.toURI())
+            val rootPath = File(javaClass.getResource("/mc112modlang/")!!.toURI())
             val files = (rootPath.list() ?: emptyArray()).map {
                 Paths.get(rootPath.path, it, "lang", "zh_cn.lang").toFile()
             }
