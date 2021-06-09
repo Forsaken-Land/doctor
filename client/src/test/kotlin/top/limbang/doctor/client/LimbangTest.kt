@@ -32,13 +32,13 @@ fun main() {
         .enablePlayerList()
         .enableLag()
 
-    if(!client.start(host, port)) return
+    if (!client.start(host, port)) return
 
     client.once(JoinGameEvent) {
-        logger.info( "登陆成功，开始发送 forge tps 指令")
+        logger.info("登陆成功，开始发送 forge tps 指令")
     }.onPacket<PlayerPositionAndLookPacket> {
         GlobalScope.launch {
-            val forgeTps = client.getForgeTps()
+            val forgeTps = client.tpsTools.getTpsSuspend()
             var outMsg = "[123]低于20TPS的维度如下:\n"
             forgeTps.forEach { tpsEntity ->
                 val dim = tpsEntity.dim.substringBetween("Dim", "(").trim()
@@ -48,7 +48,7 @@ fun main() {
                     else -> ""
                 }
             }
-            logger.info( outMsg)
+            logger.info(outMsg)
             client.stop()
         }
     }

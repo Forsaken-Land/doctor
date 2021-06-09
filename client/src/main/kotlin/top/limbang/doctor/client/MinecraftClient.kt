@@ -8,10 +8,7 @@ import top.limbang.doctor.client.factory.NetworkManagerFactory
 import top.limbang.doctor.client.handler.PacketForwardingHandler
 import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
-import top.limbang.doctor.client.running.PlayerTab
-import top.limbang.doctor.client.running.PlayerUtils
-import top.limbang.doctor.client.running.TpsEntity
-import top.limbang.doctor.client.running.TpsUtils
+import top.limbang.doctor.client.running.*
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
 import top.limbang.doctor.client.utils.ServerInfoUtils
 import top.limbang.doctor.client.utils.newPromise
@@ -53,12 +50,17 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     private lateinit var networkManager: NetworkManager
     private var protocol: Int = 0
     private lateinit var playerUtils: PlayerUtils
-    private lateinit var tpsUtils: TpsUtils
-    private var forgeFeature: ForgeFeature? = null
     private lateinit var pluginManager: PluginManager
     private var modPacketRegistry: IModPacketRegistry = ModPacketRegistryImpl()
 
 
+    /**
+     * ### 获取FML特征
+     */
+    var forgeFeature: ForgeFeature? = null
+        private set
+    var tpsTools: ITpsTools = DummyTpsTools
+        private set
     val connection get() = networkManager.connection
 
     /**
@@ -172,7 +174,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
             .addListener(PacketForwardingHandler())
 
         networkManager.connect()
-        this.tpsUtils = TpsUtils(this)
+        this.tpsTools = TpsTools.create(this)
         return true
     }
 
@@ -229,22 +231,6 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         }
     }
 
-    /**
-     * ### 获取forgeTps
-     */
-
-    fun getForgeTps(): List<TpsEntity> {
-        return if (forgeFeature != null && this::tpsUtils.isInitialized) {
-            tpsUtils.getTps()
-        } else throw RuntimeException("未开启玩家列表/或服务器不是Forge监听")
-    }
-
-    /**
-     * ### 获取FML特征
-     */
-    fun getForgeFeature(): ForgeFeature? {
-        return this.forgeFeature
-    }
 
     companion object {
 
