@@ -268,7 +268,6 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
                     }
                     .once(ConnectionEvent.Disconnect) {
                         net.shutdown()
-                        result.setFailure(ConnectionFailedException("连接断开"))
                     }
 
                 net.connect()

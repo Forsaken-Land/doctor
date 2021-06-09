@@ -3,7 +3,6 @@
 package top.limbang.doctor.client.running
 
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*

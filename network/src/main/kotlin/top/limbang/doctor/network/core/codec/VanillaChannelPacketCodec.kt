@@ -1,5 +1,6 @@
 package top.limbang.doctor.network.core.codec
 
+import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageCodec
 import top.limbang.doctor.protocol.api.ChannelPacket
@@ -19,9 +20,10 @@ class VanillaChannelPacketCodec(
     private val decodeDirection: PacketDirection
 ) : MessageToMessageCodec<Packet, Packet>() {
     override fun encode(ctx: ChannelHandlerContext, msg: Packet, out: MutableList<Any>) {
-        val buf = ctx.alloc().buffer()
         if (msg !is CustomPayloadPacket) {
+            lateinit var buf : ByteBuf
             try {
+                buf = ctx.alloc().buffer()
                 val encoder = protocol.packetMap(encodeDirection).encoder(msg.javaClass)
                 val channel = protocol.packetMap(encodeDirection).packetKey(msg.javaClass)
                 out.add(CustomPayloadPacket(channel, encoder.encode(buf, msg)))
