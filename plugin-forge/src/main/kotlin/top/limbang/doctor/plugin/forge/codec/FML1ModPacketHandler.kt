@@ -19,7 +19,7 @@ import top.limbang.doctor.protocol.extension.writeVarInt
  * @author Doctor_Yin
  * @since 2021/6/5:20:39
  */
-class ModPacketHandler(
+class FML1ModPacketHandler(
     private val modRegistry: IModPacketRegistry
 ) : MessageToMessageCodec<CustomPayloadPacket, ModPacket>() {
 

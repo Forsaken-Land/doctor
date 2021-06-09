@@ -72,7 +72,7 @@ object DummyTpsTools : ITpsTools {
         unit: TimeUnit,
         callback: (error: Throwable?, List<TpsEntity>) -> Unit
     ): Disposable {
-        throw TpsException("未开启服务器/当前服务器不支持查询Tps")
+        throw TpsException("当前服务器不支持查询Tps")
     }
 
 }

@@ -9,10 +9,11 @@ import top.limbang.doctor.network.handler.ReadPacketListener
 import top.limbang.doctor.network.hooks.InitChannelPipelineHook
 import top.limbang.doctor.plugin.forge.api.ForgeProtocolState
 import top.limbang.doctor.plugin.forge.codec.Forge1PacketHandler
-import top.limbang.doctor.plugin.forge.codec.ModPacketHandler
+import top.limbang.doctor.plugin.forge.codec.FML1ModPacketHandler
 import top.limbang.doctor.plugin.forge.handler.Forge1HandshakeListener
 import top.limbang.doctor.plugin.forge.protocol.FML1
 import top.limbang.doctor.plugin.forge.registry.IModPacketRegistry
+import top.limbang.doctor.plugin.forge.registry.ModPacketRegistryImpl
 
 /**
  *
@@ -20,11 +21,10 @@ import top.limbang.doctor.plugin.forge.registry.IModPacketRegistry
  * @since 2021-05-14
  */
 class FML1Plugin(
-    val modList: Map<String, String>,
-    val modRegistry: IModPacketRegistry
+    val modList: Map<String, String>
 ) : Plugin,
     EventEmitter by DefaultEventEmitter() {
-
+    val modRegistry: IModPacketRegistry = ModPacketRegistryImpl()
     val channelPacketRegistry = FML1()
 
     override fun created(manager: IPluginManager) {
@@ -49,7 +49,7 @@ class FML1Plugin(
             )
             this.pipeline().addAfter(
                 "fml1:clientHandler", "fml1:modHandler",
-                ModPacketHandler(modRegistry)
+                FML1ModPacketHandler(modRegistry)
             )
 
             this.attr(ATTR_FORGE_STATE).set(ForgeProtocolState.HELLO)

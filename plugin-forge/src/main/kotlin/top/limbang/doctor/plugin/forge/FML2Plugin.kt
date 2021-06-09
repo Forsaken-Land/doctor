@@ -10,6 +10,7 @@ import top.limbang.doctor.plugin.forge.codec.Forge2PacketHandler
 import top.limbang.doctor.plugin.forge.handler.Forge2HandshakeListener
 import top.limbang.doctor.plugin.forge.protocol.FML2
 import top.limbang.doctor.plugin.forge.registry.IModPacketRegistry
+import top.limbang.doctor.plugin.forge.registry.ModPacketRegistryImpl
 
 
 /**
@@ -18,11 +19,10 @@ import top.limbang.doctor.plugin.forge.registry.IModPacketRegistry
  * @since 2021/5/16 下午9:50
  */
 class FML2Plugin(
-    val modList: Map<String, String>,
-    val modRegistry: IModPacketRegistry
+    val modList: Map<String, String>
 ) : Plugin,
     EventEmitter by DefaultEventEmitter() {
-
+    val modRegistry: IModPacketRegistry = ModPacketRegistryImpl()
     private val channelPacketRegistry = FML2()
 
     override fun created(manager: IPluginManager) {
@@ -35,7 +35,7 @@ class FML2Plugin(
      * 注册插件的事件
      */
     override fun registerEvent(emitter: EventEmitter) {
-           emitter.addListener(Forge2HandshakeListener(this))
+        emitter.addListener(Forge2HandshakeListener(this))
     }
 
     override fun hookProvider(registry: IHookProviderRegistry) {

@@ -3,7 +3,8 @@ package top.limbang.doctor.client
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.event.ChatEvent
-import top.limbang.doctor.client.running.mod.LagGogglesUtils
+import top.limbang.doctor.client.running.mod.enableLag
+import top.limbang.doctor.client.running.mod.getLag
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
@@ -39,9 +40,10 @@ fun main() {
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
         .enablePlayerList()
-        .enableLag()
 
-    if(!client.start(host, port)) return
+    if (!client.start(host, port)) return
+
+    client.enableLag()
 
     client.on(ConnectionEvent.Disconnect) {
         Thread.sleep(2000)
@@ -58,13 +60,13 @@ fun main() {
     }.onPacket<PlayerPositionAndLookPacket> {
         logger.info("登录成功")
     }
-    val lag = LagGogglesUtils(client)
+
 
     while (true) {
         when (val msg = readLine()) {
             "test" -> {
                 try {
-                    val result = lag.getLag()
+                    val result = client.getLag()
                     logger.info(result.toString())
                 } catch (e: Exception) {
                     logger.error(e.message)
@@ -72,7 +74,7 @@ fun main() {
             }
             "tps" -> {
                 try {
-                    val result = client.getForgeTps()
+                    val result = client.tpsTools.getTps()
                     logger.info(result.toString())
                 } catch (e: Exception) {
                     println("123")

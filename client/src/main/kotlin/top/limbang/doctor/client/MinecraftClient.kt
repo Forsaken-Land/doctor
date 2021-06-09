@@ -4,6 +4,7 @@ import io.netty.util.concurrent.Promise
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.entity.ForgeFeature
+import top.limbang.doctor.client.entity.ForgeInfo
 import top.limbang.doctor.client.factory.NetworkManagerFactory
 import top.limbang.doctor.client.handler.PacketForwardingHandler
 import top.limbang.doctor.client.listener.LoginListener
@@ -24,9 +25,6 @@ import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.setProtocolState
 import top.limbang.doctor.plugin.forge.FML1Plugin
 import top.limbang.doctor.plugin.forge.FML2Plugin
-import top.limbang.doctor.plugin.forge.registry.IModPacketRegistry
-import top.limbang.doctor.plugin.forge.registry.ModPacketRegistryImpl
-import top.limbang.doctor.plugin.laggoggles.protocol.Lag
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.client.HandshakePacket
@@ -50,8 +48,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     private lateinit var networkManager: NetworkManager
     private var protocol: Int = 0
     private lateinit var playerUtils: PlayerUtils
-    private lateinit var pluginManager: PluginManager
-    private var modPacketRegistry: IModPacketRegistry = ModPacketRegistryImpl()
+    val pluginManager: PluginManager = PluginManager(this)
 
 
     /**
@@ -104,13 +101,6 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         return this
     }
 
-    /**
-     * ### 开启Lag mod功能
-     */
-    fun enableLag(): MinecraftClient {
-        this.modPacketRegistry.registerGroup(Lag)
-        return this
-    }
 
     /**
      * ### 启动客户端
@@ -130,7 +120,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
      * - [timeout] 等待时间 毫秒
      */
     fun start(host: String, port: Int, timeout: Long): Boolean {
-        this.pluginManager = PluginManager(this)
+//        this.pluginManager = PluginManager(this)
 
         val jsonStr: String
         try {
@@ -149,8 +139,8 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
 
         // 注册插件
         if (serviceInfo.forge != null) when (serviceInfo.forge.forgeFeature) {
-            ForgeFeature.FML1 -> pluginManager.registerPlugin(FML1Plugin(serviceInfo.forge.modMap, modPacketRegistry))
-            ForgeFeature.FML2 -> pluginManager.registerPlugin(FML2Plugin(serviceInfo.forge.modMap, modPacketRegistry))
+            ForgeFeature.FML1 -> pluginManager.registerPlugin(FML1Plugin(serviceInfo.forge.modMap))
+            ForgeFeature.FML2 -> pluginManager.registerPlugin(FML2Plugin(serviceInfo.forge.modMap))
         }
 
         val suffix = if (serviceInfo.forge == null) "" else serviceInfo.forge.forgeFeature.getForgeVersion()

@@ -30,7 +30,6 @@ fun main() {
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
         .enablePlayerList()
-        .enableLag()
 
     if (!client.start(host, port)) return
 
