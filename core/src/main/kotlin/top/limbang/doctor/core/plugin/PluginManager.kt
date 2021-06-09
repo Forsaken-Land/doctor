@@ -34,7 +34,7 @@ class PluginManager(
      */
     override fun <T : Plugin> registerPlugin(plugin: T) {
         val key = plugin.javaClass
-        plugin.created()
+        plugin.created(this)
         val redirect = if (plugin is EventEmitter)
             plugin as EventEmitter
         else DefaultEventEmitter()

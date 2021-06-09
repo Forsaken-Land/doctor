@@ -2,6 +2,7 @@ package top.limbang.doctor.plugin.forge
 
 import top.limbang.doctor.core.api.IHookProviderRegistry
 import top.limbang.doctor.core.api.event.EventEmitter
+import top.limbang.doctor.core.api.plugin.IPluginManager
 import top.limbang.doctor.core.api.plugin.Plugin
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.network.hooks.InitChannelPipelineHook
@@ -24,7 +25,7 @@ class FML2Plugin(
 
     private val channelPacketRegistry = FML2()
 
-    override fun created() {
+    override fun created(manager: IPluginManager) {
     }
 
     override fun destroy() {

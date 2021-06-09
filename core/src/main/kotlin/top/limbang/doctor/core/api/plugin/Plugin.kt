@@ -13,7 +13,7 @@ interface Plugin {
     /**
      * 初始化插件
      */
-    fun created()
+    fun created(manager: IPluginManager)
 
     /**
      * 销毁插件
