@@ -1,7 +1,7 @@
 package top.limbang.doctor.protocol.entity.text
 
 import top.limbang.doctor.protocol.entity.text.style.Style
-import top.limbang.doctor.protocol.entity.text.translation.I18n
+import top.limbang.doctor.translation.api.I18n
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -13,7 +13,8 @@ import java.util.regex.Pattern
  */
 class TranslationChat(
     val key: String,
-    val formatArgs: Array<Any> = emptyArray()
+    val formatArgs: Array<Any> = emptyArray(),
+    val i18n: I18n
 ) : AbstractChat() {
     init {
         this.formatArgs.forEach {
@@ -60,7 +61,7 @@ class TranslationChat(
                     addChild("%")
                 } else {
                     if ("s" != formatOption) {
-                        throw TranslationChatFormatError(this, "Unsupported format: '$s'")
+                        throw TranslationFormatError(this, "Unsupported format: '$s'")
                     }
                     val argsIndex = matcher.group(1)
                     val index = if (argsIndex != null) argsIndex.toInt() - 1 else i++
@@ -74,13 +75,13 @@ class TranslationChat(
                 addChild(String.format(format.substring(current)))
             }
         } catch (e: IllegalFormatException) {
-            throw TranslationChatFormatError(this, e)
+            throw TranslationFormatError(this, e)
         }
     }
 
     private fun getFormatArgumentAsComponent(index: Int): IChat {
         if (index >= formatArgs.size) {
-            throw TranslationChatFormatError(this, index)
+            throw TranslationFormatError(this, index)
         } else {
             val obj = formatArgs[index]
             return if (obj is IChat) {
@@ -97,8 +98,8 @@ class TranslationChat(
         }
         isInit = true
         try {
-            initializeFromFormat(I18n.translate(key))
-        } catch (e: TranslationChatFormatError) {
+            initializeFromFormat(i18n.translate(key))
+        } catch (e: TranslationFormatError) {
             e.printStackTrace()
             initializeFromFormat(key)
         }
@@ -142,6 +143,6 @@ class TranslationChat(
             }
         }.toTypedArray()
 
-        return TranslationChat(key, argsCopy).copyFrom(this)
+        return TranslationChat(key, argsCopy, i18n).copyFrom(this)
     }
 }

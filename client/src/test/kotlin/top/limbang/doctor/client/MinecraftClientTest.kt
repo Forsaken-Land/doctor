@@ -74,7 +74,7 @@ fun main() {
             }
             "tps" -> {
                 try {
-                    val result = client.tpsTools.getTps()
+                    val result = client.tpsTools.getTps().get()
                     logger.info(result.toString())
                 } catch (e: Exception) {
                     println("123")

@@ -7,7 +7,7 @@ import top.limbang.doctor.protocol.entity.text.TranslationChat
  * @author WarmthDawn
  * @since 2021-05-12
  */
-class TranslationChatFormatError : IllegalArgumentException {
+class TranslationFormatError : IllegalArgumentException {
     constructor(
         component: TranslationChat,
         message: String

@@ -49,12 +49,15 @@ interface ITpsTools {
 
     fun getTps(timeout: Long = defaultTimeout.first, unit: TimeUnit = defaultTimeout.second): Future<List<TpsEntity>> {
         return Single.create<List<TpsEntity>?> { obs ->
-            getTps(timeout, unit) { err, it ->
+            val disp = getTps(timeout, unit) { err, it ->
                 if (err != null) {
                     obs.onError(err)
                 } else {
                     obs.onSuccess(it)
                 }
+            }
+            obs.setCancellable {
+                disp.dispose()
             }
         }.toFuture()
     }

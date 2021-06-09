@@ -5,16 +5,15 @@ import kotlinx.serialization.json.*
 import top.limbang.doctor.protocol.entity.text.style.StyleSerializer
 import top.limbang.doctor.protocol.utils.stringChild
 import top.limbang.doctor.protocol.utils.stringChildNullable
-
+import top.limbang.doctor.translation.api.I18n
 /**
  *
  * @author WarmthDawn
  * @since 2021-05-11
  */
 object ChatSerializer {
-
-
-    fun deserialize(json: JsonElement): IChat {
+    fun deserialize(json: JsonElement): IChat = deserialize(json, I18n.DEFAULT)
+    fun deserialize(json: JsonElement, i18n: I18n): IChat {
         return when {
             (json is JsonPrimitive) -> {
                 PlainChat(json.content)
@@ -51,9 +50,9 @@ object ChatSerializer {
                                         }
                                     }
                             }.toTypedArray()
-                            TranslationChat(s, args)
+                            TranslationChat(s, args, i18n)
                         } else {
-                            TranslationChat(s)
+                            TranslationChat(s, i18n = i18n)
                         }
                     }
                     //计分板文本
