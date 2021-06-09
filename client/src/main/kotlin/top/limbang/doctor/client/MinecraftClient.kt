@@ -36,6 +36,9 @@ import top.limbang.doctor.protocol.definition.client.HandshakePacket
 import top.limbang.doctor.protocol.definition.play.server.CChatPacket
 import top.limbang.doctor.protocol.definition.status.client.RequestPacket
 import top.limbang.doctor.protocol.definition.status.server.ResponsePacket
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 /**
  * ### Minecraft 客户端
@@ -109,10 +112,35 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
 
     /**
      * ### 启动客户端
+     * 默认等待时间2秒
+     *
+     * - [host] 服务器地址
+     * - [port] 服务器端口
      */
-    fun start(host: String, port: Int): MinecraftClient {
+    fun start(host: String, port: Int): Boolean {
+        return start(host, port, 2000)
+    }
+
+    /**
+     * ### 启动客户端
+     * - [host] 服务器地址
+     * - [port] 服务器端口
+     * - [timeout] 等待时间 毫秒
+     */
+    fun start(host: String, port: Int, timeout: Long): Boolean {
         this.pluginManager = PluginManager(this)
-        val jsonStr = ping(host, port).get()
+
+        val jsonStr: String
+        try {
+            jsonStr = ping(host, port).get(timeout, TimeUnit.MILLISECONDS)
+        } catch (e: TimeoutException) {
+            logger.error("获取ping信息,等待超时...")
+            return false
+        } catch (e: ExecutionException) {
+            logger.error("获取ping信息失败,${e.message}")
+            return false
+        }
+
         val serviceInfo = ServerInfoUtils.getServiceInfo(jsonStr)
         protocol = serviceInfo.versionNumber
         forgeFeature = serviceInfo.forge?.forgeFeature
@@ -145,7 +173,7 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
 
         networkManager.connect()
         this.tpsUtils = TpsUtils(this)
-        return this
+        return true
     }
 
     /**
@@ -237,6 +265,10 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
                     .once(ConnectionEvent.Error) {
                         net.shutdown()
                         result.setFailure(ConnectionFailedException("连接失败"))
+                    }
+                    .once(ConnectionEvent.Disconnect) {
+                        net.shutdown()
+                        result.setFailure(ConnectionFailedException("连接断开"))
                     }
 
                 net.connect()

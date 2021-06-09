@@ -6,7 +6,6 @@ import top.limbang.doctor.client.event.ChatEvent
 import top.limbang.doctor.client.running.mod.LagGogglesUtils
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
-import top.limbang.doctor.plugin.laggoggles.definations.ScanResultPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
 import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
 import top.limbang.doctor.protocol.entity.text.ChatSerializer
@@ -41,8 +40,8 @@ fun main() {
         .sessionServerUrl(sessionServerUrl)
         .enablePlayerList()
         .enableLag()
-        .start(host, port)
 
+    if(!client.start(host, port)) return
 
     client.on(ConnectionEvent.Disconnect) {
         Thread.sleep(2000)
