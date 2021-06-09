@@ -3,6 +3,8 @@
 package top.limbang.doctor.client.running
 
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
 import top.limbang.doctor.client.MinecraftClient
@@ -24,7 +26,7 @@ class TpsUtils(
 ) {
     //观察流（基于Chat事件）
     private val tpsObservable = when (client.getForgeFeature()) {
-        FML1 -> client.asObservable(PacketEvent(ChatType0Packet::class))
+        FML1 -> client.asObservable(PacketEvent(ChatType0Packet::class)).observeOn(Schedulers.io())
             .filter {
                 //过滤Tps消息
                 it.json.contains("commands.forge.tps.summary")
@@ -36,7 +38,7 @@ class TpsUtils(
                 it.dim == "Overall"
             }
             .toList() //结果转换为列表
-        FML2 -> client.asObservable(PacketEvent(ChatType1Packet::class))
+        FML2 -> client.asObservable(PacketEvent(ChatType1Packet::class)).observeOn(Schedulers.io())
             .filter {
                 //过滤Tps消息
                 (it.json.contains("commands.forge.tps.summary.all")
