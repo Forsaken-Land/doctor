@@ -5,18 +5,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.MinecraftClient
-import top.limbang.doctor.client.entity.ForgeFeature
-import top.limbang.doctor.client.running.DummyTpsTools
-import top.limbang.doctor.client.running.ITpsTools
-import top.limbang.doctor.client.running.TpsEntity
-import top.limbang.doctor.client.running.TpsToolsFML1
 import top.limbang.doctor.client.session.UUIDSerializer
 import top.limbang.doctor.client.utils.asObservable
 import top.limbang.doctor.network.handler.PacketEvent
@@ -25,7 +14,6 @@ import top.limbang.doctor.plugin.laggoggles.definations.RequestScanPacket
 import top.limbang.doctor.plugin.laggoggles.definations.ScanResultPacket
 import top.limbang.doctor.plugin.laggoggles.definations.ScanResultPacket.Type.*
 import top.limbang.doctor.plugin.laggoggles.entity.Entry
-import top.limbang.doctor.protocol.definition.play.client.ChatType0Packet
 import java.util.*
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
@@ -107,13 +95,11 @@ class LagTools(
     override val defaultTimeout: Pair<Long, TimeUnit> = Pair(timeout, timeUnit)
     private val lagObservable = client.asObservable(PacketEvent(ScanResultPacket::class))
         .observeOn(Schedulers.io())
-        .takeUntil {
-            !it.hasMore
-        }.map {
-            it.data.map { objectData ->
-                parseLagEntity(objectData)
-            }
-        }.toList()
+        .takeUntil { !it.hasMore }
+        .flatMapIterable { it.data }
+        .map { parseLagEntity(it) }
+        .mapOptional { Optional.ofNullable(it) }
+        .toList()
 
     override fun getLag(
         timeout: Long,
@@ -125,15 +111,7 @@ class LagTools(
                 if (err != null) {
                     callback(err, emptyList())
                 } else {
-                    val list = mutableListOf<LagEntity>()
-                    it.forEach {
-                        it.forEach { lagEntity ->
-                            if (lagEntity != null) {
-                                list.add(lagEntity)
-                            }
-                        }
-                    }
-                    callback(null, list)
+                    callback(null, it)
                 }
             }
         client.sendPacket(RequestScanPacket(20))

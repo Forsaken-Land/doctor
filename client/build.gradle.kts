@@ -9,7 +9,7 @@ dependencies {
     testImplementation(project(":translate:mc112-vanilla"))
     testImplementation(project(":translate:mc112-mod"))
 
-    implementation(project(":translate:translate-core"))
-    testImplementation(project(":translate:mc116-vanilla"))
+//    implementation(project(":translate:translate-core"))
+//    testImplementation(project(":translate:mc116-vanilla"))
 
 }
