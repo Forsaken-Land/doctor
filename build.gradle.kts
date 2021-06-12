@@ -6,7 +6,7 @@ plugins {
     id("application")
 }
 
-allprojects{
+allprojects {
     val projectVersion: String by project
     group = "top.limbang.doctor"
     version = projectVersion
