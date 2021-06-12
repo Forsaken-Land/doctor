@@ -132,29 +132,29 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
             return false
         }
 
-        val serviceInfo = ServerInfoUtils.getServiceInfo(jsonStr)
-        protocol = serviceInfo.versionNumber
-        forgeFeature = serviceInfo.forge?.forgeFeature
+        val serverInfo = ServerInfoUtils.getServiceInfo(jsonStr)
+        protocol = serverInfo.versionNumber
+        forgeFeature = serverInfo.forge?.forgeFeature
 
         // 注册插件
-        if (serviceInfo.forge != null) when (serviceInfo.forge.forgeFeature) {
-            ForgeFeature.FML1 -> pluginManager.registerPlugin(FML1Plugin(serviceInfo.forge.modMap))
-            ForgeFeature.FML2 -> pluginManager.registerPlugin(FML2Plugin(serviceInfo.forge.modMap))
+        if (serverInfo.forge != null) when (serverInfo.forge.forgeFeature) {
+            ForgeFeature.FML1 -> pluginManager.registerPlugin(FML1Plugin(serverInfo.forge.modMap))
+            ForgeFeature.FML2 -> pluginManager.registerPlugin(FML2Plugin(serverInfo.forge.modMap))
         }
 
-        val suffix = if (serviceInfo.forge == null) "" else serviceInfo.forge.forgeFeature.getForgeVersion()
+        val suffix = if (serverInfo.forge == null) "" else serverInfo.forge.forgeFeature.getForgeVersion()
 
         // 判断是否设置了名称,有就代码离线登陆
         val loginListener: LoginListener = if (name.isEmpty()) {
             val sessionService = YggdrasilMinecraftSessionService(authServerUrl, sessionServerUrl)
             val session = sessionService.loginYggdrasilWithPassword(username, password)
-            LoginListener(name, session, serviceInfo.versionNumber, sessionService, suffix)
+            LoginListener(name, session, serverInfo.versionNumber, sessionService, suffix)
         } else {
-            LoginListener(name = name, protocolVersion = serviceInfo.versionNumber, suffix = suffix)
+            LoginListener(name = name, protocolVersion = serverInfo.versionNumber, suffix = suffix)
         }
 
         networkManager = NetworkManagerFactory.createNetworkManager(
-            host, port, pluginManager, serviceInfo.versionName, this
+            host, port, pluginManager, serverInfo.versionName, this
         )
 
         networkManager
