@@ -21,8 +21,8 @@ class DefaultPluginHookManager : IPluginHookManager {
     }
 
     val registry: Registry<IPluginHookProvider<*>, PluginHookRegistry<*>> = DefaultRegistry()
-    override fun <T : IHookMessage> invokeHook(provider: IPluginHookProvider<T>, args: T, freezeHook: Boolean) {
-        val hooks = registry.tryGet(provider) ?: return
+    override fun <T : IHookMessage> invokeHook(provider: IPluginHookProvider<T>, args: T, freezeHook: Boolean): Boolean {
+        val hooks = registry.tryGet(provider) ?: return false
         if (hooks.frozen) {
             log.warn("尝试触发已经冻结的钩子，你是否错误的冻结了某个钩子？")
         }
@@ -31,7 +31,7 @@ class DefaultPluginHookManager : IPluginHookManager {
             @Suppress("UNCHECKED_CAST")
             hook as PluginHookHandler<T>
             if (hook.handle(args) && args.isCoR) {
-                break
+                return true
             }
         }
 
@@ -39,6 +39,7 @@ class DefaultPluginHookManager : IPluginHookManager {
             hooks.clear()
             hooks.freeze("钩子已经被锁定，无法注册")
         }
+        return false
     }
 
     override fun <T : IHookMessage> getHook(provider: IPluginHookProvider<T>): PluginHookRegistry<T> {

@@ -1,10 +1,9 @@
 package top.limbang.doctor.core.plugin
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.core.api.event.EventEmitter
-import top.limbang.doctor.core.api.plugin.IPluginHookManager
-import top.limbang.doctor.core.api.plugin.IPluginManager
-import top.limbang.doctor.core.api.plugin.Plugin
+import top.limbang.doctor.core.api.plugin.*
 import top.limbang.doctor.core.cast
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.core.impl.registy.DefaultRegistry
@@ -23,7 +22,7 @@ class PluginManager(
     private val enabledPlugins = mutableSetOf<Class<*>>()
 
     companion object {
-        val log = LoggerFactory.getLogger(PluginManager::class.java)
+        val log: Logger = LoggerFactory.getLogger(PluginManager::class.java)
     }
 
     /**
@@ -31,22 +30,27 @@ class PluginManager(
      */
     override fun <T : Plugin> registerPlugin(plugin: T) {
         val key = plugin.javaClass
+        emitter.emit(PluginEvent.BeforeCreate, PluginEventArgs(this, plugin))
         plugin.created(this)
+        emitter.emit(PluginEvent.Created, PluginEventArgs(this, plugin))
         pluginRegistry.register(key, plugin)
     }
 
     override fun onPluginEnabled() {
-        pluginRegistry.freeze(true)
+        pluginRegistry.freeze(true, "插件注册已经被锁定，请检查您插件注册的时机")
         val allPlugins = pluginRegistry.all()
         while (pluginRegistry.size > enabledPlugins.size) {
             val plugin = allPlugins
-                .firstOrNull { enabledPlugins.containsAll(it.dependencies) }
+                .firstOrNull {
+                    (!enabledPlugins.contains(it::class.java))
+                            && enabledPlugins.containsAll(it.dependencies)
+                }
 
             if (plugin == null) {
                 val notEnabled = allPlugins.filterNot { it.javaClass in enabledPlugins }
-                notEnabled.forEach { plugin ->
-                    val pluginName = plugin.javaClass.simpleName
-                    val missingDependencies = plugin.dependencies.asSequence()
+                notEnabled.forEach { enabledPlugin ->
+                    val pluginName = enabledPlugin.javaClass.simpleName
+                    val missingDependencies = enabledPlugin.dependencies.asSequence()
                         .filterNot { it.javaClass in enabledPlugins }
                         .joinToString { it.javaClass.simpleName }
                     log.warn("插件 $pluginName 缺少以下依赖 $missingDependencies")
@@ -56,13 +60,15 @@ class PluginManager(
             val key = plugin.javaClass
             val redirect = if (plugin is EventEmitter) plugin else DefaultEventEmitter()
             pluginEventRegistry.register(key, redirect)
-            emitter.targetTo(redirect)
             try {
+                emitter.emit(PluginEvent.BeforeEnable, PluginEventArgs(this, plugin))
+                plugin.enabled(this)
                 plugin.registerEvent(redirect)
                 plugin.registerHook(this)
+                emitter.emit(PluginEvent.Enabled, PluginEventArgs(this, plugin))
+                emitter.targetTo(redirect)
                 enabledPlugins.add(plugin.javaClass)
             } catch (e: Exception) {
-                allPlugins.remove(plugin)
                 removePlugin(plugin.javaClass)
                 log.error("启动插件失败", e)
             }
@@ -79,13 +85,14 @@ class PluginManager(
             val redirect = pluginEventRegistry.get(key)
             emitter.removeTarget(redirect)
             plugin.destroy()
+            emitter.emit(PluginEvent.Destroyed, PluginEventArgs(this, plugin))
         }
         pluginRegistry.remove(key)
         pluginEventRegistry.remove(key)
     }
 
     override fun <T : Plugin> getPlugin(key: Class<T>) = pluginRegistry.get(key).cast<T>()
-    override fun getAllPlugins() = pluginRegistry.all()
+    override fun getAllPlugins() = pluginRegistry.all().toList()
     override fun <T : Plugin> hasPlugin(key: Class<T>) = pluginRegistry.have(key)
 
 

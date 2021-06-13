@@ -36,11 +36,15 @@ interface EventEmitter {
     /**
      * 发布事件
      */
-    fun <T> emit(event: Event<T>, args: T): EventEmitter
+    fun <T> emit(event: Event<T>, args: T): EventEmitter {
+        return emit(event, args, emptyList())
+    }
 
     fun emit(event: Event<Unit>): EventEmitter {
-        return emit(event, Unit)
+        return emit(event, Unit, emptyList())
     }
+
+    fun <T> emit(event: Event<T>, args: T, sources: List<EventEmitter>): EventEmitter
 
     /**
      * 取消监听事件
@@ -84,6 +88,7 @@ interface EventEmitter {
      * 使当前事件触发器同时触发其他触发器的事件
      */
     fun targetTo(another: EventEmitter)
+
     /**
      * 取消触发器同时触发
      */
@@ -91,4 +96,5 @@ interface EventEmitter {
 
     val emitter: EventEmitter
         get() = this
+
 }

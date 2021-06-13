@@ -2,21 +2,28 @@ package top.limbang.doctor.client
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import top.limbang.doctor.client.running.mod.*
+import top.limbang.doctor.client.running.AutoVersionForgePlugin
+import top.limbang.doctor.client.running.PlayerPlugin
+import top.limbang.doctor.core.api.event.Event
 import top.limbang.doctor.network.handler.oncePacket
+import top.limbang.doctor.plugin.laggoggles.PluginLagGoggles
+import top.limbang.doctor.plugin.laggoggles.getLagSuspend
+import top.limbang.doctor.plugin.laggoggles.tools.Block
+import top.limbang.doctor.plugin.laggoggles.tools.Entity
 import top.limbang.doctor.protocol.definition.play.client.JoinGamePacket
 
 fun main() {
 
-    val client = MinecraftClient()
+    val client = MinecraftClient.builder()
         .user(username, password)
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
-        .enablePlayerList()
+        .plugin(PluginLagGoggles())
+        .plugin(PlayerPlugin())
+        .plugin(AutoVersionForgePlugin())
+        .build()
 
     if (!client.start(host, port)) return
-
-    client.enableLag()
 
     client.oncePacket<JoinGamePacket> {
         GlobalScope.launch {
@@ -42,9 +49,7 @@ fun main() {
                             val worldId = (it.data as Entity).worldId
                             "实体：$name,uuid：$uuid,时间：$worldId,耗时：${it.nanos / 1000}us/t\n" //可能是这样换算
                         }
-                        is Event -> {
-                            ""
-                        }
+                        else -> ""
                     }
                 }
             }

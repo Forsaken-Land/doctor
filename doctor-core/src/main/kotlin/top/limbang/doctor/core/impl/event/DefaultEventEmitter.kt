@@ -26,6 +26,7 @@ class DefaultEventEmitter : EventEmitter {
     private val onceListeners = ConcurrentHashMap<Event<*>, ConcurrentHashSet<EventHandler<*>>>()
     private val durationListeners = ConcurrentHashMap<Event<*>, ConcurrentHashSet<Pair<Long, EventHandler<*>>>>()
     private val targets: ConcurrentHashSet<EventEmitter> = newConcurrentHashSet()
+    private var passive = false
 
     private fun clearExpire() {
         val now = Instant.now().epochSecond
@@ -76,7 +77,8 @@ class DefaultEventEmitter : EventEmitter {
 //        handler.cast<T>()(args)
     }
 
-    override fun <T> emit(event: Event<T>, args: T): EventEmitter {
+
+    override fun <T> emit(event: Event<T>, args: T, sources: List<EventEmitter>): EventEmitter {
         val timeout = setTimeout(1000 * 5) { logger.warn("事件 $event 执行超过5秒") }
         //普通事件
         listeners[event]?.toList()?.forEach {
@@ -95,11 +97,16 @@ class DefaultEventEmitter : EventEmitter {
             handleEvent(it.second, args)
         }
 
-        targets.forEach {
-            if (it != this) {
-                it.emit(event, args)
+        if(targets.size > 0){
+            val newSource = sources.toMutableList()
+            newSource.add(this)
+            targets.forEach {
+                if (it !in sources) {
+                    it.emit(event, args, newSource)
+                }
             }
         }
+
         timeout.cancel()
         return this
     }
@@ -158,6 +165,9 @@ class DefaultEventEmitter : EventEmitter {
     }
 
     override fun targetTo(another: EventEmitter) {
+        if (passive) {
+            logger.warn("尝试向一个Passive的事件处理器添加事件重定向")
+        }
         targets.add(another)
     }
 

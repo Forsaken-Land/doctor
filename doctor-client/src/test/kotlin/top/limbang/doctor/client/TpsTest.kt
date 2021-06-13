@@ -2,6 +2,9 @@ package top.limbang.doctor.client
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import top.limbang.doctor.client.running.AutoVersionForgePlugin
+import top.limbang.doctor.client.running.TpsPlugin
+import top.limbang.doctor.client.running.tpsTools
 import top.limbang.doctor.client.utils.substringBetween
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.network.handler.oncePacket
@@ -10,11 +13,13 @@ import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookP
 
 fun main() {
 
-    val client = MinecraftClient()
+    val client = MinecraftClient.builder()
         .user(username, password)
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
-        .enablePlayerList()
+        .plugin(TpsPlugin())
+        .plugin(AutoVersionForgePlugin())
+        .build()
 
     if (!client.start(host, port)) return
 

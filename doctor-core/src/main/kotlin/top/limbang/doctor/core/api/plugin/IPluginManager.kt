@@ -6,6 +6,9 @@ package top.limbang.doctor.core.api.plugin
  * @since 2021-05-15
  */
 interface IPluginManager: IPluginHookManager {
+    /**
+     * 启动所有插件，在此之后禁止注册新的插件
+     */
     fun onPluginEnabled()
     /**
      * 注册插件

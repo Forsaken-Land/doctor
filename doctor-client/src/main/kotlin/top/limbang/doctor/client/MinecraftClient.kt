@@ -3,15 +3,19 @@ package top.limbang.doctor.client
 import io.netty.util.concurrent.Promise
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import top.limbang.doctor.client.entity.ForgeFeature
 import top.limbang.doctor.client.factory.NetworkManagerFactory
 import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
-import top.limbang.doctor.client.running.*
+import top.limbang.doctor.client.plugin.ClientAddListenerHook
+import top.limbang.doctor.client.plugin.ClientPlugin
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
 import top.limbang.doctor.client.utils.ServerInfoUtils
 import top.limbang.doctor.client.utils.newPromise
 import top.limbang.doctor.core.api.event.EventEmitter
+import top.limbang.doctor.core.api.event.EventListener
+import top.limbang.doctor.core.api.plugin.Plugin
+import top.limbang.doctor.core.api.plugin.PluginEvent
+import top.limbang.doctor.core.api.plugin.invokeMutableHook
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.core.plugin.PluginManager
 import top.limbang.doctor.network.core.NetworkManager
@@ -21,8 +25,6 @@ import top.limbang.doctor.network.exception.ConnectionFailedException
 import top.limbang.doctor.network.handler.PacketEvent
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.network.utils.setProtocolState
-import top.limbang.doctor.plugin.forge.FML1Plugin
-import top.limbang.doctor.plugin.forge.FML2Plugin
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.definition.client.HandshakePacket
@@ -36,67 +38,46 @@ import java.util.concurrent.TimeoutException
 /**
  * ### Minecraft 客户端
  */
-class MinecraftClient : EventEmitter by DefaultEventEmitter() {
+class MinecraftClient(
+    val email: String,
+    val password: String,
+    val name: String,
+    val sessionService: YggdrasilMinecraftSessionService = YggdrasilMinecraftSessionService
+) : EventEmitter by DefaultEventEmitter() {
     private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
-    private var username: String = ""
-    private var password: String = ""
-    private var name: String = ""
-    private var authServerUrl = "https://authserver.mojang.com/authenticate"
-    private var sessionServerUrl = "https://sessionserver.mojang.com"
     private lateinit var networkManager: NetworkManager
-    private var protocol: Int = 0
-    private lateinit var playerUtils: PlayerUtils
+    var protocol: Int = 0
+        private set
     val pluginManager: PluginManager = PluginManager(this)
 
+    init {
+        this.on(PluginEvent.BeforeCreate) {
+            if (it.plugin is ClientPlugin) {
+                (it.plugin as ClientPlugin).client = this
+            }
+        }
+    }
 
-    /**
-     * ### 获取FML特征
-     */
-    var forgeFeature: ForgeFeature? = null
-        private set
-    var tpsTools: ITpsTools = DummyTpsTools
-        private set
+
     val connection get() = networkManager.connection
 
-    /**
-     * ### 设置在线登录
-     */
-    fun user(username: String, password: String): MinecraftClient {
-        this.username = username
-        this.password = password
+
+    inline fun <reified T : Plugin> plugin(): T? {
+        return if (pluginManager.hasPlugin(T::class.java)) {
+            pluginManager.getPlugin(T::class.java)
+        } else {
+            null
+        }
+    }
+
+
+    fun addPlugin(plugin: Plugin): MinecraftClient {
+        pluginManager.registerPlugin(plugin)
         return this
     }
 
-    /**
-     * ### 设置离线登录名称
-     */
-    fun name(name: String): MinecraftClient {
-        this.name = name
-        return this
-    }
-
-    /**
-     * ### 设置外置登录 验证地址
-     */
-    fun authServerUrl(url: String): MinecraftClient {
-        this.authServerUrl = url
-        return this
-    }
-
-    /**
-     * ### 设置外置登录 session地址
-     */
-    fun sessionServerUrl(url: String): MinecraftClient {
-        this.sessionServerUrl = url
-        return this
-    }
-
-    /**
-     * ### 设置开启监听玩家列表
-     */
-    fun enablePlayerList(): MinecraftClient {
-        this.playerUtils = PlayerUtils(this)
-        return this
+    fun <T : Plugin> removePlugin(plugin: Class<T>) {
+        pluginManager.removePlugin(plugin)
     }
 
 
@@ -112,13 +93,13 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
     }
 
     /**
+     * TODO: 这里要不要挪到builder里面，理论上只要ping一次获得服务器版本就行？
      * ### 启动客户端
      * - [host] 服务器地址
      * - [port] 服务器端口
      * - [timeout] 等待时间 毫秒
      */
     fun start(host: String, port: Int, timeout: Long): Boolean {
-//        this.pluginManager = PluginManager(this)
 
         val jsonStr: String
         try {
@@ -133,35 +114,37 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
 
         val serverInfo = ServerInfoUtils.getServiceInfo(jsonStr)
         protocol = serverInfo.versionNumber
-        forgeFeature = serverInfo.forge?.forgeFeature
-
-        // 注册插件
-        if (serverInfo.forge != null) when (serverInfo.forge.forgeFeature) {
-            ForgeFeature.FML1 -> pluginManager.registerPlugin(FML1Plugin(serverInfo.forge.modMap))
-            ForgeFeature.FML2 -> pluginManager.registerPlugin(FML2Plugin(serverInfo.forge.modMap))
-        }
-
-        val suffix = if (serverInfo.forge == null) "" else serverInfo.forge.forgeFeature.getForgeVersion()
 
         // 判断是否设置了名称,有就代码离线登陆
         val loginListener: LoginListener = if (name.isEmpty()) {
-            val sessionService = YggdrasilMinecraftSessionService(authServerUrl, sessionServerUrl)
-            val session = sessionService.loginYggdrasilWithPassword(username, password)
-            LoginListener(name, session, serverInfo.versionNumber, sessionService, suffix)
+            val session = sessionService.loginYggdrasilWithPassword(email, password)
+            LoginListener(name, session, protocol, sessionService)
         } else {
-            LoginListener(name = name, protocolVersion = serverInfo.versionNumber, suffix = suffix)
+            LoginListener(name = name, protocolVersion = protocol)
         }
+
+        pluginManager.getAllPlugins().forEach {
+            if (it is ClientPlugin) it.beforeEnable(serverInfo)
+        }
+        pluginManager.onPluginEnabled()
 
         networkManager = NetworkManagerFactory.createNetworkManager(
             host, port, pluginManager, serverInfo.versionName, this
         )
 
         networkManager
-            .addListener(loginListener)
-            .addListener(PlayListener())
+            .addListenerHooked(loginListener)
+            .addListenerHooked(PlayListener())
+
+
+
         networkManager.connect()
-        this.tpsTools = TpsTools.create(this)
         return true
+    }
+
+    private fun EventEmitter.addListenerHooked(listener: EventListener): EventEmitter {
+        val hooked = pluginManager.invokeMutableHook(ClientAddListenerHook, listener)
+        return this.addListener(hooked)
     }
 
     /**
@@ -199,27 +182,10 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         networkManager.sendPacket(packet)
     }
 
-    /**
-     * ### 获取版本ID
-     */
-    fun getProtocol(): Int {
-        return protocol
-    }
-
-    /**
-     * ### 获取玩家列表
-     */
-    fun getPlayerTab(): PlayerTab {
-        if (this::playerUtils.isInitialized) {
-            return playerUtils.getPlayers()
-        } else {
-            throw RuntimeException("未开启玩家列表监听")
-        }
-    }
-
 
     companion object {
 
+        fun builder() = MinecraftClientBuilder()
         /**
          * ### Ping 服务器
          *

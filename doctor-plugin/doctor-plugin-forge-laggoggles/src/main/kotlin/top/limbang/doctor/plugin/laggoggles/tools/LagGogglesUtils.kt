@@ -1,4 +1,4 @@
-package top.limbang.doctor.client.running.mod
+package top.limbang.doctor.plugin.laggoggles.tools
 
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
@@ -25,28 +25,6 @@ import kotlin.coroutines.resumeWithException
  * @author Doctor_Yin
  * @since 2021/6/6:11:29
  */
-private lateinit var lagTools: LagTools
-
-fun MinecraftClient.enableLag(): MinecraftClient {
-    pluginManager.registerPlugin(PluginLagGoggles)
-    lagTools = LagTools(this)
-    return this
-}
-
-class LagException(msg: String) : RuntimeException(msg)
-
-fun MinecraftClient.getLag(): Future<List<LagEntity>> {
-    return if (::lagTools.isLateinit) {
-        lagTools.getLag()
-    } else throw LagException("客户端未启用Lag")
-
-}
-
-suspend fun MinecraftClient.getLagSuspend(): List<LagEntity> {
-    return if (::lagTools.isLateinit) {
-        lagTools.getLagSuspend()
-    } else throw LagException("客户端未启用Lag")
-}
 
 interface ILagTools {
     val defaultTimeout: Pair<Long, TimeUnit>

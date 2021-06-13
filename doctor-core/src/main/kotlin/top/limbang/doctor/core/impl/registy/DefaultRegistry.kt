@@ -33,8 +33,8 @@ class DefaultRegistry<K, V> : Registry<K, V> {
         return map[key]
     }
 
-    override fun all(): MutableList<V> {
-        return map.values.toMutableList()
+    override fun all(): Iterable<V> {
+        return map.values
     }
 
     override fun remove(key: K) {

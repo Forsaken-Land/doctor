@@ -7,7 +7,7 @@ import io.netty.channel.ChannelOutboundHandlerAdapter
 import io.netty.util.concurrent.Future
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.plugin.IPluginManager
-import top.limbang.doctor.core.api.plugin.MutableHookMessage
+import top.limbang.doctor.core.api.plugin.invokeMutableHook
 import top.limbang.doctor.network.api.AbstractConnection
 import top.limbang.doctor.network.core.codec.CompressionCodec
 import top.limbang.doctor.network.core.codec.EncryptionCodec
@@ -56,13 +56,9 @@ class NetworkConnection(
 
     override fun sendPacket(packet: Packet): Future<*> {
         return if (!isClosed()) {
-            val hook = MutableHookMessage(packet)
-            pluginManager.invokeHook(BeforePacketSendHook, hook, false)
-            if (hook.edited) {
-                channel.writeAndFlush(hook.message)
-            } else {
-                channel.writeAndFlush(packet)
-            }
+            val packetToSend = pluginManager.invokeMutableHook(BeforePacketSendHook, packet, false)
+
+            channel.writeAndFlush(packetToSend)
         } else throw ChannelException("channel 已关闭.")
 
     }

@@ -8,6 +8,7 @@ import io.netty.channel.ChannelOption
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioSocketChannel
+import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.util.concurrent.Future
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -50,6 +51,7 @@ class NetworkManager(
     companion object {
         val logger: Logger = LoggerFactory.getLogger(NetworkManager::class.java)
         val MANAGER_CHANNEL = "clientHandler"
+        val TIMEOUT_HANDLER = "timeout"
     }
 
     init {
@@ -105,6 +107,7 @@ class NetworkManager(
             .handler(object : ChannelInitializer<SocketChannel>() {
                 override fun initChannel(ch: SocketChannel) {
                     try {
+                        ch.pipeline().addLast(TIMEOUT_HANDLER, ReadTimeoutHandler(30))
                         codecInitializer.initChannel(ch, this@NetworkManager)
                         // 客户端事件处理
                         ch.pipeline().addLast(MANAGER_CHANNEL, ClientHandler(this@NetworkManager))
@@ -169,8 +172,13 @@ class NetworkManager(
         fun build(): NetworkManager {
             val protocol = this.protocol ?: createProtocol(protocolVersion, pluginManager)
             val channelRegistry = this.channelRegistry ?: createChannel(protocolVersion)
+            val emitter = DefaultEventEmitter()
+            if (this.emitter != null) {
+                this.emitter!!.targetTo(emitter)
+                this.emitter!!.listenTo(emitter)
+            }
             return NetworkManager(
-                emitter ?: DefaultEventEmitter(),
+                emitter,
                 host,
                 port,
                 protocol,

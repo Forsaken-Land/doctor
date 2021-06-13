@@ -1,9 +1,10 @@
 package top.limbang.doctor.client
 
-import top.limbang.doctor.client.running.mod.enableLag
-import top.limbang.doctor.client.running.mod.getLag
+import top.limbang.doctor.client.running.*
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
+import top.limbang.doctor.plugin.laggoggles.PluginLagGoggles
+import top.limbang.doctor.plugin.laggoggles.getLag
 import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
 import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
@@ -16,17 +17,18 @@ fun main() {
 //    val port = 25565
 //    val name = pros["name"] as String
 
-    val client = MinecraftClient()
+    val client = MinecraftClient.builder()
         //.name(name)
         .user(username, password)
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
-        .enablePlayerList()
+        .plugin(PluginLagGoggles())
+        .plugin(PlayerPlugin())
+        .plugin(AutoVersionForgePlugin())
+        .plugin(TpsPlugin())
+        .build()
 
     if (!client.start(host, port)) return
-
-
-    client.enableLag()
 
     client.on(ConnectionEvent.Disconnect) {
         Thread.sleep(2000)
@@ -60,7 +62,7 @@ fun main() {
                     val result = client.tpsTools.getTps().get()
                     logger.info(result.toString())
                 } catch (e: Exception) {
-                    println("123")
+                    logger.error("获取tps失败", e)
                 }
             }
 

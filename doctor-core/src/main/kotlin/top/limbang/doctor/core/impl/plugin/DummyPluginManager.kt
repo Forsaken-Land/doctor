@@ -37,8 +37,8 @@ class DummyPluginManager : IPluginManager {
         return true
     }
 
-    override fun <T : IHookMessage> invokeHook(provider: IPluginHookProvider<T>, args: T, freezeHook: Boolean) {
-
+    override fun <T : IHookMessage> invokeHook(provider: IPluginHookProvider<T>, args: T, freezeHook: Boolean): Boolean {
+        return false
     }
 
     override fun <T : IHookMessage> getHook(provider: IPluginHookProvider<T>): PluginHookRegistry<T> {

@@ -7,8 +7,12 @@ import top.limbang.doctor.core.api.event.Event
  * @author WarmthDawn
  * @since 2021-05-14
  */
-class PluginEvent(val name: String) : Event<PluginEventArgs> {
-
+enum class PluginEvent : Event<PluginEventArgs> {
+    BeforeCreate,
+    Created,
+    BeforeEnable,
+    Enabled,
+    Destroyed,
 }
 
-open class PluginEventArgs(val sender: String)
+data class PluginEventArgs(val manager: IPluginManager, val plugin: Plugin)

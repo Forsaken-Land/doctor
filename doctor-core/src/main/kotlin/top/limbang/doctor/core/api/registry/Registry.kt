@@ -19,7 +19,7 @@ interface Registry<K, V> {
 
     fun tryGet(key: K): V?
     fun remove(key: K)
-    fun all(): List<V>
+    fun all(): Iterable<V>
 
     /**
      * 禁止添加新的注册

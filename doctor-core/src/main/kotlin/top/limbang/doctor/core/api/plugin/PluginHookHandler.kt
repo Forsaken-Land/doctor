@@ -1,7 +1,5 @@
 package top.limbang.doctor.core.api.plugin
 
-import top.limbang.doctor.core.plugin.PluginHookRegistry
-
 /**
  *
  * @author WarmthDawn
@@ -31,7 +29,6 @@ inline fun <reified T : IHookMessage> Plugin.createHandler(
 }
 
 
-
 interface IHookMessage {
     val isCoR: Boolean
 }
@@ -58,7 +55,7 @@ open class HookMessage<T>(
  */
 open class MutableHookMessage<T>(
     var message: T,
-    var edited: Boolean = false,
+    override val isCoR: Boolean = false
 ) : IHookMessage {
-    override val isCoR: Boolean get() = true
+    var edited: Boolean = false
 }
