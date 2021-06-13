@@ -49,6 +49,4 @@ bintray.key.txt
 /build-gpg-sign
 # Name for IDEA direction sorting
 build-secret-keys/
-/doctor-translate/doctor-translate-mc112-vanilla/src/main/resources/mc112vanillalang/translateList
 /doctor-translate/doctor-translate-mc112-mod/src/main/resources/mc112modlang/translateList
-/doctor-translate/doctor-translate-mc116-vanilla/src/main/resources/mc116vanillalang/translateList

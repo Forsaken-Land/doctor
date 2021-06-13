@@ -4,11 +4,12 @@ dependencies {
 
 tasks.register("generateList") {
     dependsOn(
-        generateList("src/main/resources/mc112modlang/")
+        generateList()
     )
 }
 
-fun generateList(path: String) {
+fun generateList(){
+    val path = "src/main/resources/mc112modlang/"
     val pathFile = project.layout.projectDirectory.file("$path").asFile
     val file = project.layout.projectDirectory.file("$path/translateList").asFile
     var list = ""
@@ -16,7 +17,7 @@ fun generateList(path: String) {
         .filter { it.isFile }
         .filter { it.name != "translateList" }
         .forEach {
-            list += "${it.absolutePath.substringAfter(path)}\n"
+            list += "${it.canonicalPath.substringAfter("mc112modlang")}\n"
         }
     file.writeText(list.substringBeforeLast("\n"))
 }
