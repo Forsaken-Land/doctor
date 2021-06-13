@@ -1,5 +1,7 @@
 package top.limbang.doctor.client
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
 import top.limbang.doctor.core.api.plugin.Plugin
 
@@ -9,9 +11,13 @@ import top.limbang.doctor.core.api.plugin.Plugin
  * @since 2021-06-14
  */
 class MinecraftClientBuilder {
+    companion object {
 
-    private var email: String = ""
-    private var password: String = ""
+        private val logger: Logger = LoggerFactory.getLogger(MinecraftClientBuilder::class.java)
+    }
+
+    private var email: String? = null
+    private var password: String? = null
     private var name: String = ""
     private var authServerUrl: String? = null
     private var sessionServerUrl: String? = null
@@ -59,17 +65,26 @@ class MinecraftClientBuilder {
         return this
     }
 
-    fun build(): MinecraftClient {
-        val result: MinecraftClient = if (authServerUrl != null && sessionServerUrl != null) {
-            val sessionService = YggdrasilMinecraftSessionService(authServerUrl!!, sessionServerUrl!!)
-            MinecraftClient(email, password, name, sessionService)
-        } else {
-            MinecraftClient(email, password, name)
-        }
-        plugins.forEach {
-            result.pluginManager.registerPlugin(it)
-        }
 
-        return result
+    fun build(): MinecraftClient {
+        val client: MinecraftClient = if (email != null && password != null) {
+            val sessionService = if (authServerUrl != null && sessionServerUrl != null) {
+                YggdrasilMinecraftSessionService(authServerUrl!!, sessionServerUrl!!)
+            } else null
+            val session = sessionService?.loginYggdrasilWithPassword(email!!, password!!)
+
+            if (session != null) {
+                MinecraftClient(session = session, sessionService = sessionService)
+            } else {
+                MinecraftClient(name = name)
+            }
+        } else {
+            MinecraftClient(name = name)
+        }
+        //加载插件
+        plugins.forEach {
+            client.pluginManager.registerPlugin(it)
+        }
+        return client
     }
 }
