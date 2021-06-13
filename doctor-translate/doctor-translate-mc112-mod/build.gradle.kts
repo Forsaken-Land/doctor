@@ -2,15 +2,16 @@ dependencies {
     api(project(":doctor-translate:doctor-translate-mc112"))
 }
 
-tasks.register("generateList") {
-    dependsOn(
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileKotlin") {
+    doFirst {
         generateList()
-    )
+    }
 }
 
-fun generateList(){
+fun generateList() {
+    println("Task :generateList")
     val path = "src/main/resources/mc112modlang/"
-    val pathFile = project.layout.projectDirectory.file("$path").asFile
+    val pathFile = project.layout.projectDirectory.file(path).asFile
     val file = project.layout.projectDirectory.file("$path/translateList").asFile
     var list = ""
     pathFile.walk().maxDepth(3)
