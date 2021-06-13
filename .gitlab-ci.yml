@@ -27,7 +27,7 @@ buildjdk8:
     - jdk8
 
 
-buildjdk11:
+.buildjdk11:
   image: gradle:7.0.0-jdk11
   stage: build
   retry: 2
