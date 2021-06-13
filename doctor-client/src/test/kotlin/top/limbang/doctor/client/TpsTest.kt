@@ -2,9 +2,10 @@ package top.limbang.doctor.client
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import top.limbang.doctor.client.event.JoinGameEvent
 import top.limbang.doctor.client.utils.substringBetween
 import top.limbang.doctor.network.handler.onPacket
+import top.limbang.doctor.network.handler.oncePacket
+import top.limbang.doctor.protocol.definition.play.client.JoinGamePacket
 import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
 
 fun main() {
@@ -17,7 +18,7 @@ fun main() {
 
     if (!client.start(host, port)) return
 
-    client.once(JoinGameEvent) {
+    client.oncePacket<JoinGamePacket> {
         logger.info("登陆成功，开始发送 forge tps 指令")
     }.onPacket<PlayerPositionAndLookPacket> {
         GlobalScope.launch {

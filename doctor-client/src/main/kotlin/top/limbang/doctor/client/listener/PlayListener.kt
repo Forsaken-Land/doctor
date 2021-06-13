@@ -1,6 +1,5 @@
 package top.limbang.doctor.client.listener
 
-import top.limbang.doctor.client.event.JoinGameEvent
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.event.EventListener
 import top.limbang.doctor.network.handler.onPacket
@@ -19,10 +18,7 @@ class PlayListener : EventListener {
             it
         }
         // 监听加入游戏包并回复
-        emitter.on(JoinGameEvent) {
-            it.connection.sendPacket(ClientSettingPacket())
-        }
-//        emitter.replyPacket<JoinGamePacket>(ClientSettingPacket())
+        emitter.replyPacket<JoinGamePacket>(ClientSettingPacket())
         // 监听心跳数据包并回复
         emitter.replyPacket<SKeepAlivePacket> { CKeepAlivePacket(it.keepAliveId) }
         // 监听战斗事件

@@ -5,7 +5,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.client.entity.ForgeFeature
 import top.limbang.doctor.client.factory.NetworkManagerFactory
-import top.limbang.doctor.client.handler.PacketForwardingHandler
 import top.limbang.doctor.client.listener.LoginListener
 import top.limbang.doctor.client.listener.PlayListener
 import top.limbang.doctor.client.running.*
@@ -160,8 +159,6 @@ class MinecraftClient : EventEmitter by DefaultEventEmitter() {
         networkManager
             .addListener(loginListener)
             .addListener(PlayListener())
-            .addListener(PacketForwardingHandler())
-
         networkManager.connect()
         this.tpsTools = TpsTools.create(this)
         return true

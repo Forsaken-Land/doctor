@@ -5,10 +5,14 @@ import top.limbang.doctor.core.api.event.Event
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.event.EventHandler
 import top.limbang.doctor.core.api.event.EventListener
+import top.limbang.doctor.core.cast
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.utils.connection
 import top.limbang.doctor.protocol.api.Packet
+import top.limbang.doctor.protocol.core.annotation.VersionExpandPacket
 import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.isSuperclassOf
 
 /**
  * ### 读取数据包监听器
@@ -39,9 +43,21 @@ fun emitPacketEvent(
     message: Packet,
     ctx: ChannelHandlerContext
 ) {
-    emitter.emit(PacketEvent(message.javaClass.kotlin), message)
+    var eventClass: KClass<Packet> = message.javaClass.kotlin
+
+    val expand = eventClass.findAnnotation<VersionExpandPacket>()
+    if (expand != null) {
+        if (!expand.parent.isSuperclassOf(eventClass)) {
+            throw UnsupportedOperationException("${eventClass.simpleName} 事件标记为了 VersionExpandPacket， 但是它并不是 ${expand.parent.simpleName}的子类")
+        }
+        eventClass = expand.parent.cast()
+
+    }
+
+
+    emitter.emit(PacketEvent(eventClass), message)
     emitter.emit(
-        WrappedPacketEvent(message.javaClass.kotlin),
+        WrappedPacketEvent(eventClass),
         WrappedPacketEventArgs(ctx, message)
     )
 }

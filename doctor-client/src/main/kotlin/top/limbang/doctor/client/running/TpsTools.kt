@@ -13,8 +13,7 @@ import top.limbang.doctor.client.entity.ForgeFeature.FML1
 import top.limbang.doctor.client.entity.ForgeFeature.FML2
 import top.limbang.doctor.client.utils.asObservable
 import top.limbang.doctor.network.handler.PacketEvent
-import top.limbang.doctor.protocol.definition.play.client.ChatType0Packet
-import top.limbang.doctor.protocol.definition.play.client.ChatType1Packet
+import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
@@ -131,7 +130,7 @@ abstract class TpsTools(
 }
 
 class TpsToolsFML1(client: MinecraftClient) : TpsTools(client) {
-    override val tpsObservable = client.asObservable(PacketEvent(ChatType0Packet::class)).observeOn(Schedulers.io())
+    override val tpsObservable = client.asObservable(PacketEvent(ChatPacket::class)).observeOn(Schedulers.io())
         .filter {
             //过滤Tps消息
             it.json.contains("commands.forge.tps.summary")
@@ -160,7 +159,7 @@ class TpsToolsFML1(client: MinecraftClient) : TpsTools(client) {
 }
 
 class TpsToolsFML2(client: MinecraftClient) : TpsTools(client) {
-    override val tpsObservable = client.asObservable(PacketEvent(ChatType1Packet::class)).observeOn(Schedulers.io())
+    override val tpsObservable = client.asObservable(PacketEvent(ChatPacket::class)).observeOn(Schedulers.io())
         .filter {
             //过滤Tps消息
             it.json.contains("commands.forge.tps.summary.all") ||

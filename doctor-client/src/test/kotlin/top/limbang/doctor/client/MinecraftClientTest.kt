@@ -1,10 +1,10 @@
 package top.limbang.doctor.client
 
-import top.limbang.doctor.client.event.ChatEvent
 import top.limbang.doctor.client.running.mod.enableLag
 import top.limbang.doctor.client.running.mod.getLag
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
+import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
 import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
 import top.limbang.doctor.protocol.entity.text.ChatSerializer
@@ -31,9 +31,9 @@ fun main() {
     client.on(ConnectionEvent.Disconnect) {
         Thread.sleep(2000)
         client.reconnect()
-    }.on(ChatEvent) {
-        if (!it.chatPacket.json.contains("commands.forge.tps.summary")) {
-            val chat = ChatSerializer.jsonToChat(it.chatPacket.json)
+    }.onPacket<ChatPacket> {
+        if (!packet.json.contains("commands.forge.tps.summary")) {
+            val chat = ChatSerializer.jsonToChat(packet.json)
             logger.info(chat.getFormattedText())
         }
 

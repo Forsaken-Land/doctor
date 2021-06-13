@@ -1,18 +1,12 @@
 package top.limbang.doctor.core.api.plugin
 
-import top.limbang.doctor.core.impl.plugin.DefaultHookProvider
-
 /**
  *
  * @author WarmthDawn
  * @since 2021-05-15
  */
-interface IPluginManager {
-    /**
-     * 触发插件钩子
-     */
-    fun <T, V : DefaultHookProvider<T>> invokeHook(provider: Class<V>, args: T, clearHooks: Boolean = false)
-
+interface IPluginManager: IPluginHookManager {
+    fun onPluginEnabled()
     /**
      * 注册插件
      */

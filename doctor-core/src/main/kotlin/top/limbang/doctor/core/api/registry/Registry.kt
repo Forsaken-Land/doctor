@@ -1,7 +1,12 @@
 package top.limbang.doctor.core.api.registry
 
+import top.limbang.doctor.core.api.plugin.PluginHookHandler
+import top.limbang.doctor.core.plugin.PluginHookRegistry
+
 /**
- *
+ * 注册系统
+ *  [K] 注册的 Key 类型
+ *  [V] 注册的 Value 类型
  * @author WarmthDawn
  * @since 2021-05-14
  */
@@ -21,4 +26,5 @@ interface Registry<K, V> {
      */
     fun freeze(freeze: Boolean) = freeze(freeze, "注册被锁定")
     fun freeze(freeze: Boolean, reason: String)
+    val size: Int
 }

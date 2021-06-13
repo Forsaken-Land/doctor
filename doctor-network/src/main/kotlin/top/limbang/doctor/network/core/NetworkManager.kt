@@ -12,6 +12,7 @@ import io.netty.util.concurrent.Future
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.limbang.doctor.core.api.event.EventEmitter
+import top.limbang.doctor.core.api.plugin.HookMessage
 import top.limbang.doctor.core.api.plugin.IPluginManager
 import top.limbang.doctor.core.impl.event.DefaultEventEmitter
 import top.limbang.doctor.core.impl.plugin.DummyPluginManager
@@ -107,7 +108,7 @@ class NetworkManager(
                         codecInitializer.initChannel(ch, this@NetworkManager)
                         // 客户端事件处理
                         ch.pipeline().addLast(MANAGER_CHANNEL, ClientHandler(this@NetworkManager))
-                        pluginManager.invokeHook(InitChannelPipelineHook::class.java, ch)
+                        pluginManager.invokeHook(InitChannelPipelineHook, HookMessage(ch))
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }

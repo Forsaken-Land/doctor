@@ -1,5 +1,6 @@
 package top.limbang.doctor.protocol.version.vanilla
 
+import top.limbang.doctor.core.api.plugin.HookMessage
 import top.limbang.doctor.core.api.plugin.IPluginManager
 import top.limbang.doctor.protocol.api.ProtocolState
 import top.limbang.doctor.protocol.core.PacketDirection
@@ -80,7 +81,7 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x01, CTabCompleteType0Encoder())
             }
         }
-        pluginManager.invokeHook(PacketRegistryHook::class.java, this, true)
+        pluginManager.invokeHook(PacketRegistryHook, HookMessage(this), true)
 
 
     }

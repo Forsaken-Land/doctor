@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf
 import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
+import top.limbang.doctor.protocol.core.annotation.VersionExpandPacket
 import top.limbang.doctor.protocol.extension.readString
 import top.limbang.doctor.protocol.extension.readVarInt
 
@@ -15,6 +16,7 @@ import top.limbang.doctor.protocol.extension.readVarInt
 interface STabCompletePacket : Packet
 
 @Serializable
+@VersionExpandPacket(STabCompletePacket::class)
 data class STabCompleteType1Packet(
     val id: Int,
     val start: Int,
@@ -33,6 +35,7 @@ data class STabCompleteType1Packet(
 
 
 @Serializable
+@VersionExpandPacket(STabCompletePacket::class)
 data class STabCompleteType0Packet(
     val matches: Array<String>
 ) : STabCompletePacket {

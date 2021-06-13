@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import net.querz.nbt.tag.CompoundTag
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
+import top.limbang.doctor.protocol.core.annotation.VersionExpandPacket
 import top.limbang.doctor.protocol.definition.play.client.Difficulty.*
 import top.limbang.doctor.protocol.definition.play.client.GameMode.*
 import top.limbang.doctor.protocol.definition.play.client.WorldType.*
@@ -31,6 +32,7 @@ interface JoinGamePacket : Packet
  *
  */
 @Serializable
+@VersionExpandPacket(JoinGamePacket::class)
 data class JoinGamePacketType0(
     val entityId: Int,
     val isHardcore: Boolean,
@@ -64,6 +66,7 @@ data class JoinGamePacketType0(
  *
  */
 @Serializable
+@VersionExpandPacket(JoinGamePacket::class)
 data class JoinGamePacketType1(
     val entityId: Int,
     val isHardcore: Boolean,

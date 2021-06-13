@@ -7,11 +7,11 @@ import io.netty.channel.ChannelOutboundHandlerAdapter
 import io.netty.util.concurrent.Future
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.api.plugin.IPluginManager
+import top.limbang.doctor.core.api.plugin.MutableHookMessage
 import top.limbang.doctor.network.api.AbstractConnection
 import top.limbang.doctor.network.core.codec.CompressionCodec
 import top.limbang.doctor.network.core.codec.EncryptionCodec
 import top.limbang.doctor.network.hooks.BeforePacketSendHook
-import top.limbang.doctor.network.hooks.BeforePacketSendHookOperation
 import top.limbang.doctor.network.lib.Attributes
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.ProtocolState
@@ -56,10 +56,10 @@ class NetworkConnection(
 
     override fun sendPacket(packet: Packet): Future<*> {
         return if (!isClosed()) {
-            val hook = BeforePacketSendHookOperation(false, packet)
-            pluginManager.invokeHook(BeforePacketSendHook::class.java, hook, false)
-            if (hook.modified) {
-                channel.writeAndFlush(hook.packet)
+            val hook = MutableHookMessage(packet)
+            pluginManager.invokeHook(BeforePacketSendHook, hook, false)
+            if (hook.edited) {
+                channel.writeAndFlush(hook.message)
             } else {
                 channel.writeAndFlush(packet)
             }

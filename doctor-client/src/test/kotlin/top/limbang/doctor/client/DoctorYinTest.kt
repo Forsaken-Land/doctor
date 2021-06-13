@@ -2,8 +2,9 @@ package top.limbang.doctor.client
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import top.limbang.doctor.client.event.JoinGameEvent
 import top.limbang.doctor.client.running.mod.*
+import top.limbang.doctor.network.handler.oncePacket
+import top.limbang.doctor.protocol.definition.play.client.JoinGamePacket
 
 fun main() {
 
@@ -17,7 +18,7 @@ fun main() {
 
     client.enableLag()
 
-    client.once(JoinGameEvent) {
+    client.oncePacket<JoinGamePacket> {
         GlobalScope.launch {
             val lags = client.getLagSuspend()
             var outMsg = "[123]高于1000us/t 的方块/实体如下:\n"

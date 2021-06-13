@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf
 import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
+import top.limbang.doctor.protocol.core.annotation.VersionExpandPacket
 
 /**
  * @author Doctor_Yin
@@ -13,11 +14,14 @@ import top.limbang.doctor.protocol.api.PacketDecoder
 interface ServerDifficultyPacket : Packet
 
 @Serializable
+@VersionExpandPacket(ServerDifficultyPacket::class)
 data class ServerDifficultyType1Packet(
     val difficulty: ServerDifficulty,
     val difficultyIsLocked: Boolean
 ) : ServerDifficultyPacket
 
+@Serializable
+@VersionExpandPacket(ServerDifficultyPacket::class)
 data class ServerDifficultyType0Packet(
     val difficulty: ServerDifficulty
 ) : ServerDifficultyPacket

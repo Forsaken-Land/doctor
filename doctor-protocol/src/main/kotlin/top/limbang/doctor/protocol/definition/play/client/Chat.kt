@@ -5,6 +5,7 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
+import top.limbang.doctor.protocol.core.annotation.VersionExpandPacket
 import top.limbang.doctor.protocol.extension.readString
 import top.limbang.doctor.protocol.extension.readUUID
 import java.util.*
@@ -16,12 +17,14 @@ interface ChatPacket : Packet {
 }
 
 @Serializable
+@VersionExpandPacket(ChatPacket::class)
 data class ChatType0Packet(
     override val json: String,
     override val type: ChatType
 ) : ChatPacket
 
 @Serializable
+@VersionExpandPacket(ChatPacket::class)
 data class ChatType1Packet(
     override val json: String,
     override val type: ChatType,
