@@ -2,7 +2,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import top.limbang.doctor.translation.api.IResources
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
 
@@ -16,17 +19,16 @@ abstract class Mc116LangResources : IResources {
     override var loaded: Boolean = false
         protected set
 
-    fun load(vararg files: File) {
+    fun load(vararg files: InputStream?) {
         properties.clear()
-        files.filter {
-            it.exists()
-        }.forEach {
+        files.filterNotNull().forEach {
             loadLangFile(it)
         }
     }
 
-    private fun loadLangFile(file: File) {
-        val obj = Json.parseToJsonElement(file.readText(StandardCharsets.UTF_8)) as JsonObject
+    private fun loadLangFile(file: InputStream) {
+        val json = BufferedReader(InputStreamReader(file, StandardCharsets.UTF_8)).readText()
+        val obj = Json.parseToJsonElement(json) as JsonObject
         obj.entries.forEach {
             val (key, v) = it
             properties[key] = PATTERN.matcher(v.jsonPrimitive.content).replaceAll("%$1s")

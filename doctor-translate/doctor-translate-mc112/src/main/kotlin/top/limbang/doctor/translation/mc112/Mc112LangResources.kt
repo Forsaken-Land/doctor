@@ -1,5 +1,7 @@
 import top.limbang.doctor.translation.api.IResources
-import java.io.File
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
 
@@ -23,7 +25,7 @@ abstract class Mc112LangResources : IResources {
             val k = s.length
             j += k
             for (l in 0 until k) {
-                if (s[l].toInt() >= 256) {
+                if (s[l].code >= 256) {
                     ++i
                 }
             }
@@ -32,25 +34,24 @@ abstract class Mc112LangResources : IResources {
         isUnicode = f.toDouble() > 0.1
     }
 
-    fun load(vararg files: File) {
+    fun load(vararg files: InputStream?) {
         properties.clear()
-        files.filter {
-            it.exists()
-        }.forEach {
-            loadLangFile(it)
-        }
+        files
+            .filterNotNull()
+            .forEach { loadLangFile(it) }
         checkUnicode()
     }
 
-    private fun loadLangFile(file: File) {
-        file.forEachLine(StandardCharsets.UTF_8) { str ->
-            str.takeIf {
-                it.isNotEmpty() && it[0] != '#'
-            }?.split('=', limit = 2)?.takeIf { it.size == 2 }?.let {
-                val (key, v) = it
-                properties[key] = PATTERN.matcher(v).replaceAll("%$1s")
+    private fun loadLangFile(file: InputStream) {
+        BufferedReader(InputStreamReader(file, StandardCharsets.UTF_8))
+            .forEachLine { str ->
+                str.takeIf {
+                    it.isNotEmpty() && it[0] != '#'
+                }?.split('=', limit = 2)?.takeIf { it.size == 2 }?.let {
+                    val (key, v) = it
+                    properties[key] = PATTERN.matcher(v).replaceAll("%$1s")
+                }
             }
-        }
     }
 
     override fun contains(key: String): Boolean {
