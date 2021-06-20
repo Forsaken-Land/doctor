@@ -48,7 +48,8 @@ class MinecraftClient(
     private lateinit var networkManager: NetworkManager
     var versionlName: String = ""
         private set
-
+    var protocolVersion: Int = 0
+        private set
     var started: Boolean = false
         private set
     val pluginManager: PluginManager = PluginManager(this)
@@ -109,7 +110,7 @@ class MinecraftClient(
 
         val serverInfo = ping(host, port, timeout, TimeUnit.MILLISECONDS) ?: return false
         versionlName = serverInfo.versionName
-
+        protocolVersion = serverInfo.versionNumber
         // 判断是否设置了名称,有就代码离线登陆
         val loginListener: LoginListener = if (name.isEmpty()) {
             LoginListener(name, session, serverInfo.versionNumber, sessionService)

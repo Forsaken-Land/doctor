@@ -1,6 +1,8 @@
 package top.limbang.doctor.client
 
 import top.limbang.doctor.client.running.*
+import top.limbang.doctor.client.running.tabcomplete.TabCompletePlugin
+import top.limbang.doctor.client.running.tabcomplete.tabCompleteTool
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.plugin.laggoggles.PluginLagGoggles
@@ -8,6 +10,7 @@ import top.limbang.doctor.plugin.laggoggles.getLag
 import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
 import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
+import top.limbang.doctor.protocol.definition.play.client.STabCompletePacket
 import top.limbang.doctor.protocol.entity.text.ChatSerializer
 
 
@@ -25,6 +28,7 @@ fun main() {
         .plugin(PluginLagGoggles())
         .plugin(PlayerPlugin())
         .plugin(AutoVersionForgePlugin())
+        .plugin(TabCompletePlugin())
         .plugin(TpsPlugin())
         .build()
 
@@ -44,6 +48,8 @@ fun main() {
         logger.warn(reason.getFormattedText())
     }.onPacket<PlayerPositionAndLookPacket> {
         logger.info("登录成功")
+    }.onPacket<STabCompletePacket> {
+        logger.info("tab")
     }
 
 
@@ -78,51 +84,19 @@ fun main() {
 
             }
             else -> {
+                if (msg?.startsWith("/") == true) {
+                    try {
+                        val tab = client.tabCompleteTool.getCompletions(msg)
+//                        logger.info(tab.joinToString())
+                    } catch (e: Exception) {
+                    }
+                }
                 if (!msg.isNullOrBlank()) {
                     client.sendMessage(msg)
                 }
             }
 //
-//            else -> {
-//                if (!msg.isNullOrBlank()) {
-//                    if (msg.startsWith("/")) {
-//                        client.connection
-//                        if (client.getProtocol() > 348) { //TODO 找不到分辨方式
-//                            val resp =
-//                                client.connection.sendAndWait(TabCompleteEvent, CTabCompleteType1Packet(text = msg))
-//                            if ((resp.sTabCompletePacket as STabCompleteType1Packet).matches.isNotEmpty()) {
-//                                val words = msg.split(' ')
-//                                val rest = if (words.size > 1) words.subList(0, words.size - 1) else emptyList()
-//                                val result =
-//                                    rest.toMutableList()
-//                                        .also { it.add((resp.sTabCompletePacket as STabCompleteType1Packet).matches.first().match) }
-//                                        .joinToString(" ")
-//                                logger.info("自动补全命令：/${result}")
-//                                client.sendMessage("/$result")
-//                            } else {
-//                                client.sendMessage(msg)
-//                            }
-//                        } else {
-//                            val resp = client.connection.sendAndWait(TabCompleteEvent, CTabCompleteType0Packet(msg))
-//                            if ((resp.sTabCompletePacket as STabCompleteType0Packet).matches.isNotEmpty()) {
-//                                val words = msg.split(' ')
-//                                val rest = if (words.size > 1) words.subList(0, words.size - 1) else emptyList()
-//                                val result =
-//                                    rest.toMutableList()
-//                                        .also { it.add((resp.sTabCompletePacket as STabCompleteType0Packet).matches.first()) }
-//                                        .joinToString(" ")
-//                                logger.info("自动补全命令：${result}")
-//                                client.sendMessage(result)
-//                            } else {
-//                                client.sendMessage(msg)
-//                            }
-//                        }
 //
-//                    } else {
-//                        client.sendMessage(msg)
-//                    }
-//                }
-//            }
         }
 
     }

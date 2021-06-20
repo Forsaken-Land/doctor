@@ -1,5 +1,6 @@
 package top.limbang.doctor.protocol.entity.text.style
 
+import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.entity.text.IChat
 
 /**
@@ -7,10 +8,11 @@ import top.limbang.doctor.protocol.entity.text.IChat
  * @author WarmthDawn
  * @since 2021-05-11
  */
+@Serializable
 data class ClickEvent(val action: ClickAction, val value: String) {
 
 }
-
+@Serializable
 data class HoverEvent(val action: HoverAction, val value: IChat) {
 
 }

@@ -56,8 +56,8 @@ data class STabCompleteType0Packet(
 
 }
 
-class STabCompleteType0Decoder : PacketDecoder<STabCompletePacket> {
-    override fun decoder(buf: ByteBuf): STabCompletePacket {
+class STabCompleteType0Decoder : PacketDecoder<STabCompleteType0Packet> {
+    override fun decoder(buf: ByteBuf): STabCompleteType0Packet {
         val length = buf.readVarInt()
         val matches = Array(length) { "" }
         for (i in 0 until length) {
@@ -70,8 +70,8 @@ class STabCompleteType0Decoder : PacketDecoder<STabCompletePacket> {
 
 }
 
-class STabCompleteType1Decoder : PacketDecoder<STabCompletePacket> {
-    override fun decoder(buf: ByteBuf): STabCompletePacket {
+class STabCompleteType1Decoder : PacketDecoder<STabCompleteType1Packet> {
+    override fun decoder(buf: ByteBuf): STabCompleteType1Packet {
         val id = buf.readVarInt()
         val start = buf.readVarInt()
         val length = buf.readVarInt()
