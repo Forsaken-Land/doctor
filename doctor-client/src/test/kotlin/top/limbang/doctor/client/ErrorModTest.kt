@@ -38,7 +38,7 @@ class ErrorModTest : EventEmitter by DefaultEventEmitter() {
         val loginListener = LoginListener("", session, serverInfo.versionNumber, sessionService, suffix)
 
         networkManager = NetworkManagerFactory.createNetworkManager(
-            host, port, pluginManager, serverInfo.versionName, this
+            host, port, pluginManager, serverInfo.versionNumber, this
         )
 
         networkManager

@@ -124,7 +124,7 @@ class MinecraftClient(
         pluginManager.onPluginEnabled()
 
         networkManager = NetworkManagerFactory.createNetworkManager(
-            host, port, pluginManager, serverInfo.versionName, this
+            host, port, pluginManager, serverInfo.versionNumber, this
         )
 
         networkManager

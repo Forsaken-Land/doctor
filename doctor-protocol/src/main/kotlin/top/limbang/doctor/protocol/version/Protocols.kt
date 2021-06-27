@@ -18,21 +18,21 @@ import top.limbang.doctor.protocol.version.vanilla.MinecraftClientProtocol_v1_16
 /**
  * 获取协议
  */
-fun createProtocol(name: String, pluginManager: IPluginManager): IPacketRegistry {
-    return when (name) {
-        "1.12.2" -> MinecraftClientProtocol_v1_12_2(pluginManager)
+fun createProtocol(versionNumber: Int, pluginManager: IPluginManager): IPacketRegistry {
+    return when (versionNumber) {
+        v1_12_2 -> MinecraftClientProtocol_v1_12_2(pluginManager)
 
-        "1.16.2", "1.16.5" -> MinecraftClientProtocol_v1_16_2(pluginManager)
+        v1_16_2, v1_16_5 -> MinecraftClientProtocol_v1_16_2(pluginManager)
 
         else -> {
-            throw ProtocolException("找不到协议$name")
+            throw ProtocolException("找不到协议号$versionNumber")
         }
     }
 }
 
-fun createChannel(name: String): IChannelPacketRegistry {
-    return when (name) {
-        "1.12.2" -> {
+fun createChannel(versionNumber: Int): IChannelPacketRegistry {
+    return when (versionNumber) {
+        v1_16_2 -> {
             MinecraftClientChannel_v1_12_2()
         }
 

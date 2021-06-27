@@ -27,7 +27,7 @@ object NetworkManagerFactory {
             host: String,
             port: Int,
             pluginManager: PluginManager,
-            version: String,
+            version: Int,
             eventEmitter: EventEmitter
         ): NetworkManager {
             return NetworkManager.Builder()
