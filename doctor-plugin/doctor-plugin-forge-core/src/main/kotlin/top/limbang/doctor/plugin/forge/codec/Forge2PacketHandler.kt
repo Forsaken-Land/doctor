@@ -65,6 +65,11 @@ class Forge2PacketHandler(
                 val packet: FML2Packet
                 val decoder = LoginWrapperDecoder()
                 packet = decoder.decoder(msg.data)
+                if (packet.resourceLocation != "fml:handshake") { //临时修复astralsorcery问题
+                    packet.close()
+                    msg.close()
+                    return
+                }
                 val buf = readVarIntLengthBasedFrame(ctx, packet.data)
                 val packerId = buf.readVarInt()
                 val packetDecoder = fmL2PacketRegistry.fml2PacketMap(PacketDirection.S2C).decoder<FML2Packet>(packerId)
