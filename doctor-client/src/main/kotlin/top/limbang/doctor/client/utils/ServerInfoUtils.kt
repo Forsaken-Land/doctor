@@ -19,8 +19,13 @@ object ServerInfoUtils {
         val versionName = versionObject.jsonObject["name"]!!.jsonPrimitive.content
         // 获取描述
         val descriptionObject = jsonElement.jsonObject["description"]!!
-        val description =
+        val description = try {
             descriptionObject.jsonObject["text"]?.jsonPrimitive?.content ?: descriptionObject.jsonPrimitive.content
+        } catch (e: IllegalArgumentException) {
+            descriptionObject.toString()
+        }
+
+
         // 获取玩家信息
         val playerObject = jsonElement.jsonObject["players"]!!
         val playerMax = playerObject.jsonObject["max"]!!.jsonPrimitive.int
