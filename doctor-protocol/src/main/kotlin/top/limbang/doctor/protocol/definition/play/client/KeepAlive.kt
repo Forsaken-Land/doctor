@@ -37,12 +37,30 @@ class KeepAliveDecoder : PacketDecoder<SKeepAlivePacket> {
 
 }
 
+class KeepAliveBeforeDecoder : PacketDecoder<SKeepAlivePacket> {
+    override fun decoder(buf: ByteBuf): SKeepAlivePacket {
+        println(buf.readableBytes())
+        val i = buf.readInt()
+        println(i)
+        println(i.toLong())
+        return SKeepAlivePacket(i.toLong())
+    }
+
+}
+
 /**
  * ### 编码
  */
 class KeepAliveEncoder : PacketEncoder<CKeepAlivePacket> {
     override fun encode(buf: ByteBuf, packet: CKeepAlivePacket): ByteBuf {
         buf.writeLong(packet.keepAliveId)
+        return buf
+    }
+}
+
+class KeepAliveBeforeEncoder : PacketEncoder<CKeepAlivePacket> {
+    override fun encode(buf: ByteBuf, packet: CKeepAlivePacket): ByteBuf {
+        buf.writeInt(packet.keepAliveId.toInt())
         return buf
     }
 }

@@ -38,13 +38,21 @@ class Forge1HandshakeListener(
         emitter.onPacket<ModListPacket> {
             setForgeState(ctx.channel(), ForgeProtocolState.HANDSHAKE)
             connection.sendPacket(HandshakeAckPacket(phase = 2))
-            setForgeState(ctx.channel(), ForgeProtocolState.REGISTERDATA)
+            if (fmlPlugin.modList["Forge"]!!.startsWith("10.12.") or fmlPlugin.modList["Forge"]!!.startsWith("10.13.")) {
+                setForgeState(ctx.channel(), ForgeProtocolState.MODIDDATA)
+            } else {
+                setForgeState(ctx.channel(), ForgeProtocolState.REGISTERDATA)
+            }
         }
         emitter.onPacket<RegistryDataPacket> {
             if (!packet.hasMore) {
                 setForgeState(ctx.channel(), ForgeProtocolState.HANDSHAKE)
                 connection.sendPacket(HandshakeAckPacket(phase = 3))
             }
+        }
+        emitter.onPacket<ModIdDataPacket> {
+            setForgeState(ctx.channel(), ForgeProtocolState.HANDSHAKE)
+            connection.sendPacket(HandshakeAckPacket(phase = 3))
         }
         emitter.onPacket<HandshakeAckPacket> {
             if (packet.phase.toInt() == 2) connection.sendPacket(HandshakeAckPacket(phase = 5))

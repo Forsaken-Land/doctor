@@ -9,6 +9,7 @@ import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
 import top.limbang.doctor.protocol.extension.readString
+import top.limbang.doctor.protocol.extension.readVarShort
 import top.limbang.doctor.protocol.extension.writeString
 
 /**
@@ -42,9 +43,28 @@ class CustomPayloadDecoder : PacketDecoder<CustomPayloadPacket> {
     }
 }
 
+class CustomPayloadBeforeDecoder : PacketDecoder<CustomPayloadPacket> {
+    override fun decoder(buf: ByteBuf): CustomPayloadPacket {
+        val channel = buf.readString()
+        val byteBuf = Unpooled.buffer(buf.readVarShort())
+        buf.readBytes(byteBuf)
+        return CustomPayloadPacket(channel, byteBuf)
+    }
+}
+
 class CustomPayloadEncoder : PacketEncoder<CustomPayloadPacket> {
     override fun encode(buf: ByteBuf, packet: CustomPayloadPacket): ByteBuf {
         buf.writeString(packet.channel)
+        buf.writeBytes(packet.data)
+        packet.close()
+        return buf
+    }
+}
+
+class CustomPayloadBeforeEncoder : PacketEncoder<CustomPayloadPacket> {
+    override fun encode(buf: ByteBuf, packet: CustomPayloadPacket): ByteBuf {
+        buf.writeString(packet.channel)
+        buf.writeShort(packet.data.readableBytes())
         buf.writeBytes(packet.data)
         packet.close()
         return buf

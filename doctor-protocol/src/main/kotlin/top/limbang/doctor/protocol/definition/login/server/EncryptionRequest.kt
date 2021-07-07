@@ -1,11 +1,14 @@
 package top.limbang.doctor.protocol.definition.login.server
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
+import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
+import top.limbang.doctor.protocol.extension.readByteArray
+import top.limbang.doctor.protocol.extension.readString
+import top.limbang.doctor.protocol.extension.writeByteArray
+import top.limbang.doctor.protocol.extension.writeString
 import java.security.KeyFactory
 import java.security.spec.X509EncodedKeySpec
 
@@ -56,6 +59,28 @@ class EncryptionRequestDecoder : PacketDecoder<EncryptionRequestPacket> {
         val serverID = buf.readString()
         val publicKeyArray = buf.readByteArray()
         val verifyTokenArray = buf.readByteArray()
+        return EncryptionRequestPacket(
+            serverID = serverID,
+            publicKey = publicKeyArray,
+            verifyToken = verifyTokenArray
+        )
+    }
+}
+
+class EncryptionRequestBeforeDecoder : PacketDecoder<EncryptionRequestPacket> {
+    /**
+     * 解码
+     *
+     * **客户端**
+     */
+    override fun decoder(buf: ByteBuf): EncryptionRequestPacket {
+        val serverID = buf.readString()
+        val publicKeyArray = ByteArray(buf.readShort().toInt()).also {
+            buf.readBytes(it)
+        }
+        val verifyTokenArray = ByteArray(buf.readShort().toInt()).also {
+            buf.readBytes(it)
+        }
         return EncryptionRequestPacket(
             serverID = serverID,
             publicKey = publicKeyArray,

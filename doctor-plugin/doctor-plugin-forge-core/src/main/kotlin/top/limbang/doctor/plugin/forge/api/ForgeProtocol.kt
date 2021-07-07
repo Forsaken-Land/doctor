@@ -14,5 +14,6 @@ enum class ForgeProtocolState {
     MODLIST,
     HANDSHAKE,
     REGISTERDATA,
-    PLAY
+    PLAY,
+    MODIDDATA
 }

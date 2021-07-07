@@ -5,13 +5,14 @@ import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.api.PacketEncoder
-import top.limbang.doctor.protocol.extension.*
+import top.limbang.doctor.protocol.extension.readByteArray
+import top.limbang.doctor.protocol.extension.writeByteArray
 
 /**
  * ### 加密响应
  *
  * - [sharedSecret] 客户端生成的共享密匙
- * - [verifyToken] 服务器加密请求包 [EncryptionRequestPacket.verifyToken] 字段用 [EncryptionRequestPacket.publicKey] 加密后的数据
+ * - [verifyToken] 服务器加密请求包 [top.limbang.doctor.protocol.definition.login.server.EncryptionRequestPacket.verifyToken] 字段用 [top.limbang.doctor.protocol.definition.login.server.EncryptionRequestPacket.publicKey] 加密后的数据
  */
 @Serializable
 data class EncryptionResponsePacket(
@@ -49,6 +50,21 @@ class EncryptionResponseEncoder : PacketEncoder<EncryptionResponsePacket> {
     override fun encode(buf: ByteBuf, packet: EncryptionResponsePacket): ByteBuf {
         buf.writeByteArray(packet.sharedSecret.size, packet.sharedSecret)
         buf.writeByteArray(packet.verifyToken.size, packet.verifyToken)
+        return buf
+    }
+}
+
+class EncryptionResponseBeforeEncoder : PacketEncoder<EncryptionResponsePacket> {
+    /**
+     * 编码
+     *
+     * **客户端**
+     */
+    override fun encode(buf: ByteBuf, packet: EncryptionResponsePacket): ByteBuf {
+        buf.writeShort(packet.sharedSecret.size)
+        buf.writeBytes(packet.sharedSecret)
+        buf.writeShort(packet.verifyToken.size)
+        buf.writeBytes(packet.verifyToken)
         return buf
     }
 }

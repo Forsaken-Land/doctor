@@ -26,6 +26,8 @@ class FML1 :
             .register("FML|HS", ModListDecoder())
         channelPacketMap(PacketDirection.S2C, ForgeProtocolState.REGISTERDATA)
             .register("FML|HS", RegistryDataDecoder())
+        channelPacketMap(PacketDirection.S2C, ForgeProtocolState.MODIDDATA)
+            .register("FML|HS", ModIdDataDecoder())
         channelPacketMap(PacketDirection.S2C, ForgeProtocolState.HANDSHAKE)
             .register("FML|HS", HandshakeAckDecoder())
         channelPacketMap(PacketDirection.S2C, ForgeProtocolState.HANDSHAKE)

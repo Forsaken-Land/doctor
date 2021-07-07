@@ -155,3 +155,25 @@ fun ByteBuf.writeResourceLocation(resourceLocation: ResourceLocation): ByteBuf {
     writeString("${resourceLocation.namespace}:${resourceLocation.path}")
     return this
 }
+
+fun ByteBuf.readVarShort(): Int {
+    var low = readUnsignedShort()
+    var high = 0
+    if (low and 0x8000 != 0) {
+        low = low and 0x7FFF
+        high = readUnsignedByte().toInt()
+    }
+    return high and 0xFF shl 15 or low
+}
+
+fun ByteBuf.writeVarShort(toWrite: Int) {
+    var low = toWrite and 0x7FFF
+    val high = toWrite and 0x7F8000 shr 15
+    if (high != 0) {
+        low = low or 0x8000
+    }
+    writeShort(low)
+    if (high != 0) {
+        writeByte(high)
+    }
+}

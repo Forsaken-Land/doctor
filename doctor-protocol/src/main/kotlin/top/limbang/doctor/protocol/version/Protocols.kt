@@ -8,6 +8,7 @@ import top.limbang.doctor.protocol.registry.IPacketRegistry
 import top.limbang.doctor.protocol.version.vanilla.MinecraftClientChannel_v1_12_2
 import top.limbang.doctor.protocol.version.vanilla.MinecraftClientProtocol_v1_12_2
 import top.limbang.doctor.protocol.version.vanilla.MinecraftClientProtocol_v1_16_2
+import top.limbang.doctor.protocol.version.vanilla.MinecraftClientProtocol_v1_7_10
 
 /**
  *
@@ -23,6 +24,8 @@ fun createProtocol(versionNumber: Int, pluginManager: IPluginManager): IPacketRe
         v1_12_2 -> MinecraftClientProtocol_v1_12_2(pluginManager)
 
         v1_16_2, v1_16_5 -> MinecraftClientProtocol_v1_16_2(pluginManager)
+
+        v1_7_10 -> MinecraftClientProtocol_v1_7_10(pluginManager)
 
         else -> {
             throw ProtocolException("找不到协议号$versionNumber")
@@ -42,6 +45,4 @@ fun createChannel(versionNumber: Int): IChannelPacketRegistry {
     }
 }
 
-class DefaultChannelRegistry : IChannelPacketRegistry by ChannelPacketRegistryImpl() {
-
-}
+class DefaultChannelRegistry : IChannelPacketRegistry by ChannelPacketRegistryImpl()
