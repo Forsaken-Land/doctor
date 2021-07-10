@@ -93,7 +93,7 @@ class MinecraftClient(
      * - [port] 服务器端口
      */
     fun start(host: String, port: Int): Boolean {
-        return start(host, port, 2000)
+        return start(host, port, 5000)
     }
 
     /**

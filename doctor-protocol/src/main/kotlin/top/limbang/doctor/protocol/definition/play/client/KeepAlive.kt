@@ -39,10 +39,7 @@ class KeepAliveDecoder : PacketDecoder<SKeepAlivePacket> {
 
 class KeepAliveBeforeDecoder : PacketDecoder<SKeepAlivePacket> {
     override fun decoder(buf: ByteBuf): SKeepAlivePacket {
-        println(buf.readableBytes())
         val i = buf.readInt()
-        println(i)
-        println(i.toLong())
         return SKeepAlivePacket(i.toLong())
     }
 

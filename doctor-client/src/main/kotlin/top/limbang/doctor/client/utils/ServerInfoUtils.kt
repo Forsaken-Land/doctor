@@ -22,7 +22,7 @@ object ServerInfoUtils {
         val description = try {
             descriptionObject.jsonObject["text"]?.jsonPrimitive?.content ?: descriptionObject.jsonPrimitive.content
         } catch (e: IllegalArgumentException) {
-            descriptionObject.toString()
+            descriptionObject.jsonPrimitive.content
         }
 
 
