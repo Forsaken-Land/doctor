@@ -38,7 +38,9 @@ class Forge1HandshakeListener(
         emitter.onPacket<ModListPacket> {
             setForgeState(ctx.channel(), ForgeProtocolState.HANDSHAKE)
             connection.sendPacket(HandshakeAckPacket(phase = 2))
-            if (fmlPlugin.modList["Forge"]!!.startsWith("10.12.") or fmlPlugin.modList["Forge"]!!.startsWith("10.13.")) {
+            if (fmlPlugin.modList["Forge"]?.startsWith("10.12.") == true
+                or (fmlPlugin.modList["Forge"]?.startsWith("10.13.") == true)
+            ) {
                 setForgeState(ctx.channel(), ForgeProtocolState.MODIDDATA)
             } else {
                 setForgeState(ctx.channel(), ForgeProtocolState.REGISTERDATA)
