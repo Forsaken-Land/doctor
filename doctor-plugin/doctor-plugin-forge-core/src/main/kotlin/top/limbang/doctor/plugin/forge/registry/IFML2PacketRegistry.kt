@@ -23,7 +23,12 @@ interface IFML2PacketRegistry : GroupRegistrable<IFML2PacketRegistry> {
         DirectionActionFML2(this).run(action)
 
 }
-typealias IFML2PacketMap = IPacketMap<Int, FML2Packet>
+
+data class ChannelAndId(
+    val channel: String,
+    val id: Int
+)
+typealias IFML2PacketMap = IPacketMap<ChannelAndId, FML2Packet>
 
 class DirectionActionFML2(private val registry: IFML2PacketRegistry) {
     fun whenC2S(action: IFML2PacketMap.() -> Unit) {

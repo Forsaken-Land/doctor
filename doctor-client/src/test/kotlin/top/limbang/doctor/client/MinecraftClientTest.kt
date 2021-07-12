@@ -5,6 +5,7 @@ import top.limbang.doctor.client.running.tabcomplete.TabCompletePlugin
 import top.limbang.doctor.client.running.tabcomplete.tabCompleteTool
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
+import top.limbang.doctor.plugin.astralsorcery.PluginAstralSorcery
 import top.limbang.doctor.plugin.laggoggles.PluginLagGoggles
 import top.limbang.doctor.plugin.laggoggles.getLag
 import top.limbang.doctor.protocol.definition.play.client.ChatPacket
@@ -30,6 +31,7 @@ fun main() {
         .plugin(AutoVersionForgePlugin())
         .plugin(TabCompletePlugin())
         .plugin(TpsPlugin())
+        .plugin(PluginAstralSorcery())
         .build()
 
     if (!client.start(host, port)) return

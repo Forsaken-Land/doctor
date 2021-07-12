@@ -11,6 +11,7 @@ import top.limbang.doctor.plugin.forge.api.FML2Packet
 import top.limbang.doctor.plugin.forge.definations.fml2.LoginWrapperDecoder
 import top.limbang.doctor.plugin.forge.definations.fml2.LoginWrapperEncoder
 import top.limbang.doctor.plugin.forge.definations.fml2.LoginWrapperPacket
+import top.limbang.doctor.plugin.forge.registry.ChannelAndId
 import top.limbang.doctor.plugin.forge.registry.IFML2PacketRegistry
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.core.PacketDirection
@@ -36,16 +37,17 @@ class Forge2PacketHandler(
         val outBuf = ctx.alloc().buffer()
         try {
 
-            //写LoginWrapperEncoder包
-            val encoder = LoginWrapperEncoder()
-            val loginWrapperPacket = LoginWrapperPacket("fml:handshake", outBuf)
-            encoder.encode(outBuf, loginWrapperPacket)
-
             //写FML2包id+包
             val packetEncoder = fmL2PacketRegistry.fml2PacketMap(PacketDirection.C2S).encoder(msg.javaClass)
-            val packetId = fmL2PacketRegistry.fml2PacketMap(PacketDirection.C2S).packetKey(msg.javaClass)
+            val channelAndId = fmL2PacketRegistry.fml2PacketMap(PacketDirection.C2S).packetKey(msg.javaClass)
+            val packetId = channelAndId.id
+            val channel = channelAndId.channel
             buf.writeVarInt(packetId)
             packetEncoder.encode(buf, msg)
+            //写LoginWrapperEncoder包
+            val encoder = LoginWrapperEncoder()
+            val loginWrapperPacket = LoginWrapperPacket(channel, outBuf)
+            encoder.encode(outBuf, loginWrapperPacket)
 
             //写FML2包长度
             outBuf.writeVarInt(buf.readableBytes())
@@ -65,14 +67,12 @@ class Forge2PacketHandler(
                 val packet: FML2Packet
                 val decoder = LoginWrapperDecoder()
                 packet = decoder.decoder(msg.data)
-                if (packet.resourceLocation != "fml:handshake") { //临时修复astralsorcery问题
-                    packet.close()
-                    msg.close()
-                    return
-                }
+                val channel = packet.resourceLocation
                 val buf = readVarIntLengthBasedFrame(ctx, packet.data)
                 val packerId = buf.readVarInt()
-                val packetDecoder = fmL2PacketRegistry.fml2PacketMap(PacketDirection.S2C).decoder<FML2Packet>(packerId)
+                val packetDecoder = fmL2PacketRegistry.fml2PacketMap(PacketDirection.S2C).decoder<FML2Packet>(
+                    ChannelAndId(channel, packerId)
+                )
                 val packetInPacket = packetDecoder.decoder(buf)
                 buf.release()
                 packetInPacket.messageId = msg.messageId

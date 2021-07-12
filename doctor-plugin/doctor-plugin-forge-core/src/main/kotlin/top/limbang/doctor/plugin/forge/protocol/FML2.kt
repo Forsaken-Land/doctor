@@ -1,6 +1,7 @@
 package top.limbang.doctor.plugin.forge.protocol
 
 import top.limbang.doctor.plugin.forge.definations.fml2.*
+import top.limbang.doctor.plugin.forge.registry.ChannelAndId
 import top.limbang.doctor.plugin.forge.registry.FML2PacketRegistryImpl
 import top.limbang.doctor.plugin.forge.registry.IFML2PacketRegistry
 import top.limbang.doctor.protocol.core.PacketDirection
@@ -16,17 +17,17 @@ class FML2 :
     init {
         fml2PacketMap(PacketDirection.S2C)
             .register(
-                1, ModListDecoder()
+                ChannelAndId("fml:handshake", 1), ModListDecoder()
             ).register(
-                3, ServerRegisterDecoder()
+                ChannelAndId("fml:handshake", 3), ServerRegisterDecoder()
             ).register(
-                4, ConfigurationDataDecoder()
+                ChannelAndId("fml:handshake", 4), ConfigurationDataDecoder()
             )
         fml2PacketMap(PacketDirection.C2S)
             .register(
-                2, ModListEncoder()
+                ChannelAndId("fml:handshake", 2), ModListEncoder()
             ).register(
-                99, AcknowledgementEncoder()
+                ChannelAndId("fml:handshake", 99), AcknowledgementEncoder()
             )
     }
 }

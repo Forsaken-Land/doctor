@@ -23,7 +23,7 @@ class FML2Plugin(
 ) : Plugin,
     EventEmitter by DefaultEventEmitter() {
     val modRegistry: IModPacketRegistry = ModPacketRegistryImpl()
-    private val channelPacketRegistry = FML2()
+    val channelPacketRegistry = FML2()
 
     /**
      * 注册插件的事件
