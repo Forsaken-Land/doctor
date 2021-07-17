@@ -3,6 +3,7 @@ package top.limbang.doctor.client.factory
 import top.limbang.doctor.core.api.event.EventEmitter
 import top.limbang.doctor.core.plugin.PluginManager
 import top.limbang.doctor.network.core.NetworkManager
+import top.limbang.doctor.protocol.version.ProtocolVersion
 import top.limbang.doctor.protocol.version.autoversion.PingProtocol
 
 /**
@@ -34,7 +35,7 @@ object NetworkManagerFactory {
                 .host(host)
                 .port(port)
                 .pluginManager(pluginManager)
-                .protocolVersion(version)
+                .protocolVersion(ProtocolVersion.fromNumber(version))
                 .eventEmitter(eventEmitter)
                 .build()
         }

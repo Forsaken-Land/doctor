@@ -1,7 +1,6 @@
 package top.limbang.doctor.protocol.version
 
 import top.limbang.doctor.core.api.plugin.IPluginManager
-import top.limbang.doctor.protocol.core.ProtocolException
 import top.limbang.doctor.protocol.registry.ChannelPacketRegistryImpl
 import top.limbang.doctor.protocol.registry.IChannelPacketRegistry
 import top.limbang.doctor.protocol.registry.IPacketRegistry
@@ -11,31 +10,28 @@ import top.limbang.doctor.protocol.version.vanilla.MinecraftClientProtocol_v1_16
 import top.limbang.doctor.protocol.version.vanilla.MinecraftClientProtocol_v1_7_10
 
 /**
- *
- * @author WarmthDawn
- * @since 2021-05-14
+ * ### 创建协议
+ * @param versionNumber 协议版本号,参考[ProtocolVersion]
+ * @param pluginManager 插件管理器
  */
-
-/**
- * 获取协议
- */
-fun createProtocol(versionNumber: Int, pluginManager: IPluginManager): IPacketRegistry {
+fun createProtocol(versionNumber: ProtocolVersion, pluginManager: IPluginManager): IPacketRegistry {
     return when (versionNumber) {
-        v1_12_2 -> MinecraftClientProtocol_v1_12_2(pluginManager)
+        ProtocolVersion.V1_12_2 -> MinecraftClientProtocol_v1_12_2(pluginManager)
 
-        v1_16_2, v1_16_5 -> MinecraftClientProtocol_v1_16_2(pluginManager)
+        ProtocolVersion.V1_16_2, ProtocolVersion.V1_16_5 -> MinecraftClientProtocol_v1_16_2(pluginManager)
 
-        v1_7_10 -> MinecraftClientProtocol_v1_7_10(pluginManager)
+        ProtocolVersion.V1_7_10 -> MinecraftClientProtocol_v1_7_10(pluginManager)
 
-        else -> {
-            throw ProtocolException("找不到协议号$versionNumber")
-        }
     }
 }
 
-fun createChannel(versionNumber: Int): IChannelPacketRegistry {
+/**
+ * ### 创建插件通道
+ * @param versionNumber 协议版本号,参考[ProtocolVersion]
+ */
+fun createChannel(versionNumber: ProtocolVersion): IChannelPacketRegistry {
     return when (versionNumber) {
-        v1_16_2 -> {
+        ProtocolVersion.V1_16_2 -> {
             MinecraftClientChannel_v1_12_2()
         }
 

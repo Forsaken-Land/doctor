@@ -32,9 +32,10 @@ import top.limbang.doctor.network.utils.FutureUtils
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.registry.IChannelPacketRegistry
 import top.limbang.doctor.protocol.registry.IPacketRegistry
+import top.limbang.doctor.protocol.version.ProtocolVersion
 import top.limbang.doctor.protocol.version.createChannel
 import top.limbang.doctor.protocol.version.createProtocol
-import top.limbang.doctor.protocol.version.v1_12_2
+
 
 /**
  *
@@ -124,7 +125,7 @@ class NetworkManager(
     class Builder {
         private var host: String = "localhost"
         private var port = 25565
-        private var protocolVersion: Int = v1_12_2
+        private var protocolVersion: ProtocolVersion = ProtocolVersion.V1_12_2
         private var emitter: EventEmitter? = null
         private var pluginManager: IPluginManager = DummyPluginManager()
         private var codecInitializer: CodecInitializer = DummyCodecInitializer
@@ -141,7 +142,7 @@ class NetworkManager(
             return this
         }
 
-        fun protocolVersion(protocolVersion: Int): Builder {
+        fun protocolVersion(protocolVersion: ProtocolVersion): Builder {
             this.protocolVersion = protocolVersion
             return this
         }
