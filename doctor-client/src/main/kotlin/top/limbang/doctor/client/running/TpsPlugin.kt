@@ -7,6 +7,8 @@ import top.limbang.doctor.plugin.forge.FML1Plugin
 import top.limbang.doctor.plugin.forge.FML2Plugin
 
 /**
+ * ### TPS插件
+ * 基于 `/forge tps` 指令
  *
  * @author WarmthDawn
  * @since 2021-06-13

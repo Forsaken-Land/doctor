@@ -13,6 +13,7 @@ import top.limbang.doctor.plugin.forge.FML1Plugin
 import top.limbang.doctor.plugin.forge.FML2Plugin
 
 /**
+ * ### 自动获取 Forge 版本插件
  *
  * @author WarmthDawn
  * @since 2021-06-13

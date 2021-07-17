@@ -2,13 +2,10 @@ package top.limbang.doctor.client.running.tabcomplete
 
 import top.limbang.doctor.client.MinecraftClient
 import top.limbang.doctor.client.plugin.ClientPlugin
-import top.limbang.doctor.client.running.*
-import top.limbang.doctor.client.running.TpsPlugin
 import top.limbang.doctor.core.api.plugin.IPluginManager
-import top.limbang.doctor.plugin.forge.FML1Plugin
-import top.limbang.doctor.plugin.forge.FML2Plugin
 
 /**
+ * tab补全命令插件
  *
  * @author WarmthDawn
  * @since 2021-06-20

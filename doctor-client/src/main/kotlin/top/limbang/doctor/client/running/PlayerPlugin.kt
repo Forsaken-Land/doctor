@@ -5,6 +5,7 @@ import top.limbang.doctor.client.plugin.ClientPlugin
 import top.limbang.doctor.core.api.plugin.IPluginManager
 
 /**
+ * ### 获取玩家列表插件
  *
  * @author WarmthDawn
  * @since 2021-06-14
