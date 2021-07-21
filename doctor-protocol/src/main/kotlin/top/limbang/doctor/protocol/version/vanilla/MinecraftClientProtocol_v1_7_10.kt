@@ -7,10 +7,7 @@ import top.limbang.doctor.protocol.definition.login.client.EncryptionResponseBef
 import top.limbang.doctor.protocol.definition.login.client.LoginStartEncoder
 import top.limbang.doctor.protocol.definition.login.server.EncryptionRequestBeforeDecoder
 import top.limbang.doctor.protocol.definition.login.server.LoginSuccess340Decoder
-import top.limbang.doctor.protocol.definition.play.client.CustomPayloadBeforeDecoder
-import top.limbang.doctor.protocol.definition.play.client.CustomPayloadBeforeEncoder
-import top.limbang.doctor.protocol.definition.play.client.KeepAliveBeforeDecoder
-import top.limbang.doctor.protocol.definition.play.client.KeepAliveBeforeEncoder
+import top.limbang.doctor.protocol.definition.play.client.*
 import top.limbang.doctor.protocol.hook.PacketRegistryHook
 import top.limbang.doctor.protocol.registry.IPacketRegistry
 import top.limbang.doctor.protocol.registry.PacketRegistryImpl
@@ -42,10 +39,16 @@ class MinecraftClientProtocol_v1_7_10(pluginManager: IPluginManager) : IPacketRe
         packetMap(ProtocolState.PLAY) {
             whenS2C {
                 register(0x00, KeepAliveBeforeDecoder())
+                register(0x01, JoinGameType2Decoder())
+                register(0x02, ChatType0Decoder())
+                register(0x1A, EntityStatusDecoder())
                 register(0x3F, CustomPayloadBeforeDecoder())
+                register(0x40, DisconnectDecoder())
             }
             whenC2S {
                 register(0x00, KeepAliveBeforeEncoder())
+                register(0x15, ClientSettingEncoder())
+                register(0x16, ClientStatusEncoder())
                 register(0x17, CustomPayloadBeforeEncoder())
             }
         }

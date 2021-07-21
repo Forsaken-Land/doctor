@@ -35,7 +35,11 @@ data class ChatType1Packet(
 class ChatType0Decoder : PacketDecoder<ChatPacket> {
     override fun decoder(buf: ByteBuf): ChatPacket {
         val json = buf.readString()
-        val type = ChatType.byId(buf.readByte())
+        val type = if (buf.readableBytes() == 0) {
+            ChatType.CHAT
+        } else {
+            ChatType.byId(buf.readByte())
+        }
         return ChatType0Packet(json, type)
     }
 }

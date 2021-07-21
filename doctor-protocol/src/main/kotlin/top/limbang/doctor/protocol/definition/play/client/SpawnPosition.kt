@@ -1,20 +1,22 @@
 package top.limbang.doctor.protocol.definition.play.client
 
-import kotlinx.serialization.Serializable
 import io.netty.buffer.ByteBuf
-import top.limbang.doctor.protocol.extension.*
+import kotlinx.serialization.Serializable
 import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 
 @Serializable
 data class SpawnPositionPacket(
-    val location: Position
+    val x: Int,
+    val y: Int,
+    val z: Int
 ) : Packet
 
 class SpawnPositionDecoder : PacketDecoder<SpawnPositionPacket> {
     override fun decoder(buf: ByteBuf): SpawnPositionPacket {
-//        return SpawnPositionPacket(location = buf.readPosition())
-
-        TODO()
+        val x = buf.readInt()
+        val y = buf.readInt()
+        val z = buf.readInt()
+        return SpawnPositionPacket(x, y, z)
     }
 }

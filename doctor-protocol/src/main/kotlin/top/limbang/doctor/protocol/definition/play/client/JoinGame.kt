@@ -8,6 +8,7 @@ import top.limbang.doctor.protocol.api.Packet
 import top.limbang.doctor.protocol.api.PacketDecoder
 import top.limbang.doctor.protocol.core.annotation.VersionExpandPacket
 import top.limbang.doctor.protocol.definition.play.client.Difficulty.*
+import top.limbang.doctor.protocol.definition.play.client.Dimension.*
 import top.limbang.doctor.protocol.definition.play.client.GameMode.*
 import top.limbang.doctor.protocol.definition.play.client.WorldType.*
 import top.limbang.doctor.protocol.extension.readCompoundTag
@@ -20,7 +21,7 @@ import top.limbang.doctor.protocol.utils.ResourceLocation
 interface JoinGamePacket : Packet
 
 /**
- * ### 加入游戏 版本340(前后
+ * ### 加入游戏 版本1.12.2
  * - [entityId] 玩家实体ID (EID)
  * - [isHardcore] 是否硬核模式
  * - [gameMode] 0: 生存模式, 1: 创造模式, 2: 探险模式, 3: 观察模式. 位3（0x8）是核心标志。
@@ -46,7 +47,7 @@ data class JoinGamePacketType0(
 
 
 /**
- * ### 加入游戏 版本340(后
+ * ### 加入游戏 版本1.16
  * - [entityId] 玩家实体ID (EID)
  * - [isHardcore] 是否硬核模式
  * - [gameMode] 0: 生存模式, 1: 创造模式, 2: 探险模式, 3: 观察模式.
@@ -89,6 +90,43 @@ data class JoinGamePacketType1(
 ) : JoinGamePacket
 
 /**
+ * ### 加入游戏 版本1.7.10
+ * - [entityId] 玩家实体ID
+ * - [gameMode] 0: 生存模式, 1: 创造模式, 2: 探险模式, 3: 观察模式.
+ * - [dimension] -1: 下界, 0: 主世界, 1: 末地
+ * - [difficulty] 0: 和平, 1: 简单, 2: 普通, 3: 困难
+ * - [maxPlayers] 客户端用来绘制玩家列表
+ * - [levelType] default, flat, largeBiomes, amplified, default_1_1
+ */
+@Serializable
+@VersionExpandPacket(JoinGamePacket::class)
+data class JoinGamePacketType2(
+    val entityId: Int,
+    val gameMode: GameMode,
+    val dimension: Dimension,
+    val difficulty: Difficulty,
+    val maxPlayers: Int,
+    val levelType: String
+) : JoinGamePacket
+
+/**
+ * ### 维度
+ * - [NETHER] 下届
+ * - [OVER_WORLD] 主世界
+ * - [END] 末地
+ */
+enum class Dimension(private val id: Byte) {
+    NETHER(-1),
+    OVER_WORLD(0),
+    END(1);
+
+    companion object {
+        private val VALUES = values()
+        fun getByMode(value: Byte) = VALUES.firstOrNull { it.id == value } ?: OVER_WORLD
+    }
+}
+
+/**
  * ### 游戏模式
  * - [NOT_SET] 默认
  * - [SURVIVAL] 生存
@@ -105,7 +143,7 @@ enum class GameMode(var id: Int) {
 
     companion object {
         private val VALUES = values()
-        fun getByMode(value: Int) = VALUES.firstOrNull { it.id == value }
+        fun getByMode(value: Int) = VALUES.firstOrNull { it.id == value } ?: NOT_SET
     }
 }
 
@@ -124,7 +162,7 @@ enum class Difficulty(private val id: Int) {
 
     companion object {
         private val VALUES = values()
-        fun getByDifficulty(value: Int) = VALUES.firstOrNull { it.id == value }
+        fun getByDifficulty(value: Int) = VALUES.firstOrNull { it.id == value } ?: NORMAL
     }
 }
 
@@ -162,9 +200,9 @@ class JoinGameType0Decoder : PacketDecoder<JoinGamePacketType0> {
         var i = buf.readUnsignedByte().toInt()
         val isHardcore = (i and 8) == 8
         i = i and -9
-        val gameMode = GameMode.getByMode(i)!!
+        val gameMode = GameMode.getByMode(i)
         val dimension = buf.readInt()
-        val difficulty = Difficulty.getByDifficulty(buf.readUnsignedByte().toInt())!!
+        val difficulty = Difficulty.getByDifficulty(buf.readUnsignedByte().toInt())
         val maxPlayers = buf.readUnsignedByte().toInt()
         var worldType = WorldType.getByName(buf.readString(16))
         if (worldType == null) worldType = DEFAULT
@@ -187,8 +225,8 @@ class JoinGameType1Decoder : PacketDecoder<JoinGamePacketType1> {
     override fun decoder(buf: ByteBuf): JoinGamePacketType1 {
         val playerId = buf.readInt()
         val hardcoreMode = buf.readBoolean()
-        val gameType = GameMode.getByMode(buf.readUnsignedByte().toInt())!!
-        val previousGameMode = GameMode.getByMode(buf.readByte().toInt())!!
+        val gameType = GameMode.getByMode(buf.readUnsignedByte().toInt())
+        val previousGameMode = GameMode.getByMode(buf.readByte().toInt())
         val worldCount = buf.readVarInt()
         val worldNames = mutableSetOf<ResourceLocation>()
         for (j in 0 until worldCount) {
@@ -221,6 +259,25 @@ class JoinGameType1Decoder : PacketDecoder<JoinGamePacketType1> {
             enableRespawnScreen,
             isDebug,
             isFlat
+        )
+    }
+}
+
+class JoinGameType2Decoder : PacketDecoder<JoinGamePacketType2> {
+    override fun decoder(buf: ByteBuf): JoinGamePacketType2 {
+        val entityId = buf.readInt()
+        val gameMode = GameMode.getByMode(buf.readUnsignedByte().toInt())
+        val dimension = Dimension.getByMode(buf.readByte())
+        val difficulty = Difficulty.getByDifficulty(buf.readUnsignedByte().toInt())
+        val maxPlayers = buf.readUnsignedByte().toInt()
+        val levelType = buf.readString()
+        return JoinGamePacketType2(
+            entityId,
+            gameMode,
+            dimension,
+            difficulty,
+            maxPlayers,
+            levelType
         )
     }
 }
