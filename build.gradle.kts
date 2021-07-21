@@ -20,7 +20,7 @@ allprojects {
         mavenLocal()
         maven("https://maven.aliyun.com/repository/gradle-plugin")
         maven("https://maven.aliyun.com/repository/public")
-        maven("http://web.blackyin.top:8015/repository/maven-public/") { isAllowInsecureProtocol = true }
+        maven("https://maven.blackyin.xyz:8015/repository/maven-public/")
         maven("https://jitpack.io/")
         mavenCentral()
     }
