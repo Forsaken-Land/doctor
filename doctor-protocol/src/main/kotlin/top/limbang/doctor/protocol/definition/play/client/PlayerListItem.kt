@@ -38,7 +38,7 @@ class PlayerListItemDecoder : PacketDecoder<PlayerListItemPacket> {
             val uuid = buf.readUUID()
             val playerInfo = when (action) {
                 ADD_PLAYER -> {
-                    val name = buf.readString(16)
+                    val name = buf.readString(32)
                     val size = buf.readVarInt()
                     val propertyList = mutableListOf<PlayerInfo.Property>()
                     for (k in 0 until size) {
