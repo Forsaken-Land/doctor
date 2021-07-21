@@ -8,6 +8,7 @@ import top.limbang.doctor.protocol.definition.login.client.LoginStartEncoder
 import top.limbang.doctor.protocol.definition.login.server.EncryptionRequestBeforeDecoder
 import top.limbang.doctor.protocol.definition.login.server.LoginSuccess340Decoder
 import top.limbang.doctor.protocol.definition.play.client.*
+import top.limbang.doctor.protocol.definition.play.server.CChatEncoder
 import top.limbang.doctor.protocol.hook.PacketRegistryHook
 import top.limbang.doctor.protocol.registry.IPacketRegistry
 import top.limbang.doctor.protocol.registry.PacketRegistryImpl
@@ -47,6 +48,7 @@ class MinecraftClientProtocol_v1_7_10(pluginManager: IPluginManager) : IPacketRe
             }
             whenC2S {
                 register(0x00, KeepAliveBeforeEncoder())
+                register(0x01, CChatEncoder())
                 register(0x15, ClientSettingEncoder())
                 register(0x16, ClientStatusEncoder())
                 register(0x17, CustomPayloadBeforeEncoder())
