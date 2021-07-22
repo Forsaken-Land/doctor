@@ -79,6 +79,8 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x09, CustomPayloadEncoder())
                 register(0x03, ClientStatusEncoder())
                 register(0x01, CTabCompleteType0Encoder())
+                register(0x0A, UseEntityEncoder())
+                register(0x15, EntityActionEncoder())
             }
         }
         pluginManager.invokeHook(PacketRegistryHook, HookMessage(this), true)
