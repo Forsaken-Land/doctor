@@ -14,9 +14,12 @@ class TabCompletePlugin : ClientPlugin {
     override lateinit var client: MinecraftClient
     lateinit var tabCompleteTool: ITabCompleteTool
     override fun enabled(manager: IPluginManager) {
-        tabCompleteTool = when(client.protocolVersion) {
+        tabCompleteTool = when (client.protocolVersion) {
             340 -> {
                 TabCompleteTool112(client)
+            }
+            5 -> {
+                TabCompleteTool17(client)
             }
             else -> {
                 TabCompleteTool116(client)

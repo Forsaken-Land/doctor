@@ -10,9 +10,11 @@ import top.limbang.doctor.network.handler.PacketEvent
 import top.limbang.doctor.protocol.definition.play.client.STabCompletePacket
 import top.limbang.doctor.protocol.definition.play.client.STabCompleteType0Packet
 import top.limbang.doctor.protocol.definition.play.client.STabCompleteType1Packet
+import top.limbang.doctor.protocol.definition.play.client.STabCompleteType2Packet
 import top.limbang.doctor.protocol.definition.play.server.CTabCompletePacket
 import top.limbang.doctor.protocol.definition.play.server.CTabCompleteType0Packet
 import top.limbang.doctor.protocol.definition.play.server.CTabCompleteType1Packet
+import top.limbang.doctor.protocol.definition.play.server.CTabCompleteType2Packet
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
@@ -114,6 +116,20 @@ class TabCompleteTool112(client: MinecraftClient) : AbstractTabCompleteTool(clie
             .map { it.matches.toList() }
 }
 
+class TabCompleteTool17(client: MinecraftClient) : AbstractTabCompleteTool(client) {
+    override fun createPacket(prefix: String): CTabCompletePacket {
+        return CTabCompleteType2Packet(prefix)
+    }
+
+    override val tabCompleteObs: Single<List<String>> =
+        client.asSingle(PacketEvent(STabCompletePacket::class))
+            .observeOn(Schedulers.io())
+            .map { it as STabCompleteType2Packet }
+            .map {
+                listOf(it.match)
+            }
+}
+
 class TabCompleteTool116(client: MinecraftClient) : AbstractTabCompleteTool(client) {
     override fun createPacket(prefix: String): CTabCompletePacket {
         return CTabCompleteType1Packet(0, prefix)
@@ -123,6 +139,6 @@ class TabCompleteTool116(client: MinecraftClient) : AbstractTabCompleteTool(clie
         client.asSingle(PacketEvent(STabCompletePacket::class))
             .observeOn(Schedulers.io())
             .map { it as STabCompleteType1Packet }
-            .map { it.matches.map { m-> m.match } }
+            .map { it.matches.map { m -> m.match } }
 }
 

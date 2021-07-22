@@ -56,6 +56,13 @@ data class STabCompleteType0Packet(
 
 }
 
+@Serializable
+@VersionExpandPacket(STabCompletePacket::class)
+data class STabCompleteType2Packet(
+    val count: Int,
+    val match: String
+) : STabCompletePacket
+
 class STabCompleteType0Decoder : PacketDecoder<STabCompleteType0Packet> {
     override fun decoder(buf: ByteBuf): STabCompleteType0Packet {
         val length = buf.readVarInt()
@@ -92,4 +99,12 @@ class STabCompleteType1Decoder : PacketDecoder<STabCompleteType1Packet> {
         )
     }
 
+}
+
+class STabCompleteType2Decoder : PacketDecoder<STabCompleteType2Packet> {
+    override fun decoder(buf: ByteBuf): STabCompleteType2Packet {
+        val count = buf.readVarInt()
+        val match = buf.readString()
+        return STabCompleteType2Packet(count, match)
+    }
 }

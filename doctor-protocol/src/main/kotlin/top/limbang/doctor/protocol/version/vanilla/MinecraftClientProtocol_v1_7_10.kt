@@ -9,6 +9,7 @@ import top.limbang.doctor.protocol.definition.login.server.EncryptionRequestBefo
 import top.limbang.doctor.protocol.definition.login.server.LoginSuccess340Decoder
 import top.limbang.doctor.protocol.definition.play.client.*
 import top.limbang.doctor.protocol.definition.play.server.CChatEncoder
+import top.limbang.doctor.protocol.definition.play.server.CTabCompleteType2Encoder
 import top.limbang.doctor.protocol.hook.PacketRegistryHook
 import top.limbang.doctor.protocol.registry.IPacketRegistry
 import top.limbang.doctor.protocol.registry.PacketRegistryImpl
@@ -43,12 +44,14 @@ class MinecraftClientProtocol_v1_7_10(pluginManager: IPluginManager) : IPacketRe
                 register(0x01, JoinGameType2Decoder())
                 register(0x02, ChatType0Decoder())
                 register(0x1A, EntityStatusDecoder())
+                register(0x3A, STabCompleteType2Decoder())
                 register(0x3F, CustomPayloadBeforeDecoder())
                 register(0x40, DisconnectDecoder())
             }
             whenC2S {
                 register(0x00, KeepAliveBeforeEncoder())
                 register(0x01, CChatEncoder())
+                register(0x14, CTabCompleteType2Encoder())
                 register(0x15, ClientSettingEncoder())
                 register(0x16, ClientStatusEncoder())
                 register(0x17, CustomPayloadBeforeEncoder())
