@@ -15,6 +15,7 @@ import top.limbang.doctor.protocol.definition.login.server.LoginSuccess340Decode
 import top.limbang.doctor.protocol.definition.login.server.SetCompressionDecoder
 import top.limbang.doctor.protocol.definition.play.client.*
 import top.limbang.doctor.protocol.definition.play.server.CChatEncoder
+import top.limbang.doctor.protocol.definition.play.server.CPlayerPositionAndLookEncoder
 import top.limbang.doctor.protocol.definition.play.server.CTabCompleteType0Encoder
 import top.limbang.doctor.protocol.hook.PacketRegistryHook
 import top.limbang.doctor.protocol.registry.ChannelPacketRegistryImpl
@@ -80,6 +81,7 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x03, ClientStatusEncoder())
                 register(0x01, CTabCompleteType0Encoder())
                 register(0x0A, UseEntityEncoder())
+                register(0x0E, CPlayerPositionAndLookEncoder())
                 register(0x15, EntityActionEncoder())
             }
         }
