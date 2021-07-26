@@ -4,8 +4,6 @@ dependencies {
     implementation(project(":doctor-plugin:doctor-plugin-forge-core"))
 
     testImplementation(project(":doctor-plugin:doctor-plugin-forge-laggoggles"))
-    testImplementation(project(":doctor-plugin:doctor-plugin-forge-astralsorcery"))
-    testImplementation(project(":doctor-plugin:doctor-plugin-forge-silentgear"))
-    testImplementation(project(":doctor-plugin:doctor-plugin-forge-extendedcrafting"))
+    testImplementation(project(":doctor-plugin:doctor-plugin-forge-allLoginPlugin"))
     testImplementation(project(":doctor-translate:doctor-translate-all"))
 }

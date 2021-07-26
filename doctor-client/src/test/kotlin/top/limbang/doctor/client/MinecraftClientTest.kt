@@ -2,15 +2,13 @@ package top.limbang.doctor.client
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import top.limbang.doctor.allLoginPlugin.enableAllLoginPlugin
 import top.limbang.doctor.client.running.*
 import top.limbang.doctor.client.running.tabcomplete.TabCompletePlugin
 import top.limbang.doctor.client.running.tabcomplete.tabCompleteTool
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
-import top.limbang.doctor.plugin.astralsorcery.PluginAstralSorcery
-import top.limbang.doctor.plugin.extendedcrafting.PluginExtendedCrafting
 import top.limbang.doctor.plugin.laggoggles.getLag
-import top.limbang.doctor.plugin.silentgear.PluginSilentGear
 import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
 import top.limbang.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
@@ -34,9 +32,7 @@ fun main() {
         .plugin(AutoVersionForgePlugin())
         .plugin(TabCompletePlugin())
         .plugin(TpsPlugin())
-        .plugin(PluginAstralSorcery())
-        .plugin(PluginSilentGear())
-        .plugin(PluginExtendedCrafting())
+        .enableAllLoginPlugin()
         .build()
 
     if (!client.start(host, port)) return

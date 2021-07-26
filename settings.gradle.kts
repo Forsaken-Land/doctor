@@ -8,9 +8,11 @@ include("doctor-client")
 include("doctor-plugin:doctor-plugin-forge-core")
 
 include("doctor-plugin:doctor-plugin-forge-laggoggles")
+
 include("doctor-plugin:doctor-plugin-forge-astralsorcery")
 include("doctor-plugin:doctor-plugin-forge-silentgear")
 include("doctor-plugin:doctor-plugin-forge-extendedcrafting")
+include("doctor-plugin:doctor-plugin-forge-allLoginPlugin")
 
 include("doctor-translate:doctor-translate-core")
 
@@ -26,5 +28,4 @@ include("doctor-plugin:doctor-plugin-forge-all")
 include("doctor-translate:doctor-translate-mc116-all")
 include("doctor-translate:doctor-translate-mc112-all")
 include("doctor-translate:doctor-translate-all")
-
 
