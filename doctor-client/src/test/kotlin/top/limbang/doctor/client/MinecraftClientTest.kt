@@ -8,6 +8,7 @@ import top.limbang.doctor.client.running.tabcomplete.tabCompleteTool
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.plugin.astralsorcery.PluginAstralSorcery
+import top.limbang.doctor.plugin.extendedcrafting.PluginExtendedCrafting
 import top.limbang.doctor.plugin.laggoggles.getLag
 import top.limbang.doctor.plugin.silentgear.PluginSilentGear
 import top.limbang.doctor.protocol.definition.play.client.ChatPacket
@@ -35,6 +36,7 @@ fun main() {
         .plugin(TpsPlugin())
         .plugin(PluginAstralSorcery())
         .plugin(PluginSilentGear())
+        .plugin(PluginExtendedCrafting())
         .build()
 
     if (!client.start(host, port)) return

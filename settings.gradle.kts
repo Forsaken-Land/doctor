@@ -8,6 +8,9 @@ include("doctor-client")
 include("doctor-plugin:doctor-plugin-forge-core")
 
 include("doctor-plugin:doctor-plugin-forge-laggoggles")
+include("doctor-plugin:doctor-plugin-forge-astralsorcery")
+include("doctor-plugin:doctor-plugin-forge-silentgear")
+include("doctor-plugin:doctor-plugin-forge-extendedcrafting")
 
 include("doctor-translate:doctor-translate-core")
 
@@ -23,9 +26,5 @@ include("doctor-plugin:doctor-plugin-forge-all")
 include("doctor-translate:doctor-translate-mc116-all")
 include("doctor-translate:doctor-translate-mc112-all")
 include("doctor-translate:doctor-translate-all")
-include("doctor-plugin:doctor-plugin-forge-astralsorcery")
-findProject(":doctor-plugin:doctor-plugin-forge-astralsorcery")?.name = "doctor-plugin-forge-astralsorcery"
-include("doctor-plugin:doctor-plugin-forge-astralsorcery")
-findProject(":doctor-plugin:doctor-plugin-forge-astralsorcery")?.name = "doctor-plugin-forge-astralsorcery"
-include("doctor-plugin:doctor-plugin-forge-silentgear")
-findProject(":doctor-plugin:doctor-plugin-forge-silentgear")?.name = "doctor-plugin-forge-silentgear"
+
+
