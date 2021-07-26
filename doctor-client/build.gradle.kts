@@ -5,5 +5,6 @@ dependencies {
 
     testImplementation(project(":doctor-plugin:doctor-plugin-forge-laggoggles"))
     testImplementation(project(":doctor-plugin:doctor-plugin-forge-astralsorcery"))
+    testImplementation(project(":doctor-plugin:doctor-plugin-forge-silentgear"))
     testImplementation(project(":doctor-translate:doctor-translate-all"))
 }

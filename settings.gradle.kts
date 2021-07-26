@@ -27,3 +27,5 @@ include("doctor-plugin:doctor-plugin-forge-astralsorcery")
 findProject(":doctor-plugin:doctor-plugin-forge-astralsorcery")?.name = "doctor-plugin-forge-astralsorcery"
 include("doctor-plugin:doctor-plugin-forge-astralsorcery")
 findProject(":doctor-plugin:doctor-plugin-forge-astralsorcery")?.name = "doctor-plugin-forge-astralsorcery"
+include("doctor-plugin:doctor-plugin-forge-silentgear")
+findProject(":doctor-plugin:doctor-plugin-forge-silentgear")?.name = "doctor-plugin-forge-silentgear"
