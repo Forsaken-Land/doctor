@@ -1,12 +1,13 @@
 package top.limbang.doctor.client
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import top.limbang.doctor.client.running.*
 import top.limbang.doctor.client.running.tabcomplete.TabCompletePlugin
 import top.limbang.doctor.client.running.tabcomplete.tabCompleteTool
 import top.limbang.doctor.network.event.ConnectionEvent
 import top.limbang.doctor.network.handler.onPacket
 import top.limbang.doctor.plugin.astralsorcery.PluginAstralSorcery
-import top.limbang.doctor.plugin.laggoggles.PluginLagGoggles
 import top.limbang.doctor.plugin.laggoggles.getLag
 import top.limbang.doctor.protocol.definition.play.client.ChatPacket
 import top.limbang.doctor.protocol.definition.play.client.DisconnectPacket
@@ -26,7 +27,7 @@ fun main() {
         .user(username, password)
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
-        .plugin(PluginLagGoggles())
+//        .plugin(PluginLagGoggles())
         .plugin(PlayerPlugin())
         .plugin(AutoVersionForgePlugin())
         .plugin(TabCompletePlugin())
@@ -37,8 +38,7 @@ fun main() {
     if (!client.start(host, port)) return
 
     client.on(ConnectionEvent.Disconnect) {
-        Thread.sleep(2000)
-        client.reconnect()
+        return@on
     }.onPacket<ChatPacket> {
         if (!packet.json.contains("commands.forge.tps.summary")) {
             val chat = ChatSerializer.jsonToChat(packet.json)
@@ -54,55 +54,75 @@ fun main() {
         logger.info("tab")
     }
 
-
-    while (true) {
-        when (val msg = readLine()) {
-            "test" -> {
-                try {
-                    val result = client.getLag().get()
-                    logger.info(result.toString())
-                } catch (e: Exception) {
-                    logger.error(e.message)
-                }
-            }
-            "tps" -> {
-                try {
-                    val result = client.tpsTools.getTps().get()
-                    logger.info(result.toString())
-                } catch (e: Exception) {
-                    logger.error("获取tps失败", e)
-                }
-            }
-
-
-            "list" -> {
-                val playerTab = client.getPlayerTab()
-                logger.info(playerTab.toString())
-                logger.info("玩家数量:${playerTab.players.size}")
-                logger.info("更新时间:${playerTab.updateTime}")
-                playerTab.players.map {
-                    logger.info("name:${it.value.name} ping:${it.value.ping} gameMode:${it.value.gameMode}")
-                }
-
-            }
-            else -> {
-                if (msg?.startsWith("/") == true) {
+    val job = GlobalScope.launch {
+        while (true) {
+            when (val msg = readLine()) {
+                "test" -> {
                     try {
-                        val tab = client.tabCompleteTool.getCompletions(msg)
-//                        logger.info(tab.joinToString())
+                        val result = client.getLag().get()
+                        logger.info(result.toString())
                     } catch (e: Exception) {
+                        logger.error(e.message)
                     }
                 }
-                if (!msg.isNullOrBlank()) {
-                    client.sendMessage(msg)
+                "tps" -> {
+                    try {
+                        val result = client.tpsTools.getTps().get()
+                        logger.info(result.toString())
+                    } catch (e: Exception) {
+                        logger.error("获取tps失败", e)
+                    }
                 }
+
+                "list" -> {
+                    val playerTab = client.getPlayerTab()
+                    logger.info("玩家数量:${playerTab.players.size}")
+                    logger.info("更新时间:${playerTab.updateTime}")
+                    playerTab.players.map {
+                        logger.info("name:${it.value.name} ping:${it.value.ping} gameMode:${it.value.gameMode}")
+                    }
+
+                }
+                else -> {
+                    if (msg?.startsWith("/") == true) {
+                        try {
+                            val tab = client.tabCompleteTool.getCompletions(msg)
+//                        logger.info(tab.joinToString())
+                        } catch (e: Exception) {
+                        }
+                    }
+                    if (!msg.isNullOrBlank()) {
+                        client.sendMessage(msg)
+                    }
+                }
+//
+//
             }
-//
-//
+
         }
-
     }
-
+//    Thread.sleep(3000)
+//    client.sendPacket(EntityActionPacket(entity, 0, 0))
+//    val time = 50L
+//    val size = 2
+//    while (true) {
+//        client.sendPacket(CPlayerPositionAndLookPacket(x + size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+//        Thread.sleep(time)
+//        client.sendPacket(CPlayerPositionAndLookPacket(x + size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+//        Thread.sleep(time)
+//        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z + size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+//        Thread.sleep(time)
+//        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z + size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+//        Thread.sleep(time)
+//        client.sendPacket(CPlayerPositionAndLookPacket(x - size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+//        Thread.sleep(time)
+//        client.sendPacket(CPlayerPositionAndLookPacket(x - size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+//        Thread.sleep(time)
+//        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z - size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+//        Thread.sleep(time)
+//        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z - size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+//        Thread.sleep(time)
+//    }
 }
 
 

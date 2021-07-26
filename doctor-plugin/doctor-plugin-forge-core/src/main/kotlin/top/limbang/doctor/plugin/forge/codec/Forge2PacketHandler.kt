@@ -44,6 +44,7 @@ class Forge2PacketHandler(
             val channel = channelAndId.channel
             buf.writeVarInt(packetId)
             packetEncoder.encode(buf, msg)
+
             //写LoginWrapperEncoder包
             val encoder = LoginWrapperEncoder()
             val loginWrapperPacket = LoginWrapperPacket(channel, outBuf)

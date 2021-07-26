@@ -20,7 +20,7 @@ object AstralSorcery : ICommonPacketGroup<IFML2PacketRegistry> {
             register(ChannelAndId("astralsorcery:net_channel", 3), PktLoginAcknowledgeDecoder())
         }
         registry.fml2PacketMap(PacketDirection.C2S) {
-            register(ChannelAndId("astralsorcery:net_channel", 4), PktLoginAcknowledgeEncoder())
+            register(ChannelAndId("astralsorcery:net_channel", 3), PktLoginAcknowledgeEncoder())
 
         }
     }
