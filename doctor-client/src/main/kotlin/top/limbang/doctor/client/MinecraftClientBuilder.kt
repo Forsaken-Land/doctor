@@ -2,6 +2,7 @@ package top.limbang.doctor.client
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import top.limbang.doctor.client.session.Session
 import top.limbang.doctor.client.session.YggdrasilMinecraftSessionService
 import top.limbang.doctor.core.api.plugin.Plugin
 
@@ -21,6 +22,7 @@ class MinecraftClientBuilder {
     private var name: String = ""
     private var authServerUrl: String? = null
     private var sessionServerUrl: String? = null
+    private var localSession: Session? = null
 
     private val plugins = mutableSetOf<Plugin>()
 
@@ -58,6 +60,14 @@ class MinecraftClientBuilder {
     }
 
     /**
+     * ### 设置本地 session值
+     */
+    fun localSession(session: Session): MinecraftClientBuilder {
+        this.localSession = localSession
+        return this
+    }
+
+    /**
      * ### 添加插件
      */
     fun plugin(plugin: Plugin): MinecraftClientBuilder {
@@ -71,10 +81,13 @@ class MinecraftClientBuilder {
             val sessionService = if (authServerUrl != null && sessionServerUrl != null) {
                 YggdrasilMinecraftSessionService(authServerUrl!!, sessionServerUrl!!)
             } else null
+
             val session = sessionService?.loginYggdrasilWithPassword(email!!, password!!)
 
             if (session != null) {
                 MinecraftClient(session = session, sessionService = sessionService)
+            } else if (localSession != null && sessionService != null) {
+                MinecraftClient(session = localSession, sessionService = sessionService)
             } else {
                 MinecraftClient(name = name)
             }
