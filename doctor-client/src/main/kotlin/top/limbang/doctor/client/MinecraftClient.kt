@@ -223,8 +223,14 @@ class MinecraftClient(
                 logger.error("获取ping信息失败,${e.message}")
                 return null
             }
+            val serverInfo = try {
+                ServerInfoUtils.getServiceInfo(jsonStr)
+            } catch (e: NullPointerException) {
+                logger.error("服务器正在启动，请等待...")
+                return null
+            }
 
-            val serverInfo = ServerInfoUtils.getServiceInfo(jsonStr)
+
             return serverInfo
         }
 
