@@ -8,7 +8,7 @@ plugins {
 
 allprojects {
     val projectVersion: String by project
-    group = "top.limbang.doctor"
+    group = "top.fanua.doctor"
     version = projectVersion
 
     apply {
