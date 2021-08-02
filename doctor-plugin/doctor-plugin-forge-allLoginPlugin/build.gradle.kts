@@ -3,5 +3,6 @@ dependencies {
     implementation(project(":doctor-plugin:doctor-plugin-forge-astralsorcery"))
     implementation(project(":doctor-plugin:doctor-plugin-forge-silentgear"))
     implementation(project(":doctor-plugin:doctor-plugin-forge-extendedcrafting"))
+    implementation(project(":doctor-plugin:doctor-plugin-forge-exNihiloSequentia"))
 }
 
