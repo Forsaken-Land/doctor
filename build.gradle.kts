@@ -20,7 +20,7 @@ allprojects {
         mavenLocal()
         maven("https://maven.aliyun.com/repository/gradle-plugin")
         maven("https://maven.aliyun.com/repository/public")
-        maven("https://maven.blackyin.xyz:8015/repository/maven-public/")
+        maven("https://maven.fanua.top:8015/repository/maven-public/")
         maven("https://jitpack.io/")
         mavenCentral()
     }
