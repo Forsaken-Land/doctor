@@ -10,13 +10,15 @@ import top.limbang.doctor.client.session.GameProfile
 data class AuthenticateRequest(
     val username: String,
     val password: String,
-    val agent: Agent = Agent()
+    val agent: Agent? = null
 ) {
     @Serializable
     data class Agent(
-        val name: String = "Minecraft",
-        val version: Int = 1
-    )
+        val name: String,
+        val version: Int
+    ) {
+        constructor() : this("Minecraft", 1)
+    }
 }
 
 

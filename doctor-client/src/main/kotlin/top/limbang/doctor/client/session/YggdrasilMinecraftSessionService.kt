@@ -34,14 +34,17 @@ fun AuthenticateResponse.toSession(): Session {
  * @param sessionServer 会话服务器Url
  */
 open class YggdrasilMinecraftSessionService(
-    private val authServer: String = "https://authserver.mojang.com/authenticate",
+    private val authServer: String = "https://authserver.mojang.com",
     private val sessionServer: String = "https://sessionserver.mojang.com"
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
 
     companion object Default : YggdrasilMinecraftSessionService()
 
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
 
     /**
      * ### 进入服务器
@@ -76,7 +79,11 @@ open class YggdrasilMinecraftSessionService(
      */
     fun loginYggdrasilWithPassword(username: String, password: String): Session {
         val authServer = "$authServer/authenticate"
-        val body = json.encodeToString(AuthenticateRequest(username, password))
+        val body = if (this.authServer == "https://authserver.mojang.com") {
+            json.encodeToString(AuthenticateRequest(username, password, AuthenticateRequest.Agent()))
+        } else {
+            json.encodeToString(AuthenticateRequest(username, password))
+        }
         val response = HttpClient.postJson(authServer, body)
         if (response.code != 200) {
             val errorResponse = json.decodeFromString<YggdrasilError>(response.content)
@@ -111,7 +118,7 @@ open class YggdrasilMinecraftSessionService(
             }
 
             return session
-        }finally {
+        } finally {
             client.close()
         }
     }
