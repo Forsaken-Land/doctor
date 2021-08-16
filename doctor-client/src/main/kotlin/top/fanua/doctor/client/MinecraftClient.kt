@@ -92,8 +92,8 @@ class MinecraftClient(
      * - [host] 服务器地址
      * - [port] 服务器端口
      */
-    fun start(host: String, port: Int): Boolean {
-        return start(host, port, 5000)
+    fun start(host: String, port: Int, login: EventListener? = null): Boolean {
+        return start(host, port, 5000, login)
     }
 
     /**
@@ -102,7 +102,7 @@ class MinecraftClient(
      * - [port] 服务器端口
      * - [timeout] 等待时间 毫秒
      */
-    fun start(host: String, port: Int, timeout: Long): Boolean {
+    fun start(host: String, port: Int, timeout: Long, login: EventListener? = null): Boolean {
         if (started) {
             throw Exception("客户端已经启动")
         }
@@ -112,11 +112,12 @@ class MinecraftClient(
         versionlName = serverInfo.versionName
         protocolVersion = serverInfo.versionNumber
         // 判断是否设置了名称,有就代码离线登陆
-        val loginListener: LoginListener = if (name.isEmpty()) {
-            LoginListener(name, session, serverInfo.versionNumber, sessionService)
-        } else {
-            LoginListener(name = name, protocolVersion = serverInfo.versionNumber)
-        }
+        val loginListener = login
+            ?: if (name.isEmpty()) {
+                LoginListener(name, session, serverInfo.versionNumber, sessionService)
+            } else {
+                LoginListener(name = name, protocolVersion = serverInfo.versionNumber)
+            }
 
         pluginManager.getAllPlugins().forEach {
             if (it is ClientPlugin) it.beforeEnable(serverInfo)
@@ -215,7 +216,7 @@ class MinecraftClient(
         fun ping(host: String, port: Int, timeout: Long = 2000, unit: TimeUnit = TimeUnit.MILLISECONDS): ServerInfo? {
             val jsonStr: String
             try {
-                jsonStr = ping(host, port).get(timeout, TimeUnit.MILLISECONDS)
+                jsonStr = ping(host, port).get(timeout, unit)
             } catch (e: TimeoutException) {
                 logger.error("获取ping信息,等待超时...")
                 return null
