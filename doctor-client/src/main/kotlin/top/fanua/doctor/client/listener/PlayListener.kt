@@ -20,8 +20,9 @@ class PlayListener : EventListener {
             it
         }
         // 监听加入游戏包并回复
-        emitter.onPacket<JoinGamePacket> {
-            if (packet is JoinGamePacketType2) entityId = (packet as JoinGamePacketType2).entityId
+        emitter.replyPacket<JoinGamePacket> {
+            if (it is JoinGamePacketType2) entityId = it.entityId
+            ClientSettingPacket()
         }
         //1.7登录自动重生
         emitter.oncePacket<SKeepAlivePacket> {
