@@ -43,7 +43,7 @@ class ErrorModTest : EventEmitter by DefaultEventEmitter() {
 
         networkManager
             .addListener(loginListener)
-            .addListener(PlayListener())
+            .addListener(PlayListener(serverInfo.versionNumber))
 
         networkManager.connect()
     }

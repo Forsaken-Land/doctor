@@ -24,7 +24,8 @@ data class ClientSettingPacket(
     val chatMode: ChatMode = ChatMode.ENABLE,
     val chatColors: Boolean = true,
     val displayedSkinParts: Int = displayedSkinParts(),//TODO 需要重写
-    val mainHand: MainHandEnum = MainHandEnum.Right
+    val mainHand: MainHandEnum = MainHandEnum.Right,
+    val disableTextFiltering: Boolean? = null
 ) : Packet {
 
     companion object {
@@ -69,6 +70,9 @@ class ClientSettingEncoder : PacketEncoder<ClientSettingPacket> {
         buf.writeBoolean(packet.chatColors)
         buf.writeByte(packet.displayedSkinParts)
         buf.writeVarInt(packet.mainHand.id)
+        if (packet.disableTextFiltering != null) {
+            buf.writeBoolean(packet.disableTextFiltering)
+        }
         return buf
     }
 }

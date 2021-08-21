@@ -130,7 +130,7 @@ class MinecraftClient(
 
         networkManager
             .addListenerHooked(loginListener)
-            .addListenerHooked(PlayListener())
+            .addListenerHooked(PlayListener(serverInfo.versionNumber))
 
 
 

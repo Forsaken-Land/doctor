@@ -4,10 +4,7 @@ import top.fanua.doctor.core.api.plugin.IPluginManager
 import top.fanua.doctor.protocol.registry.ChannelPacketRegistryImpl
 import top.fanua.doctor.protocol.registry.IChannelPacketRegistry
 import top.fanua.doctor.protocol.registry.IPacketRegistry
-import top.fanua.doctor.protocol.version.vanilla.MinecraftClientChannel_v1_12_2
-import top.fanua.doctor.protocol.version.vanilla.MinecraftClientProtocol_v1_12_2
-import top.fanua.doctor.protocol.version.vanilla.MinecraftClientProtocol_v1_16_2
-import top.fanua.doctor.protocol.version.vanilla.MinecraftClientProtocol_v1_7_10
+import top.fanua.doctor.protocol.version.vanilla.*
 
 /**
  * ### 创建协议
@@ -21,6 +18,8 @@ fun createProtocol(versionNumber: ProtocolVersion, pluginManager: IPluginManager
         ProtocolVersion.V1_16_2, ProtocolVersion.V1_16_5 -> MinecraftClientProtocol_v1_16_2(pluginManager)
 
         ProtocolVersion.V1_7_10 -> MinecraftClientProtocol_v1_7_10(pluginManager)
+
+        ProtocolVersion.V1_17_1 -> MinecraftClientProtocol_v1_17_1(pluginManager)
 
     }
 }

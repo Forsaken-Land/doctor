@@ -66,3 +66,20 @@ class CombatEventDecoder : PacketDecoder<CombatEventPacket> {
         }
     }
 }
+
+@Serializable
+data class DeathCombatEventPacket(
+    val playerID: Int,
+    val entityID: Int,
+    val message: String
+) : Packet
+
+class DeathCombatEventDecoder : PacketDecoder<DeathCombatEventPacket> {
+    override fun decoder(buf: ByteBuf): DeathCombatEventPacket {
+        val playerID = buf.readVarInt()
+        val entityID = buf.readInt()
+        val message = buf.readString()
+        return DeathCombatEventPacket(playerID, entityID, message)
+    }
+
+}

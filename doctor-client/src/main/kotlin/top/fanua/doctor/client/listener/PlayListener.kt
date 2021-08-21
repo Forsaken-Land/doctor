@@ -11,7 +11,7 @@ import top.fanua.doctor.protocol.definition.play.client.*
 /**
  * ### 游戏状态监听器
  */
-class PlayListener : EventListener {
+class PlayListener(private val protocolNumber: Int) : EventListener {
     private var entityId: Int = 0
     override fun initListen(emitter: EventEmitter) {
 
@@ -22,13 +22,24 @@ class PlayListener : EventListener {
         // 监听加入游戏包并回复
         emitter.replyPacket<JoinGamePacket> {
             if (it is JoinGamePacketType2) entityId = it.entityId
-            ClientSettingPacket()
+            if (protocolNumber == 756) {
+                ClientSettingPacket(disableTextFiltering = true)
+            } else {
+                ClientSettingPacket()
+            }
+
         }
         //1.7登录自动重生
         emitter.oncePacket<SKeepAlivePacket> {
             if (entityId != 0) {
                 connection.sendPacket(ClientStatusPacket(ClientStatusEnum.PerformRespawn))
             }
+        }
+        // 监听1.17.1死亡事件
+        emitter.replyPacket<DeathCombatEventPacket> {
+            if (it.entityID == entityId) {
+                ClientStatusPacket(ClientStatusEnum.PerformRespawn)
+            } else null
         }
         // 监听心跳数据包并回复
         emitter.replyPacket<SKeepAlivePacket> { CKeepAlivePacket(it.keepAliveId) }

@@ -22,7 +22,13 @@ object ServerInfoUtils {
         val description = try {
             descriptionObject.jsonObject["text"]?.jsonPrimitive?.content ?: descriptionObject.jsonPrimitive.content
         } catch (e: IllegalArgumentException) {
-            descriptionObject.jsonPrimitive.content
+            try {
+                descriptionObject.jsonPrimitive.content
+            } catch (e: Exception) {
+                descriptionObject.toString()
+//                throw Exception("可能服务器有防压测")
+            }
+
         }
 
 
