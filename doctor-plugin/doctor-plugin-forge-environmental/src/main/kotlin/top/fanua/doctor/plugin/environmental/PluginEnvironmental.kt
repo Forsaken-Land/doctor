@@ -1,20 +1,20 @@
-package top.fanua.doctor.plugin.astralsorcery
+package top.fanua.doctor.plugin.environmental
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.fanua.doctor.client.MinecraftClient
 import top.fanua.doctor.client.plugin.ClientPlugin
 import top.fanua.doctor.core.api.plugin.IPluginManager
-import top.fanua.doctor.plugin.astralsorcery.handler.AstralSorceryListener
-import top.fanua.doctor.plugin.astralsorcery.protocol.AstralSorcery
+import top.fanua.doctor.plugin.environmental.handler.EnvironmentalListener
+import top.fanua.doctor.plugin.environmental.protocol.Environmental
 import top.fanua.doctor.plugin.forge.FML2Plugin
 
 /**
  *
  * @author Doctor_Yin
- * @since 2021/7/12:8:26
+ * @since 2021/8/24:0:17
  */
-class PluginAstralSorcery : ClientPlugin {
+class PluginEnvironmental : ClientPlugin {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     override lateinit var client: MinecraftClient
 
@@ -25,11 +25,11 @@ class PluginAstralSorcery : ClientPlugin {
             return
         }
         val forge = manager.getPlugin(FML2Plugin::class.java)
-        if (forge.modList.keys.contains("astralsorcery") || forge.modList.size >= 150) {
-            forge.channelPacketRegistry.registerGroup(AstralSorcery)
-            forge.emitter.addListener(AstralSorceryListener())
+        if (forge.modList.keys.contains("environmental") || forge.modList.size >= 150) {
+            forge.channelPacketRegistry.registerGroup(Environmental)
+            forge.emitter.addListener(EnvironmentalListener())
         } else {
-            log.debug("服务器没有AstralSorcery,插件未加载")
+            log.debug("服务器没有Environmental,插件未加载")
             return
         }
 

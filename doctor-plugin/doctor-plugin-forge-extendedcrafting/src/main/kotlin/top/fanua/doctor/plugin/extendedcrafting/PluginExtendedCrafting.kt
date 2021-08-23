@@ -25,7 +25,7 @@ class PluginExtendedCrafting : ClientPlugin {
             return
         }
         val forge = manager.getPlugin(FML2Plugin::class.java)
-        if (forge.modList.keys.contains("extendedcrafting")) {
+        if (forge.modList.keys.contains("extendedcrafting") || forge.modList.size >= 150) {
             forge.channelPacketRegistry.registerGroup(ExtendedCrafting)
             forge.emitter.addListener(ExtendedCraftingListener())
         } else {

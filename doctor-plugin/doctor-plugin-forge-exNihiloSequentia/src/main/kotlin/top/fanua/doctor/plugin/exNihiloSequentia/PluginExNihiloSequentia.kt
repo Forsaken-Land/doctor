@@ -25,7 +25,7 @@ class PluginExNihiloSequentia : ClientPlugin {
             return
         }
         val forge = manager.getPlugin(FML2Plugin::class.java)
-        if (forge.modList.keys.contains("exnihilosequentia")) {
+        if (forge.modList.keys.contains("exnihilosequentia") || forge.modList.size >= 150) {
             forge.channelPacketRegistry.registerGroup(ExNihiloSequentia)
             forge.emitter.addListener(ExNihiloSequentiaListener())
         } else {

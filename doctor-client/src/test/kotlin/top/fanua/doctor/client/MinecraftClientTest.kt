@@ -38,7 +38,8 @@ fun main() {
     if (!client.start(host, port)) return
 
     client.on(ConnectionEvent.Disconnect) {
-        return@on
+        Thread.sleep(1000L)
+        client.reconnect()
     }.onPacket<ChatPacket> {
         if (!packet.json.contains("commands.forge.tps.summary")) {
             val chat = ChatSerializer.jsonToChat(packet.json)
