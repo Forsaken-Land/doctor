@@ -28,6 +28,7 @@ fun main() {
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
 //        .plugin(PluginLagGoggles())
+        .plugin(PlayerStatusPlugin())
         .plugin(PlayerPlugin())
         .plugin(AutoVersionForgePlugin())
         .plugin(TabCompletePlugin())
@@ -60,7 +61,7 @@ fun main() {
             when (val msg = readLine()) {
                 "test" -> {
                     try {
-                        val result = client.getLag().get()
+                        val result = client.getPlayerStatus()
                         logger.info(result.toString())
                     } catch (e: Exception) {
                         logger.error(e.message)

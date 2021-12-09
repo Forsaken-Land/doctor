@@ -71,6 +71,8 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x2E, PlayerListItemDecoder())
                 register(0x20, ChunkDataType0Decoder())
                 register(0x0E, STabCompleteType0Decoder())
+                register(0x41, UpdateHealthDecoder())
+                register(0x4E, EntityPropertiesDecoder())
             }
             whenC2S {
                 register(0x0B, KeepAliveEncoder())
