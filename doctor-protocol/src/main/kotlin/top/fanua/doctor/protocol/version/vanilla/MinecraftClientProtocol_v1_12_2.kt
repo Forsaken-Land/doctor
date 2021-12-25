@@ -16,6 +16,7 @@ import top.fanua.doctor.protocol.definition.login.server.SetCompressionDecoder
 import top.fanua.doctor.protocol.definition.play.client.*
 import top.fanua.doctor.protocol.definition.play.server.CChatEncoder
 import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionAndLookEncoder
+import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionEncoder
 import top.fanua.doctor.protocol.definition.play.server.CTabCompleteType0Encoder
 import top.fanua.doctor.protocol.hook.PacketRegistryHook
 import top.fanua.doctor.protocol.registry.ChannelPacketRegistryImpl
@@ -63,6 +64,7 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x0D, ServerDifficultyType0Decoder())
                 register(0x23, JoinGameType0Decoder())
                 register(0x2F, PlayerPositionAndLookDecoder())
+                register(0x1D, UnloadChunkDecoder())
                 register(0x1F, KeepAliveDecoder())
                 register(0x2D, CombatEventDecoder())
                 register(0x1A, DisconnectDecoder())
@@ -83,6 +85,7 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
                 register(0x03, ClientStatusEncoder())
                 register(0x01, CTabCompleteType0Encoder())
                 register(0x0A, UseEntityEncoder())
+                register(0X0D, CPlayerPositionEncoder())
                 register(0x0E, CPlayerPositionAndLookEncoder())
                 register(0x15, EntityActionEncoder())
             }

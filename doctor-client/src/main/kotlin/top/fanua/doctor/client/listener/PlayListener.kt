@@ -7,6 +7,7 @@ import top.fanua.doctor.network.handler.oncePacket
 import top.fanua.doctor.network.handler.replyPacket
 import top.fanua.doctor.protocol.definition.channel.RegisterPacket
 import top.fanua.doctor.protocol.definition.play.client.*
+import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionPacket
 
 /**
  * ### 游戏状态监听器
@@ -61,6 +62,7 @@ class PlayListener(private val protocolNumber: Int) : EventListener {
         emitter.onPacket<PlayerPositionAndLookPacket> {
             connection.sendPacket(TeleportConfirmPacket(packet.teleportId))
             connection.sendPacket(ClientStatusPacket(ClientStatusEnum.PerformRespawn))
+            connection.sendPacket(CPlayerPositionPacket(packet.x, packet.y, packet.z, false))
         }
 
         emitter.onPacket<CustomPayloadPacket> {

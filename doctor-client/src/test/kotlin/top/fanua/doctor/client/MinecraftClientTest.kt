@@ -1,5 +1,6 @@
 package top.fanua.doctor.client
 
+import io.netty.buffer.Unpooled
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import top.fanua.doctor.allLoginPlugin.enableAllLoginPlugin
@@ -8,11 +9,14 @@ import top.fanua.doctor.client.running.tabcomplete.TabCompletePlugin
 import top.fanua.doctor.client.running.tabcomplete.tabCompleteTool
 import top.fanua.doctor.network.event.ConnectionEvent
 import top.fanua.doctor.network.handler.onPacket
-import top.fanua.doctor.plugin.laggoggles.getLag
 import top.fanua.doctor.protocol.definition.play.client.ChatPacket
+import top.fanua.doctor.protocol.definition.play.client.ChunkDataType0Packet
 import top.fanua.doctor.protocol.definition.play.client.DisconnectPacket
 import top.fanua.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
-import top.fanua.doctor.protocol.definition.play.client.STabCompletePacket
+import top.fanua.doctor.protocol.entity.BlockStorage
+import top.fanua.doctor.protocol.entity.Chunk
+import top.fanua.doctor.protocol.entity.NibbleArray3d
+import top.fanua.doctor.protocol.entity.Section
 import top.fanua.doctor.protocol.entity.text.ChatSerializer
 
 
@@ -38,11 +42,18 @@ fun main() {
 
     if (!client.start(host, port)) return
 
+    var x = 0
+    var y = 0
+    var z = 0
+    val chunks = mutableListOf<Chunk>()
+
+
     client.on(ConnectionEvent.Disconnect) {
         Thread.sleep(1000L)
         client.reconnect()
     }.onPacket<ChatPacket> {
         if (!packet.json.contains("commands.forge.tps.summary")) {
+//            logger.info(packet.json)
             val chat = ChatSerializer.jsonToChat(packet.json)
             logger.info(chat.getFormattedText())
         }
@@ -51,21 +62,70 @@ fun main() {
         val reason = ChatSerializer.jsonToChat(packet.reason)
         logger.warn(reason.getFormattedText())
     }.onPacket<PlayerPositionAndLookPacket> {
-        logger.info("登录成功")
-    }.onPacket<STabCompletePacket> {
-        logger.info("tab")
+        x = packet.x.toInt()
+        y = packet.y.toInt()
+        z = packet.z.toInt()
     }
-
+        .onPacket<ChunkDataType0Packet> {
+            if (packet.availableSections > 0) {
+                val buf = Unpooled.wrappedBuffer(packet.buffer)
+                val list = mutableMapOf<Int, Section?>()
+                for (i in 0 until 16) {
+                    if (packet.availableSections and (1 shl i) == 0) {
+                        list[i] = null
+                    } else {
+                        val blocks = BlockStorage(buf.readUnsignedByte().toInt(), buf)
+                        val blockLight = NibbleArray3d(buf)
+                        val skyLight = NibbleArray3d(buf)
+                        list[i] = Section(i, blocks, blockLight, skyLight)
+                    }
+                }
+                if (packet.fullChunk) {
+                    val blockBiomesArray = ByteArray(256)
+                    buf.readBytes(blockBiomesArray)
+                }
+//                logger.info("chunk:${Chunk(packet.chunkX, packet.chunkZ, list)}")
+                if (chunks.find { it.chunkZ == packet.chunkZ && it.chunkX == packet.chunkX } == null) {
+                    chunks.add(Chunk(packet.chunkX, packet.chunkZ, list))
+                }
+                buf.release()
+            }
+        }
+//        .onPacket<PlayerPositionAndLookPacket> {
+//        logger.info("登录成功")
+//        client.sendPacket(CPlayerPositionPacket(packet.x, packet.y, packet.z, false))
+//    }
+//    .onPacket<STabCompletePacket> {
+//        logger.info("tab")
+//    }
     val job = GlobalScope.launch {
         while (true) {
             when (val msg = readLine()) {
-                "test" -> {
-                    try {
-                        val result = client.getPlayerStatus()
-                        logger.info(result.toString())
-                    } catch (e: Exception) {
-                        logger.error(e.message)
+                "1" -> {
+                    val chunkX = if (x / 16 >= 0) x / 16
+                    else (x / 16) - 1
+                    val chunkY = if (y / 16 >= 0) y / 16
+                    else (y / 16) - 1
+                    val chunkZ = if (z / 16 >= 0) z / 16
+                    else (z / 16) - 1
+                    val chunk = chunks.find { it.chunkX == chunkX && it.chunkZ == chunkZ }
+                    val section = chunk?.section?.get(chunkY)
+                    if (section != null) {
+                        logger.info(
+                            "${
+                                section.blocks.flexibleStorage.data.map {
+                                    val str = it.toULong().toString(2)
+                                    var temp = ""
+                                    for (i in 0 until (64 - str.length)) {
+                                        temp += "0"
+                                    }
+                                    temp + str
+                                }
+                            }"
+                        )
+                        logger.info("${section.blocks.flexibleStorage.data.size}")
                     }
+
                 }
                 "tps" -> {
                     try {
@@ -103,27 +163,40 @@ fun main() {
 
         }
     }
+//    var entity= 0
+////    var x = 0.0
+////    var y = 0.0
+////    var z = 0.0
 //    Thread.sleep(3000)
+////    client.onPacket<PlayerPositionAndLookPacket> {
+////        x = packet.x
+////        y = packet.y
+////        z = packet.z
+////    }
 //    client.sendPacket(EntityActionPacket(entity, 0, 0))
-//    val time = 50L
-//    val size = 2
+//    val time = 100L
+////    val size = 2
 //    while (true) {
-//        client.sendPacket(CPlayerPositionAndLookPacket(x + size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+//        client.sendPacket(EntityActionPacket(entity, 0, 0))
+////        client.sendPacket(CPlayerPositionAndLookPacket(x + size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
 //        Thread.sleep(time)
-//        client.sendPacket(CPlayerPositionAndLookPacket(x + size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+//        client.sendPacket(EntityActionPacket(entity, 1, 0))
 //        Thread.sleep(time)
-//        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z + size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
-//        Thread.sleep(time)
-//        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z + size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
-//        Thread.sleep(time)
-//        client.sendPacket(CPlayerPositionAndLookPacket(x - size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
-//        Thread.sleep(time)
-//        client.sendPacket(CPlayerPositionAndLookPacket(x - size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
-//        Thread.sleep(time)
-//        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z - size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
-//        Thread.sleep(time)
-//        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z - size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
-//        Thread.sleep(time)
+//
+////        client.sendPacket(CPlayerPositionAndLookPacket(x + size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+////        Thread.sleep(time)
+////        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z + size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+////        Thread.sleep(time)
+////        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z + size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+////        Thread.sleep(time)
+////        client.sendPacket(CPlayerPositionAndLookPacket(x - size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+////        Thread.sleep(time)
+////        client.sendPacket(CPlayerPositionAndLookPacket(x - size, y, z, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+////        Thread.sleep(time)
+////        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z - size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+////        Thread.sleep(time)
+////        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z - size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
+////        Thread.sleep(time)
 //    }
 }
 
