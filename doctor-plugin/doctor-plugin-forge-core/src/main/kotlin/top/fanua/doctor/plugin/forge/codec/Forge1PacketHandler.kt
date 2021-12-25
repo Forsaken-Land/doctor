@@ -5,7 +5,6 @@ import io.netty.handler.codec.MessageToMessageCodec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.fanua.doctor.core.api.event.EventEmitter
-import top.fanua.doctor.network.handler.emitPacketEvent
 import top.fanua.doctor.plugin.forge.api.FML1Packet
 import top.fanua.doctor.plugin.forge.forgeProtocolState
 import top.fanua.doctor.plugin.forge.registry.IFML1PacketRegistry
@@ -20,7 +19,7 @@ import top.fanua.doctor.protocol.definition.play.client.CustomPayloadPacket
  */
 class Forge1PacketHandler(
     val emitter: EventEmitter,
-   private val channelRegistry: IFML1PacketRegistry
+    private val channelRegistry: IFML1PacketRegistry
 ) : MessageToMessageCodec<Packet, FML1Packet>() {
 
     private val logger: Logger = LoggerFactory.getLogger(Forge1PacketHandler::class.java)
@@ -50,8 +49,8 @@ class Forge1PacketHandler(
                 packet = decoder.decoder(msg.data)
                 msg.close()
 //                        emitter.emit(PacketEvent(packet.javaClass.kotlin), packet)
-                emitPacketEvent(emitter, packet, ctx)
-                ctx.fireChannelReadComplete()
+//                emitPacketEvent(emitter, packet, ctx)
+                out.add(packet)
             } catch (e: Exception) {
                 logger.warn(e.message)
                 return

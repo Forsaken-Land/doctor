@@ -5,7 +5,6 @@ import top.fanua.doctor.core.api.plugin.IPluginHookManager
 import top.fanua.doctor.core.api.plugin.Plugin
 import top.fanua.doctor.core.impl.event.DefaultEventEmitter
 import top.fanua.doctor.core.plugin.addHandler
-import top.fanua.doctor.network.handler.ReadPacketListener
 import top.fanua.doctor.network.hooks.InitChannelPipelineHook
 import top.fanua.doctor.plugin.forge.api.ForgeProtocolState
 import top.fanua.doctor.plugin.forge.codec.FML1ModPacketHandler
@@ -31,7 +30,7 @@ class FML1Plugin(
      * 注册插件的事件
      */
     override fun registerEvent(emitter: EventEmitter) {
-        emitter.addListener(ReadPacketListener())
+//        emitter.addListener(ReadPacketListener())
         emitter.addListener(Forge1HandshakeListener(this))
     }
 

@@ -6,7 +6,6 @@ import io.netty.handler.codec.MessageToMessageCodec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.fanua.doctor.core.api.event.EventEmitter
-import top.fanua.doctor.network.handler.emitPacketEvent
 import top.fanua.doctor.plugin.forge.api.FML2Packet
 import top.fanua.doctor.plugin.forge.definations.fml2.LoginWrapperDecoder
 import top.fanua.doctor.plugin.forge.definations.fml2.LoginWrapperEncoder
@@ -30,7 +29,7 @@ class Forge2PacketHandler(
     val fmL2PacketRegistry: IFML2PacketRegistry
 ) : MessageToMessageCodec<Packet, FML2Packet>() {
 
-    private val logger: Logger = LoggerFactory.getLogger(Forge1PacketHandler::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(Forge2PacketHandler::class.java)
 
     override fun encode(ctx: ChannelHandlerContext, msg: FML2Packet, out: MutableList<Any>) {
         val buf = ctx.alloc().buffer()
@@ -78,7 +77,7 @@ class Forge2PacketHandler(
                 buf.release()
                 packetInPacket.messageId = msg.messageId
                 logger.debug("FML2协议包解码:packetId=${packerId} $packetInPacket")
-                emitPacketEvent(emitter, packetInPacket, ctx)
+                out.add(packet)
                 ctx.fireChannelReadComplete()
                 msg.close()
                 packet.close()

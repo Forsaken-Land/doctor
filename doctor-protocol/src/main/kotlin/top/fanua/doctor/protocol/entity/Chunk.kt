@@ -62,7 +62,7 @@ private fun rawToState(raw: Int): BlockState {
     return BlockState(raw shr 4, raw and 0xF)
 }
 
-private fun index(x: Int, y: Int, z: Int): Int {
+fun index(x: Int, y: Int, z: Int): Int {
     return y shl 8 or (z shl 4) or x
 }
 
