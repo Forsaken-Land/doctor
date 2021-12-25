@@ -9,15 +9,17 @@ import top.fanua.doctor.client.running.tabcomplete.TabCompletePlugin
 import top.fanua.doctor.client.running.tabcomplete.tabCompleteTool
 import top.fanua.doctor.network.event.ConnectionEvent
 import top.fanua.doctor.network.handler.onPacket
+import top.fanua.doctor.plugin.forge.definations.fml1.Ids
+import top.fanua.doctor.plugin.forge.definations.fml1.RegistryDataPacket
 import top.fanua.doctor.protocol.definition.play.client.ChatPacket
 import top.fanua.doctor.protocol.definition.play.client.ChunkDataType0Packet
 import top.fanua.doctor.protocol.definition.play.client.DisconnectPacket
 import top.fanua.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
-import top.fanua.doctor.protocol.entity.BlockStorage
-import top.fanua.doctor.protocol.entity.Chunk
-import top.fanua.doctor.protocol.entity.NibbleArray3d
-import top.fanua.doctor.protocol.entity.Section
+import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionAndLookPacket
+import top.fanua.doctor.protocol.entity.*
 import top.fanua.doctor.protocol.entity.text.ChatSerializer
+import kotlin.math.abs
+import kotlin.math.pow
 
 
 fun main() {
@@ -47,25 +49,28 @@ fun main() {
     var z = 0
     val chunks = mutableListOf<Chunk>()
 
-
+    val ids = mutableListOf<Ids>()
     client.on(ConnectionEvent.Disconnect) {
         Thread.sleep(1000L)
         client.reconnect()
-    }.onPacket<ChatPacket> {
-        if (!packet.json.contains("commands.forge.tps.summary")) {
-//            logger.info(packet.json)
-            val chat = ChatSerializer.jsonToChat(packet.json)
-            logger.info(chat.getFormattedText())
-        }
-
-    }.onPacket<DisconnectPacket> {
-        val reason = ChatSerializer.jsonToChat(packet.reason)
-        logger.warn(reason.getFormattedText())
-    }.onPacket<PlayerPositionAndLookPacket> {
-        x = packet.x.toInt()
-        y = packet.y.toInt()
-        z = packet.z.toInt()
+    }.onPacket<RegistryDataPacket> {
+        if (packet.name == "minecraft:blocks") ids.addAll(packet.ids)
     }
+        .onPacket<ChatPacket> {
+            if (!packet.json.contains("commands.forge.tps.summary")) {
+//            logger.info(packet.json)
+                val chat = ChatSerializer.jsonToChat(packet.json)
+                logger.info(chat.getFormattedText())
+            }
+
+        }.onPacket<DisconnectPacket> {
+            val reason = ChatSerializer.jsonToChat(packet.reason)
+            logger.warn(reason.getFormattedText())
+        }.onPacket<PlayerPositionAndLookPacket> {
+            x = packet.x.toInt()
+            y = packet.y.toInt()
+            z = packet.z.toInt()
+        }
         .onPacket<ChunkDataType0Packet> {
             if (packet.availableSections > 0) {
                 val buf = Unpooled.wrappedBuffer(packet.buffer)
@@ -102,31 +107,9 @@ fun main() {
         while (true) {
             when (val msg = readLine()) {
                 "1" -> {
-                    val chunkX = if (x / 16 >= 0) x / 16
-                    else (x / 16) - 1
-                    val chunkY = if (y / 16 >= 0) y / 16
-                    else (y / 16) - 1
-                    val chunkZ = if (z / 16 >= 0) z / 16
-                    else (z / 16) - 1
-                    val chunk = chunks.find { it.chunkX == chunkX && it.chunkZ == chunkZ }
-                    val section = chunk?.section?.get(chunkY)
-                    if (section != null) {
-                        logger.info(
-                            "${
-                                section.blocks.flexibleStorage.data.map {
-                                    val str = it.toULong().toString(2)
-                                    var temp = ""
-                                    for (i in 0 until (64 - str.length)) {
-                                        temp += "0"
-                                    }
-                                    temp + str
-                                }
-                            }"
-                        )
-                        logger.info("${section.blocks.flexibleStorage.data.size}")
-                    }
-
+                    getUnder(x, y, z, chunks, ids)
                 }
+
                 "tps" -> {
                     try {
                         val result = client.tpsTools.getTps().get()
@@ -163,11 +146,50 @@ fun main() {
 
         }
     }
+
 //    var entity= 0
 ////    var x = 0.0
 ////    var y = 0.0
 ////    var z = 0.0
-//    Thread.sleep(3000)
+    Thread.sleep(3000)
+    while (true) {
+        Thread.sleep(10)
+        if (getUnder(x, y, z, chunks, ids) == "minecraft:air") {
+            if (getUnder(x, y - 1, z, chunks, ids) == "minecraft:air") {
+                val addX = (-2..2).random()
+                val addZ = (-2..2).random()
+                client.sendPacket(
+                    CPlayerPositionAndLookPacket(
+                        x.toDouble() + addX,
+                        y - 1.toDouble(),
+                        z.toDouble() + addZ,
+                        (0..360).random().toFloat(),
+                        (-90..90).random().toFloat(),
+                        false
+                    )
+                )
+                y -= 1
+                x += addX
+                z += addZ
+            } else {
+                val addX = (-2..2).random()
+                val addZ = (-2..2).random()
+                client.sendPacket(
+                    CPlayerPositionAndLookPacket(
+                        x.toDouble() + addX,
+                        y - 1.toDouble(),
+                        z.toDouble() + addZ,
+                        (0..360).random().toFloat(),
+                        (-90..90).random().toFloat(),
+                        true
+                    )
+                )
+                y -= 1
+                x += addX
+                z += addZ
+            }
+        }
+    }
 ////    client.onPacket<PlayerPositionAndLookPacket> {
 ////        x = packet.x
 ////        y = packet.y
@@ -198,6 +220,75 @@ fun main() {
 ////        client.sendPacket(CPlayerPositionAndLookPacket(x, y, z - size, (0..360).random().toFloat(), (-90..90).random().toFloat(), true))
 ////        Thread.sleep(time)
 //    }
+
+
 }
 
-
+private fun getUnder(
+    x: Int,
+    y: Int,
+    z: Int,
+    chunks: MutableList<Chunk>,
+    ids: MutableList<Ids>
+): String {
+    val chunkX = if (x / 16 >= 0) x / 16
+    else (x / 16) - 1
+    val chunkY = if (y / 16 >= 0) y / 16
+    else (y / 16) - 1
+    val chunkZ = if (z / 16 >= 0) z / 16
+    else (z / 16) - 1
+    val chunk = chunks.find { it.chunkX == chunkX && it.chunkZ == chunkZ }
+    val section = chunk?.section?.get(chunkY)
+    if (section != null) {
+//        logger.info("chunk:$chunkX,$chunkY,$chunkZ")
+        val bit = section.blocks.bitsPerEntry
+        var data = ""
+        section.blocks.flexibleStorage.data.forEach {
+            val str = it.toULong().toString(2)
+            var temp = ""
+            for (i in 0 until (64 - str.length)) {
+                temp += "0"
+            }
+            data += temp + str
+        }
+        val l = mutableListOf<String>()
+        for (i in 0 until data.length / bit) {
+            val j = data.substring(i * bit, (i * bit) + bit)
+            var binaryNumber = j.toLong()
+            var decimalNo = 0
+            var power = 0
+            while (binaryNumber > 0) {
+                val r = binaryNumber % 10
+                decimalNo = (decimalNo + r * 2.0.pow(power.toDouble())).toInt()
+                binaryNumber /= 10
+                power++
+            }
+            val name = ids.find { it.id == decimalNo }?.name ?: "air"
+            l.add(name)
+        }
+//        logger.info(
+//            "${
+//                if (x > 0) abs(x % 16)
+//                else 16 - abs(x % 16)
+//            }, ${abs(y) % 16 - 1}, ${
+//                if (z > 0) abs(z % 16)
+//                else 16 - abs(z % 16)
+//            }"
+//        )
+//        logger.info(
+//            l[index(
+//                if (x > 0) abs(x % 16)
+//                else 16 - abs(x % 16), abs(y) % 16 - 1, if (z > 0) abs(z % 16)
+//                else 16 - abs(z % 16)
+//            )]
+//        )
+//                        logger.info(l.toString())
+        return l[abs(
+            index(
+                if (x > 0) abs(x % 16)
+                else 16 - abs(x % 16), abs(y) % 16 - 1, if (z > 0) abs(z % 16)
+                else 16 - abs(z % 16)
+            )
+        )]
+    } else return "minecraft:air"
+}
