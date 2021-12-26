@@ -11,5 +11,5 @@ import top.fanua.doctor.protocol.api.ProtocolState
  */
 object Attributes {
     val ATTR_CONNECTION = AttributeKey.valueOf<Connection>("connection")
-    val ATTR_PROTOCOL_STATE= AttributeKey.valueOf<ProtocolState>("protocol_state")
+    val ATTR_PROTOCOL_STATE = AttributeKey.valueOf<ProtocolState>("protocol_state")
 }

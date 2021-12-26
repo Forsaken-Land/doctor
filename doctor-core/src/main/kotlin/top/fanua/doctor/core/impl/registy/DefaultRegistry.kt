@@ -39,9 +39,10 @@ class DefaultRegistry<K, V> : Registry<K, V> {
         map.remove(key)
     }
 
-    override val size: Int get() {
-        return map.size
-    }
+    override val size: Int
+        get() {
+            return map.size
+        }
 
     override fun freeze(freeze: Boolean, reason: String) {
         this.freeze = freeze

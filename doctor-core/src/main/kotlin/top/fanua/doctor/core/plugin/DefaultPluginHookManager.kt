@@ -21,7 +21,11 @@ class DefaultPluginHookManager : IPluginHookManager {
     }
 
     val registry: Registry<IPluginHookProvider<*>, PluginHookRegistry<*>> = DefaultRegistry()
-    override fun <T : IHookMessage> invokeHook(provider: IPluginHookProvider<T>, args: T, freezeHook: Boolean): Boolean {
+    override fun <T : IHookMessage> invokeHook(
+        provider: IPluginHookProvider<T>,
+        args: T,
+        freezeHook: Boolean
+    ): Boolean {
         val hooks = registry.tryGet(provider) ?: return false
         if (hooks.frozen) {
             log.warn("尝试触发已经冻结的钩子，你是否错误的冻结了某个钩子？")

@@ -97,7 +97,7 @@ class DefaultEventEmitter : EventEmitter {
             handleEvent(it.second, args)
         }
 
-        if(targets.size > 0){
+        if (targets.size > 0) {
             val newSource = sources.toMutableList()
             newSource.add(this)
             targets.forEach {

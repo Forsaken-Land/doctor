@@ -29,7 +29,7 @@ class VarIntLengthBasedFrameCodec : ByteToMessageCodec<ByteBuf>() {
         val remainingPacketLength: Int
         try {
             remainingPacketLength = msg.readVarInt()
-        }catch (e : IOException){
+        } catch (e: IOException) {
             // 如果出现异常说明数据还没接收完,重新定位到之前标记的读取索引,等待后面的数据
             msg.resetReaderIndex()
             return

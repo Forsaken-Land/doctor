@@ -39,7 +39,7 @@ class LoginListener(
     var session: Session? = null,
     private val protocolVersion: Int = 340,
     private val sessionService: YggdrasilMinecraftSessionService = YggdrasilMinecraftSessionService.Default,
-    var suffix : String = ""
+    var suffix: String = ""
 ) : EventListener {
     private val logger: Logger = LoggerFactory.getLogger(LoginListener::class.java)
     private var connected = false

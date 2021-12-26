@@ -76,12 +76,10 @@ class Forge2PacketHandler(
                 val packetInPacket = packetDecoder.decoder(buf)
                 buf.release()
                 packetInPacket.messageId = msg.messageId
-                logger.debug("FML2协议包解码:packetId=${packerId} $packetInPacket")
-                out.add(packet)
-                ctx.fireChannelReadComplete()
                 msg.close()
                 packet.close()
-                return
+                out.add(packetInPacket)
+                logger.debug("FML2协议包解码:packetId=${packerId} $packetInPacket")
             } catch (e: Exception) {
                 logger.warn(e.message)
                 return

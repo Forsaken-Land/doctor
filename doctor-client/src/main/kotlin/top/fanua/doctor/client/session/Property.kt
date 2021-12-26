@@ -9,10 +9,12 @@ import java.util.*
  * @since 2021-05-17
  */
 typealias PropertyMap = MutableMap<String, MutableSet<Property>>
+
 class Property(
     val name: String,
     val value: String,
-    val signature: String?) {
+    val signature: String?
+) {
 
     fun hasSignature(): Boolean {
         return signature != null

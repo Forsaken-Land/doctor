@@ -6,6 +6,7 @@ import top.fanua.doctor.plugin.environmental.PluginEnvironmental
 import top.fanua.doctor.plugin.exNihiloSequentia.PluginExNihiloSequentia
 import top.fanua.doctor.plugin.extendedcrafting.PluginExtendedCrafting
 import top.fanua.doctor.plugin.silentgear.PluginSilentGear
+import top.fanua.doctor.plugin.silentgems.PluginSilentGems
 
 /**
  *
@@ -18,5 +19,6 @@ fun MinecraftClientBuilder.enableAllLoginPlugin(): MinecraftClientBuilder {
         .plugin(PluginExtendedCrafting())
         .plugin(PluginExNihiloSequentia())
         .plugin(PluginEnvironmental())
+        .plugin(PluginSilentGems())
     return this
 }

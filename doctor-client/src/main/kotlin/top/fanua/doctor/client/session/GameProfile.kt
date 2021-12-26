@@ -38,7 +38,6 @@ object UUIDSerializer : KSerializer<UUID> {
     }
 
 
-
     fun fromString(input: String): UUID {
         return UUID.fromString(
             input.replaceFirst(

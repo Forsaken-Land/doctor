@@ -49,6 +49,7 @@ enum class NetLifeCycleEvent : Event<NetworkManager> {
  * ### 协议状态变更
  */
 object ProtocolStateChange : Event<ProtocolStateChangeEventArgs>
+
 /**
  * ### 协议状态变更事件参数
  * - [channel] 通道

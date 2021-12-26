@@ -65,7 +65,6 @@ class Style {
     }
 
 
-
     fun shallowCopy(): Style {
         return Style().also {
             it.parent = parent

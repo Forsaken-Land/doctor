@@ -7,8 +7,8 @@ package top.fanua.doctor.protocol.entity.text
  */
 class PlainChat(
     val text: String
-): AbstractChat() {
-    override fun getUnformattedComponentText(): String  = text
+) : AbstractChat() {
+    override fun getUnformattedComponentText(): String = text
 
     override fun copy(): IChat {
         return PlainChat(text).copyFrom(this)

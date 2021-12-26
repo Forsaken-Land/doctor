@@ -139,7 +139,7 @@ fun main() {
 
     Thread.sleep(3000)
 
-    while (true) {
+    while (false) {
         try {
             Thread.sleep(20)
             client.sendPacket(EntityActionPacket(0, (0..1).random(), 0))

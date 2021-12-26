@@ -6,6 +6,7 @@ import top.fanua.doctor.protocol.entity.text.style.StyleSerializer
 import top.fanua.doctor.protocol.utils.stringChild
 import top.fanua.doctor.protocol.utils.stringChildNullable
 import top.fanua.doctor.translation.api.I18n
+
 /**
  *
  * @author WarmthDawn

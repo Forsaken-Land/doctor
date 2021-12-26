@@ -10,33 +10,33 @@ import top.fanua.doctor.protocol.version.autoversion.PingProtocol
  * ### 网络管理工厂
  */
 object NetworkManagerFactory {
-        /**
-         * ### 创建 Ping [NetworkManager]
-         */
-        fun createNetworkManager(host: String, port: Int): NetworkManager {
-            return NetworkManager.Builder()
-                .host(host)
-                .port(port)
-                .protocol(PingProtocol())
-                .build()
-        }
+    /**
+     * ### 创建 Ping [NetworkManager]
+     */
+    fun createNetworkManager(host: String, port: Int): NetworkManager {
+        return NetworkManager.Builder()
+            .host(host)
+            .port(port)
+            .protocol(PingProtocol())
+            .build()
+    }
 
-        /**
-         * ### 创建 Login [NetworkManager]
-         */
-        fun createNetworkManager(
-            host: String,
-            port: Int,
-            pluginManager: PluginManager,
-            version: Int,
-            eventEmitter: EventEmitter
-        ): NetworkManager {
-            return NetworkManager.Builder()
-                .host(host)
-                .port(port)
-                .pluginManager(pluginManager)
-                .protocolVersion(ProtocolVersion.fromNumber(version))
-                .eventEmitter(eventEmitter)
-                .build()
-        }
+    /**
+     * ### 创建 Login [NetworkManager]
+     */
+    fun createNetworkManager(
+        host: String,
+        port: Int,
+        pluginManager: PluginManager,
+        version: Int,
+        eventEmitter: EventEmitter
+    ): NetworkManager {
+        return NetworkManager.Builder()
+            .host(host)
+            .port(port)
+            .pluginManager(pluginManager)
+            .protocolVersion(ProtocolVersion.fromNumber(version))
+            .eventEmitter(eventEmitter)
+            .build()
+    }
 }

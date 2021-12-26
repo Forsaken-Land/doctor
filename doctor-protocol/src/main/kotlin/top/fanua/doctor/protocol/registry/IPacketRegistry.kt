@@ -11,7 +11,7 @@ import top.fanua.doctor.protocol.version.vanilla.MinecraftClientProtocol_v1_12_2
  * @author WarmthDawn
  * @since 2021-05-14
  */
-interface IPacketRegistry : GroupRegistrable<IPacketRegistry>{
+interface IPacketRegistry : GroupRegistrable<IPacketRegistry> {
     /**
      * 获取[dir]方向，在[state]状态下的包注册表
      */

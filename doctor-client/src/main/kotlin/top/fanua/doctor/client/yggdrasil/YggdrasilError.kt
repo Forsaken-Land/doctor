@@ -9,5 +9,5 @@ import kotlinx.serialization.Serializable
 data class YggdrasilError(
     val error: String,
     val errorMessage: String,
-    val cause:String = ""
+    val cause: String = ""
 )

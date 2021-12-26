@@ -19,7 +19,7 @@ data class ServerInfo(
     val playerNameList: List<String> = listOf(),
     val versionName: String = "",
     val versionNumber: Int = 0,
-    val forge : ForgeInfo? = null,
+    val forge: ForgeInfo? = null,
     val modNumber: Int = 0
 )
 

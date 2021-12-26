@@ -21,7 +21,7 @@ class VanillaChannelPacketCodec(
 ) : MessageToMessageCodec<Packet, Packet>() {
     override fun encode(ctx: ChannelHandlerContext, msg: Packet, out: MutableList<Any>) {
         if (msg !is CustomPayloadPacket) {
-            lateinit var buf : ByteBuf
+            lateinit var buf: ByteBuf
             try {
                 buf = ctx.alloc().buffer()
                 val encoder = protocol.packetMap(encodeDirection).encoder(msg.javaClass)

@@ -18,7 +18,7 @@ class ErrorModTest : EventEmitter by DefaultEventEmitter() {
     private lateinit var networkManager: NetworkManager
     private val pluginManager: PluginManager = PluginManager(this)
 
-    fun start(){
+    fun start() {
         val serverInfo = ServerInfo(
             description = "test",
             versionName = "1.12.2",
@@ -49,7 +49,7 @@ class ErrorModTest : EventEmitter by DefaultEventEmitter() {
     }
 }
 
-fun main(){
+fun main() {
     val client = ErrorModTest()
     client.start()
 

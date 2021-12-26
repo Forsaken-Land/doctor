@@ -11,6 +11,7 @@ import top.fanua.doctor.core.api.event.EventEmitter
 interface Plugin {
 
     val dependencies: List<Class<out Plugin>> get() = emptyList()
+
     /**
      * 初始化插件
      */

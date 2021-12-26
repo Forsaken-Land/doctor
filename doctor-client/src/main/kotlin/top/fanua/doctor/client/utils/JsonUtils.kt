@@ -17,26 +17,28 @@ val JsonNode.boolean get() = jsonElement.jsonPrimitive.boolean
 val JsonNode.jsonArray get() = jsonElement.jsonArray
 val JsonNode.jsonObject get() = jsonElement.jsonObject
 val JsonNode.content get() = jsonElement.jsonPrimitive.content
+
 class JsonNode(
     val jsonElement: JsonElement
 ) {
     operator fun get(key: String): JsonNode = JsonNode(jsonElement.jsonObject[key]!!)
     operator fun get(index: Int) = JsonNode(jsonElement.jsonArray[index])
     operator fun contains(key: String) = jsonElement is JsonObject && jsonElement.containsKey(key)
-    val size get() = if(jsonElement is JsonArray) jsonElement.size else 0
-    val type: JsonType get() {
-        return when(jsonElement) {
-            is JsonArray -> JsonType.JsonArray
-            is JsonObject -> JsonType.JsonObject
-            is JsonNull -> JsonType.Null
-            is JsonPrimitive -> when {
-                jsonElement.isString -> JsonType.String
-                jsonElement.booleanOrNull != null -> JsonType.Boolean
-                else -> JsonType.Number
+    val size get() = if (jsonElement is JsonArray) jsonElement.size else 0
+    val type: JsonType
+        get() {
+            return when (jsonElement) {
+                is JsonArray -> JsonType.JsonArray
+                is JsonObject -> JsonType.JsonObject
+                is JsonNull -> JsonType.Null
+                is JsonPrimitive -> when {
+                    jsonElement.isString -> JsonType.String
+                    jsonElement.booleanOrNull != null -> JsonType.Boolean
+                    else -> JsonType.Number
+                }
+                else -> JsonType.Unknown
             }
-            else -> JsonType.Unknown
         }
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -46,11 +48,12 @@ class JsonNode(
 
         return true
     }
+
     override fun hashCode(): Int = jsonElement.hashCode()
 
 }
 
-enum class JsonType{
+enum class JsonType {
     JsonArray,
     JsonObject,
     String,
