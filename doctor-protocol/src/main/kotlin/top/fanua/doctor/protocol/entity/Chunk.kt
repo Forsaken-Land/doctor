@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.handler.codec.DecoderException
 import kotlinx.serialization.Serializable
 import top.fanua.doctor.protocol.extension.readVarInt
+import kotlin.math.abs
 
 
 /**
@@ -41,7 +42,7 @@ data class BlockStorage(
     )
 
     operator fun get(x: Int, y: Int, z: Int): BlockState {
-        val id: Int = flexibleStorage.get(index(x, y, z))
+        val id: Int = flexibleStorage.get(abs(index(x, y, z)))
         return if (bitsPerEntry <= 8) if (id >= 0 && id < states.size) states[id] else air else rawToState(id)
     }
 
