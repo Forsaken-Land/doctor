@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.ByteBufInputStream
 import net.querz.nbt.io.NBTDeserializer
 import net.querz.nbt.tag.CompoundTag
+import top.fanua.doctor.protocol.definition.play.client.Position
 import top.fanua.doctor.protocol.entity.math.BlockPos
 import top.fanua.doctor.protocol.utils.ResourceLocation
 import java.io.IOException
@@ -176,4 +177,22 @@ fun ByteBuf.writeVarShort(toWrite: Int) {
     if (high != 0) {
         writeByte(high)
     }
+}
+
+fun ByteBuf.readPosition(): Position {
+    val long = readLong().toULong().toString(2)
+    var data = ""
+    (0 until (64 - long.length)).forEach { _ -> data += "0" }
+    data += long
+
+    //if x >= 2^25 { x -= 2^26 }
+    //if y >= 2^11 { y -= 2^12 }
+    //if z >= 2^25 { z -= 2^26 }
+    var x = data.substring(0, 26).toInt(2)
+    if (x >= 33554432) x -= 67108864
+    var y = data.substring(26, 38).toInt(2)
+    if (y >= 2048) y -= 4096
+    var z = data.substring(38, 64).toInt(2)
+    if (z >= 33554432) z -= 67108864
+    return Position(x, y, z)
 }

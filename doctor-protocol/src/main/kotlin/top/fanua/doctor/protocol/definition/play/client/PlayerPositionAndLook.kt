@@ -66,9 +66,9 @@ data class PlayerPositionAndLookPacket(
 
 @Serializable
 data class Position(
-    val x: Long,
-    val y: Long,
-    val z: Long
+    val x: Int,
+    val y: Int,
+    val z: Int
 )
 
 class PlayerPositionAndLookDecoder : PacketDecoder<PlayerPositionAndLookPacket> {

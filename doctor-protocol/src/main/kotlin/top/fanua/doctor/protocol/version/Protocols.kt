@@ -30,7 +30,7 @@ fun createProtocol(versionNumber: ProtocolVersion, pluginManager: IPluginManager
  */
 fun createChannel(versionNumber: ProtocolVersion): IChannelPacketRegistry {
     return when (versionNumber) {
-        ProtocolVersion.V1_16_2 -> {
+        ProtocolVersion.V1_12_2 -> {
             MinecraftClientChannel_v1_12_2()
         }
 

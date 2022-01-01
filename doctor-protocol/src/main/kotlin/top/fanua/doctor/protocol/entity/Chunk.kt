@@ -13,10 +13,12 @@ import kotlin.math.abs
  * @since 2021/12/25:15:55
  */
 @Serializable
+@Suppress("ArrayInDataClass")
 data class Chunk(
     val chunkX: Int,
     val chunkZ: Int,
-    val section: Map<Int, Section?>
+    val section: MutableMap<Int, Section?>,
+    val biomesArray: ByteArray?
 )
 
 @Serializable
@@ -29,9 +31,9 @@ data class Section(
 
 @Serializable
 data class BlockStorage(
-    val bitsPerEntry: Int,
-    val states: List<BlockState>,
-    val flexibleStorage: FlexibleStorage
+    var bitsPerEntry: Int,
+    val states: MutableList<BlockState>,
+    var flexibleStorage: FlexibleStorage
 ) {
     private val air = BlockState(0, 0)
 
@@ -46,6 +48,37 @@ data class BlockStorage(
         return if (bitsPerEntry <= 8) if (id >= 0 && id < states.size) states[id] else air else rawToState(id)
     }
 
+    operator fun set(x: Int, y: Int, z: Int, state: BlockState) {
+        var id = if (bitsPerEntry <= 8) states.indexOf(state) else stateToRaw(state)
+        if (id == -1) {
+            states.add(state)
+            if (states.size > 1 shl bitsPerEntry) {
+                bitsPerEntry++
+                var oldStates: List<BlockState> = states
+                if (bitsPerEntry > 8) {
+                    oldStates = ArrayList(states)
+                    states.clear()
+                    bitsPerEntry = 13
+                }
+                val oldStorage: FlexibleStorage = flexibleStorage
+                flexibleStorage = FlexibleStorage(bitsPerEntry, flexibleStorage.size)
+                for (index in 0 until flexibleStorage.size) {
+                    flexibleStorage.set(
+                        index, if (bitsPerEntry <= 8) oldStorage.get(index) else stateToRaw(
+                            oldStates[index]
+                        )
+                    )
+                }
+            }
+            id = if (bitsPerEntry <= 8) states.indexOf(state) else stateToRaw(state)
+        }
+        flexibleStorage.set(index(x, y, z), id)
+    }
+
+}
+
+private fun stateToRaw(state: BlockState): Int {
+    return state.id shl 4 or (state.data and 0xF)
 }
 
 private fun readLongArray(buf: ByteBuf): LongArray {
@@ -67,7 +100,7 @@ fun index(x: Int, y: Int, z: Int): Int {
     return y shl 8 or (z shl 4) or x
 }
 
-private fun getBlockStates(buf: ByteBuf): List<BlockState> {
+private fun getBlockStates(buf: ByteBuf): MutableList<BlockState> {
     val size = buf.readVarInt()
     val list = mutableListOf<BlockState>()
     for (i in 0 until size) {
@@ -107,6 +140,24 @@ data class FlexibleStorage(
         }
     }
 
+    fun set(index: Int, value: Int) {
+        if (index < 0 || index > size - 1) {
+            throw IndexOutOfBoundsException()
+        }
+        require(!(value < 0 || value > maxEntryValue)) { "Value cannot be outside of accepted range." }
+        val bitIndex = index * bitsPerEntry
+        val startIndex = bitIndex / 64
+        val endIndex = ((index + 1) * bitsPerEntry - 1) / 64
+        val startBitSubIndex = bitIndex % 64
+        data[startIndex] =
+            data[startIndex] and (maxEntryValue shl startBitSubIndex).inv() or (value.toLong() and maxEntryValue) shl startBitSubIndex
+        if (startIndex != endIndex) {
+            val endBitSubIndex = 64 - startBitSubIndex
+            data[endIndex] =
+                data[endIndex] ushr endBitSubIndex shl endBitSubIndex or (value.toLong() and maxEntryValue) shr endBitSubIndex
+        }
+    }
+
     constructor(bitsPerEntry: Int, data: LongArray) : this(
         bitsPerEntry =
         if (bitsPerEntry < 1 || bitsPerEntry > 32) {
@@ -116,6 +167,25 @@ data class FlexibleStorage(
         size = data.size * 64 / bitsPerEntry,
         maxEntryValue = (1L shl bitsPerEntry) - 1
     )
+
+    constructor(bitsPerEntry: Int, size: Int) : this(
+        bitsPerEntry, LongArray(roundToNearest(size * bitsPerEntry, 64) / 64)
+    )
+}
+
+private fun roundToNearest(value: Int, roundTo: Int): Int {
+    var copy = roundTo
+    return if (copy == 0) {
+        0
+    } else if (value == 0) {
+        copy
+    } else {
+        if (value < 0) {
+            copy *= -1
+        }
+        val remainder = value % copy
+        if (remainder != 0) value + copy - remainder else value
+    }
 }
 
 @Suppress("ArrayInDataClass")

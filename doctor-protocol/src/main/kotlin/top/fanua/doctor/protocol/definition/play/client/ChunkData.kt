@@ -6,6 +6,10 @@ import kotlinx.serialization.Serializable
 import net.querz.nbt.tag.CompoundTag
 import top.fanua.doctor.protocol.api.Packet
 import top.fanua.doctor.protocol.api.PacketDecoder
+import top.fanua.doctor.protocol.entity.BlockStorage
+import top.fanua.doctor.protocol.entity.Chunk
+import top.fanua.doctor.protocol.entity.NibbleArray3d
+import top.fanua.doctor.protocol.entity.Section
 import top.fanua.doctor.protocol.extension.readCompoundTag
 import top.fanua.doctor.protocol.extension.readVarInt
 
@@ -23,14 +27,13 @@ import top.fanua.doctor.protocol.extension.readVarInt
  */
 interface ChunkDataPacket : Packet
 
-@Suppress("ArrayInDataClass")
 @Serializable
 data class ChunkDataType0Packet(
     val chunkX: Int,
     val chunkZ: Int,
     val fullChunk: Boolean,
     val availableSections: Int,
-    var buffer: ByteArray,
+    var chunk: Chunk,
     var tileEntityTags: MutableList<@Contextual CompoundTag>
 ) : ChunkDataPacket
 
@@ -58,8 +61,24 @@ class ChunkDataType0Decoder : PacketDecoder<ChunkDataType0Packet> {
         val fullChunk = buf.readBoolean()
         val availableSections = buf.readVarInt()
         val bufferSize = buf.readVarInt()
-        val buffer = ByteArray(bufferSize)
-        buf.readBytes(buffer)
+        val buffer = buf.readBytes(bufferSize)
+        val list = mutableMapOf<Int, Section?>()
+        for (i in 0 until 16) {
+            if (availableSections and (1 shl i) == 0) {
+                list[i] = null
+            } else {
+                val blocks = BlockStorage(buffer.readUnsignedByte().toInt(), buffer)
+                val blockLight = NibbleArray3d(buffer)
+                val skyLight = NibbleArray3d(buffer)
+                list[i] = Section(i, blocks, blockLight, skyLight)
+            }
+        }
+        val blockBiomesArray = if (fullChunk) {
+            val array = ByteArray(256)
+            buffer.readBytes(array)
+            array
+        } else null
+        buffer.release()
         val tagSize = buf.readVarInt()
         val tileEntityTags: MutableList<CompoundTag> = arrayListOf()
 
@@ -72,7 +91,7 @@ class ChunkDataType0Decoder : PacketDecoder<ChunkDataType0Packet> {
             chunkZ = chunkZ,
             fullChunk = fullChunk,
             availableSections = availableSections,
-            buffer = buffer,
+            chunk = Chunk(chunkX, chunkZ, list, blockBiomesArray),
             tileEntityTags = tileEntityTags
         )
     }

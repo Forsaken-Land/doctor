@@ -61,6 +61,7 @@ class MinecraftClientProtocol_v1_12_2(pluginManager: IPluginManager) : IPacketRe
         packetMap(ProtocolState.PLAY) {
 
             whenS2C {
+                register(0x0B, BlockChangeDecoder())
                 register(0x0D, ServerDifficultyType0Decoder())
                 register(0x23, JoinGameType0Decoder())
                 register(0x2F, PlayerPositionAndLookDecoder())
