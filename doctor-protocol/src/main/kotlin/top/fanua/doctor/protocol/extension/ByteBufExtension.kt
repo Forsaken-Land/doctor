@@ -3,8 +3,11 @@ package top.fanua.doctor.protocol.extension
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.ByteBufInputStream
 import net.querz.nbt.io.NBTDeserializer
+import net.querz.nbt.io.NBTSerializer
+import net.querz.nbt.io.NamedTag
 import net.querz.nbt.tag.CompoundTag
 import top.fanua.doctor.protocol.definition.play.client.Position
+import top.fanua.doctor.protocol.definition.play.client.SlotData
 import top.fanua.doctor.protocol.entity.math.BlockPos
 import top.fanua.doctor.protocol.utils.ResourceLocation
 import java.io.IOException
@@ -67,6 +70,29 @@ fun ByteBuf.readVarInt(): Int {
 }
 
 /**
+ * Variable-length format such that smaller numbers use fewer bytes.
+ * These are very similar to Protocol Buffer Varints: the 7 least significant bits are used to encode the value and the most significant bit indicates whether there's another byte after it for the next part of the number.
+ * The least significant group is written first, followed by each of the more significant groups; thus, VarInts are effectively little endian (however, groups are 7 bits, not 8).
+ * VarInts are never longer than 5 bytes, and VarLongs are never longer than 10 bytes.
+ * Pseudocode to read  VarLongs:
+ */
+fun ByteBuf.readVarLong(): Long {
+    var numRead = 0
+    var result: Long = 0
+    var read: Byte
+    do {
+        read = readByte()
+        val value: Int = read.toInt() and 127
+        result = result or (value shl 7 * numRead).toLong()
+        numRead++
+        if (numRead > 10) {
+            throw RuntimeException("VarLong is too big")
+        }
+    } while (read.toInt() and 128 != 0)
+    return result
+}
+
+/**
  * ### 写入压缩的 Int 到缓冲区
  *
  * 可变长度格式，使较小的数字使用较少的字节。它们非常类似于协议缓冲区变量：用7个最低有效位对值进行编码，最高有效位表示数字的下一部分是否有另一个字节。首先写入最低有效组，然后写入每个更高的组；因此，变量实际上是小端（但是，组是7位，而不是8位）。
@@ -121,17 +147,26 @@ fun ByteBuf.writeString(value: String) {
     writeBytes(bytes)
 }
 
-fun ByteBuf.readCompoundTag(): CompoundTag {
+fun ByteBuf.readCompoundTag(): CompoundTag? {
     val i = this.readerIndex()
     val length = this.readByte()
 
     return if (length == 0.toByte()) {
-        throw IOException("无法读取Nbt： 数据长度为0")
+        null
     } else {
         this.readerIndex(i)
         val stream = ByteBufInputStream(this)
         NBTDeserializer(false).fromStream(stream).tag as CompoundTag
     }
+}
+
+fun ByteBuf.writeCompoundTag(tag: CompoundTag?): ByteBuf {
+    if (tag == null) {
+        writeByte(0)
+    } else {
+        writeBytes(NBTSerializer(false).toBytes(NamedTag("", tag)))
+    }
+    return this
 }
 
 
@@ -195,4 +230,24 @@ fun ByteBuf.readPosition(): Position {
     var z = data.substring(38, 64).toInt(2)
     if (z >= 33554432) z -= 67108864
     return Position(x, y, z)
+}
+
+fun ByteBuf.readSlotData(): SlotData {
+    val blockID = readShort().toInt()
+    return if (blockID != -1) {
+        val itemCount = readByte().toInt()
+        val itemDamage = readShort().toInt()
+        val nbt = if (blockID == 0) null else readCompoundTag()
+        SlotData(blockID, itemCount, itemDamage, nbt)
+    } else SlotData(blockID)
+}
+
+fun ByteBuf.writeSlotData(slotData: SlotData): ByteBuf {
+    writeShort(slotData.blockID)
+    if (slotData.blockID >= 1) {
+        writeByte(slotData.itemCount ?: 0)
+        writeShort(slotData.itemDamage ?: 0)
+        writeCompoundTag(slotData.nbt)
+    }
+    return this
 }

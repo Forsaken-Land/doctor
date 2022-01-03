@@ -3,6 +3,7 @@ package top.fanua.doctor.protocol.entity
 import io.netty.buffer.ByteBuf
 import io.netty.handler.codec.DecoderException
 import kotlinx.serialization.Serializable
+import top.fanua.doctor.protocol.definition.play.client.Position
 import top.fanua.doctor.protocol.extension.readVarInt
 import kotlin.math.abs
 
@@ -12,6 +13,39 @@ import kotlin.math.abs
  * @author Doctor_Yin
  * @since 2021/12/25:15:55
  */
+
+@Serializable
+data class World(
+    val chunks: MutableMap<Pair<Int, Int>, Chunk> = mutableMapOf()
+) {
+    fun getOrSet(x: Int, y: Int, z: Int, blockState: BlockState? = null): BlockState {
+        val chunkX = if (x / 16 >= 0) x / 16
+        else (x / 16) - 1
+        val chunkY = if (y / 16 >= 0) y / 16
+        else (y / 16) - 1
+        val chunkZ = if (z / 16 >= 0) z / 16
+        else (z / 16) - 1
+        val blocks = chunks[Pair(chunkX, chunkZ)]?.section?.get(chunkY)?.blocks
+        return if (blockState != null) {
+            blocks?.set(
+                if (x > 0) abs(x % 16) else abs(x % 16) + 1,
+                abs(y) % 16,
+                if (z > 0) abs(z % 16) else abs(z % 16) + 1,
+                blockState
+            )
+            blockState
+        } else {
+            blocks?.get(
+                if (x > 0) abs(x % 16) else abs(x % 16) + 1,
+                abs(y) % 16,
+                if (z > 0) abs(z % 16) else abs(z % 16) + 1
+            ) ?: BlockState(0, 0)
+        }
+    }
+
+    fun set(position: Position, blockState: BlockState) = getOrSet(position.x, position.y, position.z, blockState)
+}
+
 @Serializable
 @Suppress("ArrayInDataClass")
 data class Chunk(

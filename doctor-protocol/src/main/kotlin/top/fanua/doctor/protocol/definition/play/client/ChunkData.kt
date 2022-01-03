@@ -83,7 +83,7 @@ class ChunkDataType0Decoder : PacketDecoder<ChunkDataType0Packet> {
         val tileEntityTags: MutableList<CompoundTag> = arrayListOf()
 
         for (k in 0 until tagSize) {
-            tileEntityTags.add(buf.readCompoundTag())
+            tileEntityTags.add(buf.readCompoundTag()!!)
         }
 
         return ChunkDataType0Packet(
@@ -103,7 +103,7 @@ class ChunkDataType1Decoder : PacketDecoder<ChunkDataType1Packet> {
         val chunkZ = buf.readInt()
         val fullChunk = buf.readBoolean()
         val primaryBitMask = buf.readVarInt()
-        val heightmaps = buf.readCompoundTag()
+        val heightmaps = buf.readCompoundTag()!!
         val biomesLength = if (fullChunk) {
             buf.readVarInt()
         } else {
@@ -124,7 +124,7 @@ class ChunkDataType1Decoder : PacketDecoder<ChunkDataType1Packet> {
         val numberOfBlockEntities = buf.readVarInt()
         val blockEntities = mutableListOf<CompoundTag>()
         for (blockEntity in 0 until numberOfBlockEntities) {
-            blockEntities.add(buf.readCompoundTag())
+            blockEntities.add(buf.readCompoundTag()!!)
         }
         return ChunkDataType1Packet(
             chunkX,

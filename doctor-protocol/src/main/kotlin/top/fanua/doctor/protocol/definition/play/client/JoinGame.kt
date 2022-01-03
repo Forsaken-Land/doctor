@@ -232,8 +232,8 @@ class JoinGameType1Decoder : PacketDecoder<JoinGamePacketType1> {
         for (j in 0 until worldCount) {
             worldNames.add(buf.readResourceLocation())
         }
-        val dimensionCodec = buf.readCompoundTag()
-        val dimension = buf.readCompoundTag()
+        val dimensionCodec = buf.readCompoundTag()!!
+        val dimension = buf.readCompoundTag()!!
         val worldName = buf.readResourceLocation().path
         val hashedSeed = buf.readLong()
         val maxPlayers = buf.readVarInt()

@@ -1,5 +1,7 @@
 package top.fanua.doctor.plugin.laggoggles
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import top.fanua.doctor.client.MinecraftClient
 import top.fanua.doctor.client.plugin.ClientPlugin
 import top.fanua.doctor.core.api.plugin.IPluginManager
@@ -18,16 +20,21 @@ import java.util.concurrent.Future
 class PluginLagGoggles : ClientPlugin {
     override lateinit var client: MinecraftClient
     lateinit var lagTools: LagTools
+    private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     override val dependencies: List<Class<out Plugin>> = listOf(FML1Plugin::class.java)
 
     override fun enabled(manager: IPluginManager) {
 
         if (!manager.hasPlugin(FML1Plugin::class.java)) {
-            throw Exception("必须先注册ForgePlugin")
+            log.debug("服务器不是FML1,插件插件未加载")
+            return
         }
         val forge = manager.getPlugin(FML1Plugin::class.java)
         if (forge.modList.keys.contains("laggoggles")) forge.modRegistry.registerGroup(Lag)
-        else throw Exception("服务器没有lagGoggles")
+        else {
+            log.debug("服务器没有lagGoggles,插件未加载")
+            return
+        }
 
         lagTools = LagTools(client)
     }
