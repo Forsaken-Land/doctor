@@ -3,8 +3,8 @@ package top.fanua.doctor.client
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import top.fanua.doctor.client.running.AutoVersionForgePlugin
-import top.fanua.doctor.client.running.TpsPlugin
-import top.fanua.doctor.client.running.tpsTools
+import top.fanua.doctor.client.running.tps.TpsPlugin
+import top.fanua.doctor.client.running.tps.tpsTools
 import top.fanua.doctor.client.utils.substringBetween
 import top.fanua.doctor.network.handler.onPacket
 import top.fanua.doctor.network.handler.oncePacket

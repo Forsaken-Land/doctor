@@ -1,6 +1,6 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package top.fanua.doctor.client.running
+package top.fanua.doctor.client.running.tps
 
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
@@ -11,6 +11,7 @@ import kotlinx.serialization.json.*
 import top.fanua.doctor.client.MinecraftClient
 import top.fanua.doctor.client.entity.ForgeFeature.FML1
 import top.fanua.doctor.client.entity.ForgeFeature.FML2
+import top.fanua.doctor.client.running.forgeFeature
 import top.fanua.doctor.client.utils.asObservable
 import top.fanua.doctor.network.handler.PacketEvent
 import top.fanua.doctor.protocol.definition.play.client.ChatPacket

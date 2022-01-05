@@ -1,27 +1,32 @@
 package top.fanua.doctor.client
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import top.fanua.doctor.allLoginPlugin.enableAllLoginPlugin
-import top.fanua.doctor.client.running.*
+import top.fanua.doctor.client.running.AutoVersionForgePlugin
+import top.fanua.doctor.client.running.player.bag.PlayerBagPlugin
+import top.fanua.doctor.client.running.player.bag.getPlayerBagUtils
+import top.fanua.doctor.client.running.player.list.PlayerListPlugin
+import top.fanua.doctor.client.running.player.list.getPlayerListTab
+import top.fanua.doctor.client.running.player.status.PlayerStatusPlugin
 import top.fanua.doctor.client.running.tabcomplete.TabCompletePlugin
 import top.fanua.doctor.client.running.tabcomplete.tabCompleteTool
+import top.fanua.doctor.client.running.tps.TpsPlugin
+import top.fanua.doctor.client.running.tps.tpsTools
 import top.fanua.doctor.network.event.ConnectionEvent
 import top.fanua.doctor.network.handler.onPacket
-import top.fanua.doctor.network.handler.replyPacket
 import top.fanua.doctor.plugin.forge.definations.fml1.Ids
 import top.fanua.doctor.plugin.forge.definations.fml1.RegistryDataPacket
 import top.fanua.doctor.plugin.ftbquests.PluginFtbQuests
-import top.fanua.doctor.plugin.ftbquests.definations.MessageClaimAllRewardsPacket
 import top.fanua.doctor.protocol.definition.play.client.*
-import top.fanua.doctor.protocol.definition.play.server.*
+import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionAndLookPacket
+import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionPacket
 import top.fanua.doctor.protocol.entity.BlockState
 import top.fanua.doctor.protocol.entity.World
 import top.fanua.doctor.protocol.entity.text.ChatSerializer
 import java.math.RoundingMode
 
 
+@OptIn(DelicateCoroutinesApi::class)
 fun main() {
     // 离线登陆测试
 //    val host = "localhost"
@@ -36,10 +41,11 @@ fun main() {
 //        .plugin(PluginLagGoggles())
         .plugin(PlayerStatusPlugin())
         .plugin(PluginFtbQuests())
-        .plugin(PlayerPlugin())
+        .plugin(PlayerListPlugin())
         .plugin(AutoVersionForgePlugin())
         .plugin(TabCompletePlugin())
         .plugin(TpsPlugin())
+        .plugin(PlayerBagPlugin())
         .enableAllLoginPlugin()
         .build()
 
@@ -49,7 +55,6 @@ fun main() {
     var y = 0
     var z = 0
     val world = World()
-    val bag = mutableMapOf<Int, SlotData>()
     val blocks = mutableListOf<Ids>()
     val items = mutableListOf<Ids>()
     client.on(ConnectionEvent.Disconnect) {
@@ -62,15 +67,12 @@ fun main() {
         if (packet.name == "minecraft:items") {
             items.addAll(packet.ids)
         }
-//        println(packet.name)
-//        if (packet.name.contains("bloodmagic")) println(packet.ids)
     }
         .onPacket<ChatPacket> {
             if (!packet.json.contains("commands.forge.tps.summary")) {
                 val chat = ChatSerializer.jsonToChat(packet.json)
                 logger.info(chat.getFormattedText())
             }
-
         }.onPacket<DisconnectPacket> {
             val reason = ChatSerializer.jsonToChat(packet.reason)
             logger.warn(reason.getFormattedText())
@@ -80,102 +82,68 @@ fun main() {
             val tempZ = packet.z.toBigDecimal().setScale(0, RoundingMode.DOWN).toInt()
             x = if (tempX >= 0) tempX else tempX - 1
             z = if (tempZ >= 0) tempZ else tempZ - 1
-        }.onPacket<WindowItemsPacket> {
-            if (packet.windowsId == 0) packet.slotData.forEach { (t, u) -> bag[t] = u }
-        }.onPacket<SetSlotPacket> {
-            if (packet.windowId == 0) bag[packet.slot] = packet.slotData
-        }
-        .onPacket<CustomPayloadPacket> {
-            client.sendPacket(MessageClaimAllRewardsPacket())
-            println(packet)
-        }
-        .onPacket<BlockChangePacket> {
+        }.onPacket<BlockChangePacket> {
             world.set(packet.blockPosition, BlockState(packet.blockId shr 4, packet.blockId and 15))
-        }
-        .onPacket<ChunkDataType0Packet> {
+        }.onPacket<ChunkDataType0Packet> {
             if (packet.availableSections > 0) {
                 world.chunks[Pair(packet.chunkX, packet.chunkZ)] = packet.chunk
             }
-        }.replyPacket<SConfirmTransactionPacket> {
-            CConfirmTransactionPacket(it.windowId, it.actionNumber, it.accepted)
         }
     var yaw = 0f
-    var pitch = 0f
-    val job = GlobalScope.launch {
-        while (true) {
-            when (val msg = readLine()) {
-                "1" -> {
-                    client.sendPacket(MessageClaimAllRewardsPacket())
-                }
-                "tps" -> {
-                    try {
-                        val result = client.tpsTools.getTps().get()
-                        logger.info(result.toString())
-                    } catch (e: Exception) {
-                        logger.error("获取tps失败", e)
-                    }
-                }
-
-                "list" -> {
-                    val playerTab = client.getPlayerTab()
-                    logger.info("玩家数量:${playerTab.players.size}")
-                    logger.info("更新时间:${playerTab.updateTime}")
-                    playerTab.players.map {
-                        logger.info("name:${it.value.name} ping:${it.value.ping} gameMode:${it.value.gameMode}")
-                    }
-
-                }
-                else -> {
-                    if (msg?.startsWith("/") == true) {
-                        try {
-                            val tab = client.tabCompleteTool.getCompletions(msg)
-                        } catch (_: Exception) {
-                        }
-                    }
-                    if (!msg.isNullOrBlank()) {
-                        client.sendMessage(msg)
-                    }
-                }
-            }
-
-        }
-    }
     GlobalScope.launch {
-        while (true) {
-            try {
-                client.sendPacket(EntityActionPacket(0, 1, 0))
-                delay(1000)
-                client.sendPacket(EntityActionPacket(0, 0, 0))
-                delay(1000)
-            } catch (_: Exception) {
-            }
-        }
-    }
-    GlobalScope.launch {
-        while (true) {
-            try {
-                delay(1000)
-                while (bag.isNotEmpty() && !client.connection.isClosed()) {
-                    for (i in 0 until 50) {
-                        val data = bag[i]
-                        if (data != null) {
-                            if (data.blockID != -1) {
-                                pitch = -90f
-                                yaw = 90f
-                                delay(50)
-                                client.sendPacket(ClickWindowPacket(0, i, 1, 1, ClickMode.DROP, data))
-                                client.sendPacket(CCloseWindowPacket(0))
+        coroutineScope {
+            launch {
+                while (true) {
+                    when (val msg = readLine()) {
+                        "tps" -> {
+                            withContext(Dispatchers.IO) {
+                                try {
+                                    val result = client.tpsTools.getTps().get()
+                                    logger.info(result.toString())
+                                } catch (e: Exception) {
+                                    logger.error("获取tps失败", e)
+                                }
                             }
-                            bag.remove(i)
+                        }
+                        "bag" -> {
+                            logger.info("${client.getPlayerBagUtils.getBag()}")
+                        }
+                        "list" -> {
+                            val playerTab = client.getPlayerListTab()
+                            logger.info("玩家数量:${playerTab.players.size}")
+                            logger.info("更新时间:${playerTab.updateTime}")
+                            playerTab.players.map {
+                                logger.info("name:${it.value.name} ping:${it.value.ping} gameMode:${it.value.gameMode}")
+                            }
+
+                        }
+                        else -> {
+                            if (msg?.startsWith("/") == true) {
+                                try {
+                                    client.tabCompleteTool.getCompletions(msg)
+                                } catch (_: Exception) {
+                                }
+                            }
+                            if (!msg.isNullOrBlank()) {
+                                client.sendMessage(msg)
+                            }
                         }
                     }
+
                 }
-                pitch = 0f
-            } catch (_: Exception) {
+            }
+            launch {
+                while (true) {
+                    try {
+                        client.sendPacket(EntityActionPacket(0, 1, 0))
+                        delay(1000)
+                        client.sendPacket(EntityActionPacket(0, 0, 0))
+                        delay(1000)
+                    } catch (_: Exception) {
+                    }
+                }
             }
         }
-
-
     }
     Thread.sleep(3000)
     while (true) {
@@ -220,7 +188,7 @@ fun main() {
                             y.toDouble(),
                             z.toDouble() + 0.5,
                             yaw,
-                            pitch,
+                            0f,
                             true
                         )
                     )

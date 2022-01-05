@@ -11,7 +11,7 @@ doctor 一个简单的 `Minecraft` 库
 | plugin-forge                   | forge 插件  |                    |
 | plugin-forge-laggoggles        | Lag 插件    |只有解析包(需要补全)   |
 | plugin-forge-allLoginPlugin    | 高版本登录插件|FML2的专属功能       |
-
+| plugin-forge-ftbquests         | FTB-Quests | FTB任务插件         |
 # 用法
 
 ```kotlin
@@ -55,7 +55,7 @@ repositories {
     }
 }
 dependencies {
-    def doctorVersion = "1.3.4-dev-4"
+    def doctorVersion = "1.3.4-dev-6"
     implementation "top.fanua.doctor:doctor-all:$doctorVersion"
 }
 
@@ -70,7 +70,7 @@ repositories {
     maven("https://maven.fanua.top:8015/repository/maven-public")
 }
 dependencies {
-    val doctorVersion = "1.3.4-dev-4"
+    val doctorVersion = "1.3.4-dev-6"
     implementation("top.fanua.doctor:doctor-all:$doctorVersion")
 }
 

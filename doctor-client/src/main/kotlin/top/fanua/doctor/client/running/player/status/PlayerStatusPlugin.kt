@@ -1,4 +1,4 @@
-package top.fanua.doctor.client.running
+package top.fanua.doctor.client.running.player.status
 
 import top.fanua.doctor.client.MinecraftClient
 import top.fanua.doctor.client.plugin.ClientPlugin
@@ -17,7 +17,7 @@ class PlayerStatusPlugin : ClientPlugin {
     }
 }
 
-val MinecraftClient.playerStatusUtils: PlayerStatusUtils?
+private val MinecraftClient.playerStatusUtils: PlayerStatusUtils?
     get() = plugin<PlayerStatusPlugin>()?.playerStatusUtils
 
 /**

@@ -1,4 +1,4 @@
-package top.fanua.doctor.client.running
+package top.fanua.doctor.client.running.player.status
 
 import kotlinx.serialization.Serializable
 import top.fanua.doctor.client.MinecraftClient

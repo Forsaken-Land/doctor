@@ -3,7 +3,7 @@ package top.fanua.doctor.client
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import top.fanua.doctor.client.running.AutoVersionForgePlugin
-import top.fanua.doctor.client.running.PlayerPlugin
+import top.fanua.doctor.client.running.player.list.PlayerListPlugin
 import top.fanua.doctor.network.handler.oncePacket
 import top.fanua.doctor.plugin.laggoggles.PluginLagGoggles
 import top.fanua.doctor.plugin.laggoggles.getLagSuspend
@@ -18,7 +18,7 @@ fun main() {
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
         .plugin(PluginLagGoggles())
-        .plugin(PlayerPlugin())
+        .plugin(PlayerListPlugin())
         .plugin(AutoVersionForgePlugin())
         .build()
 

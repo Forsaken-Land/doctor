@@ -1,4 +1,4 @@
-package top.fanua.doctor.client.running
+package top.fanua.doctor.client.running.player.list
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
@@ -18,10 +18,10 @@ import java.util.*
  * @author Doctor_Yin
  * @since 2021/5/22:18:51
  */
-class PlayerUtils(
+class PlayerListUtils(
     client: MinecraftClient
 ) {
-    private val logger: Logger = LoggerFactory.getLogger(PlayerUtils::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(PlayerListUtils::class.java)
     private val players = mutableMapOf<UUID, PlayerInfo>()
     private var playerUpdateTime: LocalDateTime = LocalDateTime.now()
 
@@ -72,13 +72,13 @@ class PlayerUtils(
 
     }
 
-    fun getPlayers(): PlayerTab {
-        return PlayerTab(playerUpdateTime, players)
+    fun getPlayers(): PlayerListTab {
+        return PlayerListTab(playerUpdateTime, players)
     }
 }
 
 @Serializable
-data class PlayerTab(
+data class PlayerListTab(
     val updateTime: String,
     val players: Map<@Contextual UUID, PlayerInfo>
 ) {
