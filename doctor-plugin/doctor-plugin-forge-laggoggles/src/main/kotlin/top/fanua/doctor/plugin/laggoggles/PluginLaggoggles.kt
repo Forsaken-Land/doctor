@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory
 import top.fanua.doctor.client.MinecraftClient
 import top.fanua.doctor.client.plugin.ClientPlugin
 import top.fanua.doctor.core.api.plugin.IPluginManager
-import top.fanua.doctor.core.api.plugin.Plugin
 import top.fanua.doctor.plugin.forge.FML1Plugin
 import top.fanua.doctor.plugin.laggoggles.protocol.Lag
 import top.fanua.doctor.plugin.laggoggles.tools.LagEntity
@@ -21,7 +20,6 @@ class PluginLagGoggles : ClientPlugin {
     override lateinit var client: MinecraftClient
     lateinit var lagTools: LagTools
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    override val dependencies: List<Class<out Plugin>> = listOf(FML1Plugin::class.java)
 
     override fun enabled(manager: IPluginManager) {
 

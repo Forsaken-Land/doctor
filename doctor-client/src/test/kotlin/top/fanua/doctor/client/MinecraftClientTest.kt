@@ -14,9 +14,11 @@ import top.fanua.doctor.client.running.tps.TpsPlugin
 import top.fanua.doctor.client.running.tps.tpsTools
 import top.fanua.doctor.network.event.ConnectionEvent
 import top.fanua.doctor.network.handler.onPacket
+import top.fanua.doctor.plugin.fix.PluginFix
 import top.fanua.doctor.plugin.forge.definations.fml1.Ids
 import top.fanua.doctor.plugin.forge.definations.fml1.RegistryDataPacket
 import top.fanua.doctor.plugin.ftbquests.PluginFtbQuests
+import top.fanua.doctor.plugin.ftbquests.definations.MessageClaimAllRewardsPacket
 import top.fanua.doctor.protocol.definition.play.client.*
 import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionAndLookPacket
 import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionPacket
@@ -46,6 +48,7 @@ fun main() {
         .plugin(TabCompletePlugin())
         .plugin(TpsPlugin())
         .plugin(PlayerBagPlugin())
+        .plugin(PluginFix())
         .enableAllLoginPlugin()
         .build()
 
@@ -71,7 +74,7 @@ fun main() {
         .onPacket<ChatPacket> {
             if (!packet.json.contains("commands.forge.tps.summary")) {
                 val chat = ChatSerializer.jsonToChat(packet.json)
-                logger.info(chat.getFormattedText())
+                logger.info(chat.getUnformattedText())
             }
         }.onPacket<DisconnectPacket> {
             val reason = ChatSerializer.jsonToChat(packet.reason)
@@ -106,7 +109,12 @@ fun main() {
                             }
                         }
                         "bag" -> {
-                            logger.info("${client.getPlayerBagUtils.getBag()}")
+                            logger.info(
+                                "${
+                                    client.getPlayerBagUtils.getBag()
+                                        .map { (k, v) -> "\n$k:${items.find { v!!.blockID == it.id }?.name.orEmpty()}" }
+                                }".replace(" ", "").replace(",", "")
+                            )
                         }
                         "list" -> {
                             val playerTab = client.getPlayerListTab()
@@ -117,6 +125,9 @@ fun main() {
                             }
 
                         }
+                        "ftb" -> {
+                            client.sendPacket(MessageClaimAllRewardsPacket())
+                        }
                         else -> {
                             if (msg?.startsWith("/") == true) {
                                 try {
@@ -124,7 +135,14 @@ fun main() {
                                 } catch (_: Exception) {
                                 }
                             }
-                            if (!msg.isNullOrBlank()) {
+                            if (msg?.startsWith("丢") == true) {
+                                try {
+                                    val id = msg.substring(1, msg.length).toIntOrNull() ?: 0
+                                    client.getPlayerBagUtils.dropItem(id)
+                                } catch (_: Exception) {
+
+                                }
+                            } else if (!msg.isNullOrBlank()) {
                                 client.sendMessage(msg)
                             }
                         }

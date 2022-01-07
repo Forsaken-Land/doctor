@@ -1,19 +1,19 @@
-package top.fanua.doctor.plugin.ftbquests
+package top.fanua.doctor.plugin.fix
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.fanua.doctor.client.MinecraftClient
 import top.fanua.doctor.client.plugin.ClientPlugin
 import top.fanua.doctor.core.api.plugin.IPluginManager
+import top.fanua.doctor.plugin.fix.handler.TombManyGravesFix
 import top.fanua.doctor.plugin.forge.FML1Plugin
-import top.fanua.doctor.plugin.ftbquests.protocol.FtbQuests
 
 /**
  *
  * @author Doctor_Yin
- * @since 2022/1/2:13:39
+ * @since 2022/1/7 9:22
  */
-class PluginFtbQuests : ClientPlugin {
+class PluginFix : ClientPlugin {
     override lateinit var client: MinecraftClient
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -23,13 +23,8 @@ class PluginFtbQuests : ClientPlugin {
             return
         }
         val forge = manager.getPlugin(FML1Plugin::class.java)
-        if (forge.modList.keys.contains("ftbquests")) forge.modRegistry.registerGroup(FtbQuests)
-        else {
-            log.debug("服务器没有ftbquests,插件未加载")
-            return
-        }
+        val mods = forge.modList.keys
+        if (mods.contains("tombmanygraves")) TombManyGravesFix(client)
 
     }
-
-
 }

@@ -9,6 +9,7 @@ include("doctor-plugin:doctor-plugin-forge-core")
 
 include("doctor-plugin:doctor-plugin-forge-laggoggles")
 include("doctor-plugin:doctor-plugin-forge-ftbquests")
+include("doctor-plugin:doctor-plugin-forge-fix")
 
 
 include("doctor-plugin:doctor-plugin-forge-astralsorcery")
