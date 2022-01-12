@@ -25,13 +25,9 @@ class PluginEnvironmental : ClientPlugin {
             return
         }
         val forge = manager.getPlugin(FML2Plugin::class.java)
-        if (forge.modList.keys.contains("environmental") || forge.modList.size >= 150) {
-            forge.channelPacketRegistry.registerGroup(Environmental)
-            forge.emitter.addListener(EnvironmentalListener())
-        } else {
-            log.debug("服务器没有Environmental,插件未加载")
-            return
-        }
+        forge.channelPacketRegistry.registerGroup(Environmental)
+        forge.emitter.addListener(EnvironmentalListener())
+
 
     }
 

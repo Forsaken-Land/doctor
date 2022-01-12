@@ -10,6 +10,8 @@ import top.fanua.doctor.protocol.definition.login.server.*
 import top.fanua.doctor.protocol.definition.login.server.DisconnectDecoder
 import top.fanua.doctor.protocol.definition.play.client.*
 import top.fanua.doctor.protocol.definition.play.server.CChatEncoder
+import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionAndLookEncoder
+import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionEncoder
 import top.fanua.doctor.protocol.definition.play.server.CTabCompleteType1Encoder
 import top.fanua.doctor.protocol.hook.PacketRegistryHook
 import top.fanua.doctor.protocol.registry.IPacketRegistry
@@ -56,6 +58,9 @@ class MinecraftClientProtocol_v1_16_2(pluginManager: IPluginManager) : IPacketRe
             }
             whenC2S {
                 register(0x10, KeepAliveEncoder())
+                register(0x12, CPlayerPositionEncoder())
+                register(0x13, CPlayerPositionAndLookEncoder())
+                register(0x1C, EntityActionEncoder())
                 register(0x05, ClientSettingEncoder())
                 register(0x00, TeleportConfirmEncoder())
                 register(0x04, ClientStatusEncoder())

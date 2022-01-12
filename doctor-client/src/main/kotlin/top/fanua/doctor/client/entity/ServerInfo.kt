@@ -43,10 +43,10 @@ enum class ForgeFeature {
     /**
      * ### 获取特征
      */
-    fun getFeature(): String {
+    fun getFeature(): List<String> {
         return when (this) {
-            FML1 -> "modinfo"
-            FML2 -> "forgeData"
+            FML1 -> listOf("modinfo")
+            FML2 -> listOf("forgeData", "modpackData")
         }
     }
 

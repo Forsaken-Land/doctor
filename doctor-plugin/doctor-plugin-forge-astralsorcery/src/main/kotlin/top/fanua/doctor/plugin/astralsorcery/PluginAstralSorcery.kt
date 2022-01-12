@@ -25,14 +25,8 @@ class PluginAstralSorcery : ClientPlugin {
             return
         }
         val forge = manager.getPlugin(FML2Plugin::class.java)
-        if (forge.modList.keys.contains("astralsorcery") || forge.modList.size >= 150) {
-            forge.channelPacketRegistry.registerGroup(AstralSorcery)
-            forge.emitter.addListener(AstralSorceryListener())
-        } else {
-            log.debug("服务器没有AstralSorcery,插件未加载")
-            return
-        }
-
+        forge.channelPacketRegistry.registerGroup(AstralSorcery)
+        forge.emitter.addListener(AstralSorceryListener())
     }
 
 }

@@ -23,13 +23,8 @@ class PluginSilentGems : ClientPlugin {
             return
         }
         val forge = manager.getPlugin(FML2Plugin::class.java)
-        if (forge.modList.keys.contains("silentgems") || forge.modList.size >= 150) {
-            forge.channelPacketRegistry.registerGroup(SilentGems)
-            forge.emitter.addListener(SilentGemsListener())
-        } else {
-            log.debug("服务器没有SilentGems,插件未加载")
-            return
-        }
+        forge.channelPacketRegistry.registerGroup(SilentGems)
+        forge.emitter.addListener(SilentGemsListener())
 
     }
 }

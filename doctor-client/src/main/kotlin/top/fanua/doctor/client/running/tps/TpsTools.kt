@@ -123,7 +123,7 @@ abstract class TpsTools(
         fun create(client: MinecraftClient): ITpsTools {
             return when (client.forgeFeature) {
                 FML1 -> TpsToolsFML1(client)
-                FML2 -> TpsToolsFML1(client)
+                FML2 -> TpsToolsFML2(client)
                 null -> DummyTpsTools
             }
         }

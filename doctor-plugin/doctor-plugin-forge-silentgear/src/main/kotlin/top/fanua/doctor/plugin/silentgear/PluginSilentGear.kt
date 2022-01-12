@@ -25,13 +25,8 @@ class PluginSilentGear : ClientPlugin {
             return
         }
         val forge = manager.getPlugin(FML2Plugin::class.java)
-        if (forge.modList.keys.contains("silentgear") || forge.modList.size >= 150) {
-            forge.channelPacketRegistry.registerGroup(SilentGear)
-            forge.emitter.addListener(SilentGearListener())
-        } else {
-            log.debug("服务器没有SilentGear,插件未加载")
-            return
-        }
+        forge.channelPacketRegistry.registerGroup(SilentGear)
+        forge.emitter.addListener(SilentGearListener())
 
     }
 

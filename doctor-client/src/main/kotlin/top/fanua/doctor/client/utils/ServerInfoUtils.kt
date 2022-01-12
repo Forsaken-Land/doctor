@@ -80,9 +80,16 @@ object ServerInfoUtils {
         }
 
         val modMap = mutableMapOf<String, String>()
-        val modArray = jsonElement.jsonObject[forgeFeature.getFeature()]!!.jsonObject[modStr]!!.jsonArray
+        var modArray: JsonArray? = null
+        forgeFeature.getFeature().forEach {
+            val arrayObject = jsonElement.jsonObject[it]?.jsonObject
+            if (arrayObject != null) {
+                modArray = arrayObject[modStr]?.jsonArray
+                return@forEach
+            }
+        }
 
-        modArray.forEach {
+        modArray?.forEach {
             val id = it.jsonObject[modIdStr]!!.jsonPrimitive.content
             val version = it.jsonObject[modVersionStr]!!.jsonPrimitive.content
             modMap[id] = version
@@ -97,9 +104,11 @@ object ServerInfoUtils {
     private fun getForgeFeature(jsonElement: JsonElement): ForgeFeature? {
         ForgeFeature.values().forEach {
             val feature = it.getFeature()
-            val forgeObj = jsonElement.jsonObject[feature]
-            if (forgeObj != null) {
-                return it
+            feature.forEach { str ->
+                val forgeObj = jsonElement.jsonObject[str]
+                if (forgeObj != null) {
+                    return it
+                }
             }
         }
         return null
