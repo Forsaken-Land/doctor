@@ -8,9 +8,12 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.fanua.doctor.client.MinecraftClient
 import top.fanua.doctor.client.running.player.bag.getPlayerBagUtils
+import top.fanua.doctor.client.running.player.status.getPlayerStatus
 import top.fanua.doctor.network.handler.onPacket
 import top.fanua.doctor.plugin.forge.definations.fml1.Ids
 import top.fanua.doctor.plugin.forge.definations.fml1.RegistryDataPacket
+import top.fanua.doctor.protocol.definition.play.client.SetSlotPacket
+import top.fanua.doctor.protocol.definition.play.client.WindowItemsPacket
 
 /**
  *
@@ -21,30 +24,43 @@ import top.fanua.doctor.plugin.forge.definations.fml1.RegistryDataPacket
 class TombManyGravesFix(client: MinecraftClient) {
     private val items = mutableListOf<Ids>()
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
+    private val bugName = "tombmanygraves:death_list"
 
     init {
-
+        val scope = GlobalScope
         log.info("TombManyGravesFix插件启动")
         client.onPacket<RegistryDataPacket> {
             if (packet.name == "minecraft:items") {
                 items.addAll(packet.ids)
             }
-        }
-        GlobalScope.launch {
-            delay(1000 * 10)
-            val bagUtils = client.getPlayerBagUtils
-            while (true) {
-                delay(1000)
-                try {
-                    bagUtils.getBag().forEach { (t, u) ->
-                        val name = items.find { (u?.blockID ?: 0) == it.id }?.name.orEmpty()
-                        if (name == "tombmanygraves:death_list") {
-                            log.info("检测到死亡清单:$u")
-                            bagUtils.dropItem(t, 1)
-                        }
+        }.onPacket<WindowItemsPacket> {
+            scope.launch {
+                delay(100)
+                while (client.getPlayerStatus().heal <= 0.0) {
+                    delay(10)
+                }
+                packet.slotData.forEach { (id, data) ->
+                    val name = items.find { it.id == data.blockID }?.name.orEmpty()
+                    if (name == bugName) {
+                        log.info("检测到死亡清单:$data")
+                        delay(50)
+                        client.getPlayerBagUtils.dropItem(id, 1)
                     }
-                } catch (e: Exception) {
-                    log.warn(e.message)
+                }
+            }
+        }.onPacket<SetSlotPacket> {
+            if (packet.windowId == 0) {
+                scope.launch {
+                    delay(100)
+                    while (client.getPlayerStatus().heal <= 0.0) {
+                        delay(10)
+                    }
+                    val name = items.find { it.id == packet.slotData.blockID }?.name.orEmpty()
+                    if (name == bugName) {
+                        log.info("检测到死亡清单:${packet.slotData}")
+                        delay(100)
+                        client.getPlayerBagUtils.dropItem(packet.slot, 1)
+                    }
                 }
             }
         }
