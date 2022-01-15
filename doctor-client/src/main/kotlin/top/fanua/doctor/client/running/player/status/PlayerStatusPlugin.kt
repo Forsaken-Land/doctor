@@ -24,5 +24,5 @@ private val MinecraftClient.playerStatusUtils: PlayerStatusUtils?
  * ### 获取玩家状态
  */
 fun MinecraftClient.getPlayerStatus(): PlayerStatus {
-    return playerStatusUtils?.getStatus() ?: throw RuntimeException("未开启玩家列表监听")
+    return playerStatusUtils?.getStatus() ?: throw RuntimeException("未开启玩家状态监听")
 }

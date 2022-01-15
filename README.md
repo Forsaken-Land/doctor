@@ -2,16 +2,18 @@
 
 doctor 一个简单的 `Minecraft` 库
 
-| 模块                            | 功能       | 备注                |
-| ------------------------------ | ---------  | ------------------ |
-| client                         | 客户端      |                    |
-| core                           | 核心事件    |                     |
-| network                        | 网络库      |                    |
-| protocol                       | 协议库      |                    |
-| plugin-forge                   | forge 插件  |                    |
-| plugin-forge-laggoggles        | Lag 插件    |只有解析包(需要补全)   |
-| plugin-forge-allLoginPlugin    | 高版本登录插件|FML2的专属功能       |
-| plugin-forge-ftbquests         | FTB-Quests | FTB任务插件         |
+| 模块                          | 功能         | 备注          |
+|-----------------------------|------------|-------------|
+| client                      | 客户端        |             |
+| core                        | 核心事件       |             |
+| network                     | 网络库        |             |
+| protocol                    | 协议库        |             |
+| plugin-forge                | forge 插件   |             |
+| plugin-forge-laggoggles     | Lag 插件     | 只有解析包(需要补全) |
+| plugin-forge-allLoginPlugin | 高版本登录插件    | FML2的专属功能   |
+| plugin-forge-fix            | 修复协议       | 修复数据溢出      |
+| plugin-forge-ftbquests      | FTB-Quests | FTB任务插件     |
+
 # 用法
 
 ```kotlin
@@ -26,10 +28,15 @@ fun main() {
         .user(username, password) //name和user必选一个
         .authServerUrl(authServerUrl)  //不设置是正版登录
         .sessionServerUrl(sessionServerUrl) //不设置为正版登录
-        .plugin(PlayerPlugin())  //玩家在线人数插件
+        .plugin(PlayerWorldPlugin()) //世界插件
+        .plugin(PlayerListPlugin()) //玩家列表插件
         .plugin(AutoVersionForgePlugin()) //自动判断Forge登录插件
         .plugin(TabCompletePlugin()) //命令补全插件
-        .plugin(TpsPlugin()) // Tps插件(暂时只支持1.12.2
+        .plugin(TpsPlugin()) // Tps插件
+        .plugin(PluginFtbQuests()) //FTB任务插件(仅支持手动
+        .plugin(PlayerStatusPlugin()) //玩家状态插件
+        .plugin(PlayerBagPlugin()) //玩家背包插件
+        .plugin(PluginFix()) //mod修复插件 (需要玩家背包插件和玩家状态插件
         .enableAllLoginPlugin() //开启FML2支持功能
         .build()
 
@@ -55,7 +62,7 @@ repositories {
     }
 }
 dependencies {
-    def doctorVersion = "1.3.4-dev-6"
+    def doctorVersion = "1.3.4"
     implementation "top.fanua.doctor:doctor-all:$doctorVersion"
 }
 
@@ -70,7 +77,7 @@ repositories {
     maven("https://maven.fanua.top:8015/repository/maven-public")
 }
 dependencies {
-    val doctorVersion = "1.3.4-dev-6"
+    val doctorVersion = "1.3.4"
     implementation("top.fanua.doctor:doctor-all:$doctorVersion")
 }
 
