@@ -11,4 +11,8 @@ object DummyI18n : I18n {
     override fun translate(key: String): String {
         return key
     }
+
+    override fun translateItem(start: String): Map<String, String> {
+        return emptyMap()
+    }
 }

@@ -20,6 +20,17 @@ class MultiResourceI18n : I18n {
         return key
     }
 
+    override fun translateItem(start: String): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        for (r in resources) {
+            if (r.startWith(start)) {
+                r.getList(start).forEach { (t, u) -> map[t] = u }
+            }
+        }
+        if (map.isEmpty()) map[start] = start
+        return map
+    }
+
     fun add(type: Class<*>): Boolean {
         return try {
             val res = type.getConstructor().newInstance() as IResources

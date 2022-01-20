@@ -13,6 +13,7 @@ import java.util.concurrent.locks.ReentrantLock
  */
 interface I18n {
     fun translate(key: String): String
+    fun translateItem(start: String): Map<String, String>
     fun translate(key: String, vararg parameter: Any): String {
         val s = translate(key)
         return try {

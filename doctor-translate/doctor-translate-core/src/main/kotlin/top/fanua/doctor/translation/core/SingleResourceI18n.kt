@@ -16,6 +16,15 @@ class SingleResourceI18n(
         return if (key in resource) resource[key] else key
     }
 
+    override fun translateItem(start: String): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        if (resource.startWith(start)) {
+            resource.getList(start).forEach { (t, u) -> map[t] = u }
+        }
+        if (map.isEmpty()) map[start] = start
+        return map
+    }
+
     companion object {
         fun create(type: Class<*>): SingleResourceI18n {
             val res = type.getConstructor().newInstance() as IResources

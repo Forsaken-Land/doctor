@@ -1,3 +1,4 @@
+
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -40,6 +41,15 @@ abstract class Mc116LangResources : IResources {
     }
 
     override fun get(key: String): String = properties[key] ?: key
+
+    override fun startWith(start: String): Boolean {
+        return properties.filter { it.key.startsWith(start) }.isNotEmpty()
+    }
+
+    override fun getList(start: String): Map<String, String> {
+        val list = properties.filter { it.key.startsWith(start) }
+        return list.ifEmpty { mapOf(Pair(start, start)) }
+    }
 
     companion object {
         /** Pattern that matches numeric variable placeholders in a resource string, such as "%d", "%3$d", "%.2f"  */

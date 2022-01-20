@@ -4,6 +4,8 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.querz.nbt.tag.CompoundTag
+import net.querz.nbt.tag.StringTag
 import top.fanua.doctor.allLoginPlugin.enableAllLoginPlugin
 import top.fanua.doctor.client.running.AutoVersionForgePlugin
 import top.fanua.doctor.client.running.player.bag.PlayerBagPlugin
@@ -31,6 +33,7 @@ import top.fanua.doctor.protocol.definition.play.client.PlayerPositionAndLookPac
 import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionAndLookPacket
 import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionPacket
 import top.fanua.doctor.protocol.entity.text.ChatSerializer
+import top.fanua.doctor.translation.api.I18n
 import java.math.RoundingMode
 
 
@@ -109,7 +112,32 @@ fun main() {
                     }
                     "bag" -> {
                         client.getPlayerBagUtils.getBag().forEach { (t, u) ->
-                            logger.info("位置$t:${items.find { u!!.blockID == it.id }?.name.orEmpty()},数量:${u?.itemCount}")
+                            val name = items.find { u!!.blockID == it.id }?.name.orEmpty()
+                            val list = I18n.DEFAULT.translateItem(
+                                if (name.startsWith("minecraft")) name.replace("minecraft:", "item.") + "."
+                                else "item.${name.replace(":", ".")}."
+                            )
+                            var item = I18n.DEFAULT.translate(
+                                list.keys.toList().getOrNull(u!!.itemDamage!!)
+                                    ?: (list.keys.first() + "name:${u.itemDamage}")
+                            )
+                            if (list.keys.first() == item) item += "name:${u.itemDamage}"
+                            val nbt = u.nbt?.first()
+                            if ((nbt?.key ?: "") == "SkullOwner") {
+                                if (nbt?.value is StringTag) item =
+                                    item.replace("%s", (nbt.value as StringTag).value)
+                                else {
+                                    if (nbt?.value is CompoundTag) {
+                                        (nbt.value as CompoundTag).forEach { t, u ->
+                                            if (t == "Name" && u is StringTag) item = item.replace("%s", u.value)
+
+                                        }
+                                    }
+                                }
+                            }
+                            logger.info(
+                                "位置$t:$item,数量:${u.itemCount}"
+                            )
                         }
                     }
                     "list" -> {

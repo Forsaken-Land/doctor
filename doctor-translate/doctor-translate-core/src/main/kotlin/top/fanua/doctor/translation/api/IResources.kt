@@ -10,6 +10,8 @@ interface IResources {
 
     operator fun get(key: String): String
     operator fun contains(key: String): Boolean
+    fun getList(start: String): Map<String, String>
+    fun startWith(start: String): Boolean
 
     fun load()
 }

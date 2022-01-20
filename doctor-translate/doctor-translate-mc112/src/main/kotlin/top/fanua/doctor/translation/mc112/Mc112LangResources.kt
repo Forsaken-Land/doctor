@@ -58,6 +58,15 @@ abstract class Mc112LangResources : IResources {
         return properties.containsKey(key)
     }
 
+    override fun startWith(start: String): Boolean {
+        return properties.filter { it.key.startsWith(start) }.isNotEmpty()
+    }
+
+    override fun getList(start: String): Map<String, String> {
+        val list = properties.filter { it.key.startsWith(start) }
+        return list.ifEmpty { mapOf(Pair(start, start)) }
+    }
+
     override fun get(key: String): String = properties[key] ?: key
 
     companion object {
