@@ -23,10 +23,8 @@ import top.fanua.doctor.network.handler.onPacket
 import top.fanua.doctor.plugin.fix.PluginFix
 import top.fanua.doctor.plugin.forge.definations.fml1.Ids
 import top.fanua.doctor.plugin.forge.definations.fml1.RegistryDataPacket
-import top.fanua.doctor.plugin.forge.definations.fml2.AcknowledgementPacket
 import top.fanua.doctor.plugin.ftbquests.PluginFtbQuests
 import top.fanua.doctor.plugin.ftbquests.definations.MessageClaimAllRewardsPacket
-import top.fanua.doctor.protocol.definition.login.server.LoginPluginRequestPacket
 import top.fanua.doctor.protocol.definition.play.client.ChatPacket
 import top.fanua.doctor.protocol.definition.play.client.DisconnectPacket
 import top.fanua.doctor.protocol.definition.play.client.EntityActionPacket
@@ -80,9 +78,6 @@ fun main() {
             items.addAll(packet.ids)
         }
     }
-        .onPacket<LoginPluginRequestPacket> {
-            client.sendPacket(AcknowledgementPacket(packet.messageId))
-        }
         .onPacket<ChatPacket> {
             if (!packet.json.contains("commands.forge.tps.summary")) {
                 val chat = ChatSerializer.jsonToChat(packet.json)
@@ -179,7 +174,7 @@ fun main() {
         }
         launch {
             delay(15000)
-            while (true) {
+            while (false) {
                 try {
                     delay(1000)
                     client.sendPacket(EntityActionPacket(0, 1, 0))
@@ -193,7 +188,7 @@ fun main() {
     Thread.sleep(15000)
     while (true) {
         try {
-            while (!client.connection.isClosed()) {
+            while (false) {
                 Thread.sleep(50)
                 if (yaw >= 360f) yaw = 0f
                 else yaw += 0.5f
