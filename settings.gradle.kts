@@ -12,14 +12,6 @@ include("doctor-plugin:doctor-plugin-forge-ftbquests")
 include("doctor-plugin:doctor-plugin-forge-fix")
 
 
-include("doctor-plugin:doctor-plugin-forge-astralsorcery")
-include("doctor-plugin:doctor-plugin-forge-silentgear")
-include("doctor-plugin:doctor-plugin-forge-extendedcrafting")
-include("doctor-plugin:doctor-plugin-forge-exNihiloSequentia")
-include("doctor-plugin:doctor-plugin-forge-environmental")
-include("doctor-plugin:doctor-plugin-forge-silentgems")
-include("doctor-plugin:doctor-plugin-forge-allLoginPlugin")
-
 include("doctor-translate:doctor-translate-core")
 
 include("doctor-translate:doctor-translate-mc112")

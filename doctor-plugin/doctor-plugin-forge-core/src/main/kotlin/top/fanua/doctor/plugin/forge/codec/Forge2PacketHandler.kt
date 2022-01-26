@@ -81,8 +81,9 @@ class Forge2PacketHandler(
                 out.add(packetInPacket)
                 logger.debug("FML2协议包解码:packetId=${packerId} $packetInPacket")
             } catch (e: Exception) {
-                logger.warn(e.message)
-                return
+                logger.debug(e.message)
+                logger.debug("尝试自动发送")
+                out.add(msg)
             }
 
         } else ctx.fireChannelRead(msg)

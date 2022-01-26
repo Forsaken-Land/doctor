@@ -5,8 +5,10 @@ import org.slf4j.LoggerFactory
 import top.fanua.doctor.client.MinecraftClient
 import top.fanua.doctor.client.plugin.ClientPlugin
 import top.fanua.doctor.core.api.plugin.IPluginManager
+import top.fanua.doctor.plugin.fix.handler.Fml2Fix
 import top.fanua.doctor.plugin.fix.handler.TombManyGravesFix
 import top.fanua.doctor.plugin.forge.FML1Plugin
+import top.fanua.doctor.plugin.forge.FML2Plugin
 
 /**
  *
@@ -18,13 +20,15 @@ class PluginFix : ClientPlugin {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
 
     override fun enabled(manager: IPluginManager) {
-        if (!manager.hasPlugin(FML1Plugin::class.java)) {
-            log.debug("服务器不是FML1,插件插件未加载")
-            return
+        if (manager.hasPlugin(FML1Plugin::class.java)) {
+            val forge = manager.getPlugin(FML1Plugin::class.java)
+            val mods = forge.modList.keys
+            if (mods.contains("tombmanygraves")) TombManyGravesFix(client)
         }
-        val forge = manager.getPlugin(FML1Plugin::class.java)
-        val mods = forge.modList.keys
-        if (mods.contains("tombmanygraves")) TombManyGravesFix(client)
+        if (manager.hasPlugin(FML2Plugin::class.java)) {
+            log.debug("fml2登录启用")
+            Fml2Fix(client)
+        }
 
     }
 }

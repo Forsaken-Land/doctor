@@ -7,7 +7,6 @@ dependencies {
     testImplementation(project(":doctor-plugin:doctor-plugin-forge-laggoggles"))
     testImplementation(project(":doctor-plugin:doctor-plugin-forge-ftbquests"))
     testImplementation(project(":doctor-plugin:doctor-plugin-forge-fix"))
-    testImplementation(project(":doctor-plugin:doctor-plugin-forge-allLoginPlugin"))
     testImplementation(project(":doctor-translate:doctor-translate-all"))
 
 

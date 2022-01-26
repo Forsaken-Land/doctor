@@ -6,7 +6,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.querz.nbt.tag.CompoundTag
 import net.querz.nbt.tag.StringTag
-import top.fanua.doctor.allLoginPlugin.enableAllLoginPlugin
 import top.fanua.doctor.client.running.AutoVersionForgePlugin
 import top.fanua.doctor.client.running.player.bag.PlayerBagPlugin
 import top.fanua.doctor.client.running.player.bag.getPlayerBagUtils
@@ -24,8 +23,10 @@ import top.fanua.doctor.network.handler.onPacket
 import top.fanua.doctor.plugin.fix.PluginFix
 import top.fanua.doctor.plugin.forge.definations.fml1.Ids
 import top.fanua.doctor.plugin.forge.definations.fml1.RegistryDataPacket
+import top.fanua.doctor.plugin.forge.definations.fml2.AcknowledgementPacket
 import top.fanua.doctor.plugin.ftbquests.PluginFtbQuests
 import top.fanua.doctor.plugin.ftbquests.definations.MessageClaimAllRewardsPacket
+import top.fanua.doctor.protocol.definition.login.server.LoginPluginRequestPacket
 import top.fanua.doctor.protocol.definition.play.client.ChatPacket
 import top.fanua.doctor.protocol.definition.play.client.DisconnectPacket
 import top.fanua.doctor.protocol.definition.play.client.EntityActionPacket
@@ -59,7 +60,6 @@ fun main() {
         .plugin(TpsPlugin())
         .plugin(PlayerBagPlugin())
         .plugin(PluginFix())
-        .enableAllLoginPlugin()
         .build()
 
     if (!client.start(host, port)) return
@@ -80,6 +80,9 @@ fun main() {
             items.addAll(packet.ids)
         }
     }
+        .onPacket<LoginPluginRequestPacket> {
+            client.sendPacket(AcknowledgementPacket(packet.messageId))
+        }
         .onPacket<ChatPacket> {
             if (!packet.json.contains("commands.forge.tps.summary")) {
                 val chat = ChatSerializer.jsonToChat(packet.json)
