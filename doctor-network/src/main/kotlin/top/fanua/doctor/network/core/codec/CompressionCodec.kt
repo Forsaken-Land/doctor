@@ -52,8 +52,12 @@ class CompressionCodec(private val threshold: Int) : MessageToMessageCodec<ByteB
             out.add(mgs.readBytes(mgs.readableBytes()))
             return
         }
+
         if (dataLength < threshold) throw DecoderException("数据长度:$dataLength 小于服务器压缩阈值:$threshold")
-        if (dataLength > 2097152) throw DecoderException("数据长度:$dataLength 超过协议规定最大值:2097152")
+        if (dataLength > 2097152) logger.warn("数据长度:$dataLength 超过协议规定最大值:2097152")
+        if (dataLength > 2097152 * 3) logger.error("数据长度:$dataLength 超过 [3] 倍协议规定最大值:2097152")
+        if (dataLength > 2097152 * 6) throw DecoderException("数据长度:$dataLength 超过 [6] 倍协议规定最大值:2097152")
+
         val input = ByteArray(mgs.readableBytes())
         mgs.readBytes(input)
         inflater.setInput(input)
