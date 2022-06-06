@@ -60,7 +60,7 @@ repositories {
     }
 }
 dependencies {
-    def doctorVersion = "1.3.7"
+    def doctorVersion = "1.3.9"
     implementation "top.fanua.doctor:doctor-all:$doctorVersion"
 }
 
@@ -75,7 +75,7 @@ repositories {
     maven("https://maven.fanua.top:8015/repository/maven-public")
 }
 dependencies {
-    val doctorVersion = "1.3.7"
+    val doctorVersion = "1.3.9"
     implementation("top.fanua.doctor:doctor-all:$doctorVersion")
 }
 
