@@ -53,8 +53,9 @@ deployjdk8:
     - echo user=$USERNAME >> ./gradle.properties
     - echo passwd=$PASSWORD >> ./gradle.properties
     - echo projectVersion=$VERSION >> ./gradle.properties
-    - echo mavenUrl=$URL >> ./gradle.properties
-    - cat ./gradle.properties
+    - echo signingKeyId=$SIGNING_KEY_ID >> ./gradle.properties
+    - echo signingKey=$SIGNING_KEY >> ./gradle.properties
+    - echo signingPassword=$SIGNING_PASSWORD >> ./gradle.properties
     - gradle publish
   only:
     variables:
@@ -75,7 +76,6 @@ deployjdk8:
     - echo passwd=$PASSWORD >> ./gradle.properties
     - echo projectVersion=$VERSION-jdk11 >> ./gradle.properties
     - echo mavenUrl=$URL >> ./gradle.properties
-    - cat ./gradle.properties
     - gradle publish
   only:
     variables:
@@ -96,7 +96,6 @@ deployjdk8:
     - echo passwd=$PASSWORD >> ./gradle.properties
     - echo projectVersion=$VERSION-jdk16 >> ./gradle.properties
     - echo mavenUrl=$URL >> ./gradle.properties
-    - cat ./gradle.properties
     - gradle publish
   only:
     variables:
