@@ -4,3 +4,4 @@ dependencies {
     api(project(":doctor-plugin:doctor-plugin-forge-all"))
 }
 
+description = "doctor全部模块"

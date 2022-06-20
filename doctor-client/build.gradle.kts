@@ -11,3 +11,4 @@ dependencies {
 
 
 }
+description = "doctor客户端模块"

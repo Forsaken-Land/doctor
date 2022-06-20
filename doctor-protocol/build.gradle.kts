@@ -5,3 +5,4 @@ dependencies {
     api(project(":doctor-core"))
     api(project(":doctor-translate:doctor-translate-core"))
 }
+description = "doctor协议模块"

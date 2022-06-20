@@ -36,6 +36,7 @@ subprojects {
         plugin("org.jetbrains.kotlin.jvm")
         plugin("org.jetbrains.kotlin.plugin.serialization")
     }
+    description = "doctor一个简单的Minecraft库"
 
     dependencies {
         implementation(kotlin("stdlib"))
@@ -66,7 +67,7 @@ allprojects {
                     url.set("https://github.com/Forsaken-Land/doctor")
                     name.set(project.name)
                     packaging = "jar"
-                    description.set("doctor一个简单的Minecraft库")
+                    description.set(project.description)
 
                     scm {
                         url.set("https://github.com/Forsaken-Land/doctor")

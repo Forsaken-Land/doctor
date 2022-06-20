@@ -22,3 +22,4 @@ fun generateList() {
         }
     file.writeText(list.substringBeforeLast("\n"))
 }
+description = "doctor翻译模块"
