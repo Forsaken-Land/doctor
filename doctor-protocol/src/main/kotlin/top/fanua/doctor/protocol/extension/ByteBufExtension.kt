@@ -131,7 +131,7 @@ fun ByteBuf.readString(maxLength: Int): String {
  * 从缓冲区读取最大 [Short.MAX_VALUE] 字符串,以 [StandardCharsets.UTF_8] 编码
  */
 fun ByteBuf.readString(): String {
-    return readString(Short.MAX_VALUE.toInt())
+    return readString(Int.MAX_VALUE)
 }
 
 /**
@@ -142,7 +142,7 @@ fun ByteBuf.readString(): String {
 fun ByteBuf.writeString(value: String) {
 
     val bytes = value.toByteArray(StandardCharsets.UTF_8)
-    if (bytes.size > Short.MAX_VALUE) throw IOException("尝试写入长度大于${Short.MAX_VALUE}的数据.")
+    if (bytes.size > Int.MAX_VALUE) throw IOException("尝试写入长度大于${Int.MAX_VALUE}的数据.")
     writeVarInt(bytes.size)
     writeBytes(bytes)
 }
