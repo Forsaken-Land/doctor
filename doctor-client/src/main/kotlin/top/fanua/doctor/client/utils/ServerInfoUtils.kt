@@ -12,7 +12,6 @@ object ServerInfoUtils {
 
     fun getServiceInfo(json: String): ServerInfo? {
         if (json.contains("Server is still starting! Please wait before reconnecting.")) return null
-        println(json)
         val jsonElement = Json.parseToJsonElement(json)
 
         // 获取版本信息
