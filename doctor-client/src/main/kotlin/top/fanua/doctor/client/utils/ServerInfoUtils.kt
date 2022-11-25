@@ -10,12 +10,16 @@ import top.fanua.doctor.client.entity.ServerInfo
  */
 object ServerInfoUtils {
 
-    fun getServiceInfo(json: String): ServerInfo? {
-        if (json.contains("Server is still starting! Please wait before reconnecting.")) return null
+    fun getServiceInfo(json: String): ServerInfo {
+        if (json.contains("Server is still starting! Please wait before reconnecting.")) ServerInfo(true)
         val jsonElement = Json.parseToJsonElement(json)
 
         // 获取版本信息
-        val versionObject = jsonElement.jsonObject["version"]!!
+        val versionObject = try {
+            jsonElement.jsonObject["version"]!!
+        } catch (e: NullPointerException) {
+            return ServerInfo(true)
+        }
         val versionNumber = versionObject.jsonObject["protocol"]!!.jsonPrimitive.int
         val versionName = versionObject.jsonObject["name"]!!.jsonPrimitive.content
         // 获取描述
@@ -47,6 +51,7 @@ object ServerInfoUtils {
         val modNumber = forge?.modMap?.size ?: 0
 
         return ServerInfo(
+            false,
             description,
             playerMax,
             playerOnline,

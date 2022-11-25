@@ -13,6 +13,7 @@ package top.fanua.doctor.client.entity
  * - [modNumber] 模组数
  */
 data class ServerInfo(
+    val isStarting: Boolean = false,
     val description: String = "",
     val playerMax: Int = 20,
     val playerOnline: Int = 0,

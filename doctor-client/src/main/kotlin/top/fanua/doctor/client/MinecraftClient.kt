@@ -226,12 +226,16 @@ class MinecraftClient(
                 return null
             }
             val serverInfo = try {
-                ServerInfoUtils.getServiceInfo(jsonStr) ?: return null
+                ServerInfoUtils.getServiceInfo(jsonStr)
             } catch (e: NullPointerException) {
                 logger.error("服务器正在启动，请等待...")
                 return null
             } catch (e: Exception) {
                 logger.error("获取信息错误,请稍后再试,${e.message}")
+                return null
+            }
+            if (serverInfo.isStarting) {
+                logger.error("服务器正在启动，请等待...")
                 return null
             }
 
