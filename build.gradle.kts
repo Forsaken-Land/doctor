@@ -8,7 +8,7 @@ plugins {
     id("application")
     id("signing")
 }
-
+description = "doctor一个简单的Minecraft库"
 allprojects {
     val projectVersion: String by project
     group = "top.fanua.doctor"
@@ -36,7 +36,7 @@ subprojects {
         plugin("org.jetbrains.kotlin.jvm")
         plugin("org.jetbrains.kotlin.plugin.serialization")
     }
-    description = "doctor一个简单的Minecraft库"
+
 
     dependencies {
         implementation(kotlin("stdlib"))
