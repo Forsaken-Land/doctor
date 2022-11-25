@@ -13,7 +13,7 @@ allprojects {
     val projectVersion: String by project
     group = "top.fanua.doctor"
     version = projectVersion
-
+    description = "doctor一个简单的Minecraft库"
     apply {
         plugin("org.gradle.maven-publish")
         plugin("application")
@@ -67,7 +67,7 @@ allprojects {
                     url.set("https://github.com/Forsaken-Land/doctor")
                     name.set(project.name)
                     packaging = "jar"
-                    description.set(project.description)
+                    description.set("doctor协议库" + project.description)
 
                     scm {
                         url.set("https://github.com/Forsaken-Land/doctor")
