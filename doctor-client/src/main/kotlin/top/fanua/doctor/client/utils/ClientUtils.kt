@@ -18,7 +18,7 @@ inline fun <reified T : Packet> Connection.sendAndWait(packet: Packet): T {
     return this.emitter.asSingle(packetEvent<T>()).blockingGet()
 }
 
-fun <T> Connection.sendAndWait(event: Event<T>, packet: Packet): T {
+fun <T : Any> Connection.sendAndWait(event: Event<T>, packet: Packet): T {
     this.sendPacket(packet)
     return this.emitter.asSingle(event).blockingGet()
 }

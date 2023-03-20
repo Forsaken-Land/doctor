@@ -58,7 +58,7 @@ interface ITabCompleteTool {
         timeout: Long = defaultTimeout.first,
         unit: TimeUnit = defaultTimeout.second
     ): Future<List<String>> {
-        return Single.create<List<String>?> { obs ->
+        return Single.create { obs ->
             val disp = getCompletions(prefix, timeout, unit) { err, it ->
                 if (err != null) {
                     obs.onError(err)

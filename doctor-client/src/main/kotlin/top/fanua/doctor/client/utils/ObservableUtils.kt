@@ -11,7 +11,7 @@ import top.fanua.doctor.core.api.event.EventEmitter
  * @since 2021-05-17
  */
 
-fun <T> EventEmitter.asObservable(event: Event<T>): Observable<T> {
+fun <T : Any> EventEmitter.asObservable(event: Event<T>): Observable<T> {
     return Observable.create {
         val handler = { t: T ->
             it.onNext(t)
@@ -23,7 +23,7 @@ fun <T> EventEmitter.asObservable(event: Event<T>): Observable<T> {
     }
 }
 
-fun <T> EventEmitter.asSingle(event: Event<T>): Single<T> {
+fun <T : Any> EventEmitter.asSingle(event: Event<T>): Single<T> {
     return Single.create {
         val handler = { t: T ->
             it.onSuccess(t)

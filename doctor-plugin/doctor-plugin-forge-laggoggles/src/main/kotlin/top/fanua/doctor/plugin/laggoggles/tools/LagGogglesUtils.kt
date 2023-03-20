@@ -52,7 +52,7 @@ interface ILagTools {
         }
 
     fun getLag(timeout: Long = defaultTimeout.first, unit: TimeUnit = defaultTimeout.second): Future<List<LagEntity>> {
-        return Single.create<List<LagEntity>?> { obs ->
+        return Single.create { obs ->
             getLag(timeout, unit) { err, it ->
                 if (err != null) {
                     obs.onError(err)
@@ -74,8 +74,8 @@ class LagTools(
         .observeOn(Schedulers.io())
         .takeUntil { !it.hasMore }
         .flatMapIterable { it.data }
-        .map { parseLagEntity(it) }
-        .mapOptional { Optional.ofNullable(it) }
+        .mapOptional { Optional.ofNullable(parseLagEntity(it)) }
+//        .mapOptional { Optional.ofNullable(it) }
         .toList()
 
     override fun getLag(
@@ -111,6 +111,7 @@ class LagTools(
                     lagData
                 )
             }
+
             TILE_ENTITY, BLOCK -> {
                 val lagData = Block(
                     objectData.data[Entry.WORLD_ID] as Int,
@@ -126,6 +127,7 @@ class LagTools(
                     lagData
                 )
             }
+
             EVENT_BUS_LISTENER -> {
                 val lagData = Event(
                     objectData.data[Entry.EVENT_BUS_LISTENER] as String,
@@ -138,6 +140,7 @@ class LagTools(
                     lagData
                 )
             }
+
             GUI_ENTITY, GUI_BLOCK -> {
                 null
             }
