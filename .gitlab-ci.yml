@@ -19,7 +19,7 @@ before_script:
 
 
 buildjdk8:
-  image: gradle:7.0.0-jdk8
+  image: gradle:8.0.2-jdk8
   stage: build
   retry: 2
   script: gradle build
@@ -44,7 +44,7 @@ buildjdk8:
 
 
 deployjdk8:
-  image: gradle:7.0.0-jdk8
+  image: gradle:8.0.2-jdk8
   stage: deploy maven
   script:
     - TAG=$CI_COMMIT_TAG

@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.6.21"
+    val kotlinVersion = "1.8.0"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
     id("maven-publish")
@@ -41,14 +41,14 @@ subprojects {
     dependencies {
         implementation(kotlin("stdlib"))
         implementation(kotlin("reflect"))
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
         implementation("org.jetbrains.kotlinx:kotlinx-io-jvm:0.1.16")
-        implementation("org.slf4j:slf4j-api:1.7.36")
+        implementation("org.slf4j:slf4j-api:2.0.5")
 
         testImplementation(kotlin("test"))
         testImplementation(kotlin("test-junit"))
-        testImplementation("ch.qos.logback:logback-classic:1.2.11")
+        testImplementation("ch.qos.logback:logback-classic:1.4.6")
     }
 
 }
