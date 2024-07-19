@@ -25,10 +25,7 @@ import top.fanua.doctor.plugin.forge.definations.fml1.Ids
 import top.fanua.doctor.plugin.forge.definations.fml1.RegistryDataPacket
 import top.fanua.doctor.plugin.ftbquests.PluginFtbQuests
 import top.fanua.doctor.plugin.ftbquests.definations.MessageClaimAllRewardsPacket
-import top.fanua.doctor.protocol.definition.play.client.ChatPacket
-import top.fanua.doctor.protocol.definition.play.client.DisconnectPacket
-import top.fanua.doctor.protocol.definition.play.client.EntityActionPacket
-import top.fanua.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
+import top.fanua.doctor.protocol.definition.play.client.*
 import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionAndLookPacket
 import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionPacket
 import top.fanua.doctor.protocol.entity.text.ChatSerializer
@@ -92,6 +89,12 @@ fun main() {
             val tempZ = packet.z.toBigDecimal().setScale(0, RoundingMode.DOWN).toInt()
             x = if (tempX >= 0) tempX else tempX - 1
             z = if (tempZ >= 0) tempZ else tempZ - 1
+        }.onPacket<PlayerListItemPacket> {
+            println(this.packet.players.forEach { playerInfo ->
+                playerInfo.properties?.forEach {
+                    println(it)
+                }
+            })
         }
     var yaw = 0f
     GlobalScope.launch {
@@ -172,67 +175,67 @@ fun main() {
 
             }
         }
-        launch {
-            delay(15000)
-            while (false) {
-                try {
-                    delay(1000)
-                    client.sendPacket(EntityActionPacket(0, 1, 0))
-                    delay(1000)
-                    client.sendPacket(EntityActionPacket(0, 0, 0))
-                } catch (_: Exception) {
-                }
-            }
-        }
+//        launch {
+//            delay(15000)
+//            while (false) {
+//                try {
+//                    delay(1000)
+//                    client.sendPacket(EntityActionPacket(0, 1, 0))
+//                    delay(1000)
+//                    client.sendPacket(EntityActionPacket(0, 0, 0))
+//                } catch (_: Exception) {
+//                }
+//            }
+//        }
     }
     Thread.sleep(15000)
-    while (true) {
-        try {
-            while (false) {
-                Thread.sleep(50)
-                if (yaw >= 360f) yaw = 0f
-                else yaw += 0.5f
-
-                val id = blocks.find { it.id == client.getWorld().getOrSet(x, y - 1, z).id }?.name ?: "minecraft:air"
-                val id1 = blocks.find { it.id == client.getWorld().getOrSet(x, y - 2, z).id }?.name ?: "minecraft:air"
-
-                if (id == "minecraft:air" || id.contains("torch", true)) {
-                    if (id1 == "minecraft:air" || id.contains("torch", true)) {
-                        client.sendPacket(
-                            CPlayerPositionPacket(
-                                x.toDouble() + 0.5,
-                                y.toDouble() - 1,
-                                z.toDouble() + 0.5,
-                                false
-                            )
-                        )
-                        y -= 1
-                    } else {
-                        client.sendPacket(
-                            CPlayerPositionPacket(
-                                x.toDouble() + 0.5,
-                                y.toDouble() - 1,
-                                z.toDouble() + 0.5,
-                                false
-                            )
-                        )
-                        y -= 1
-                    }
-                } else {
-                    client.sendPacket(
-                        CPlayerPositionAndLookPacket(
-                            x.toDouble() + 0.5,
-                            y.toDouble(),
-                            z.toDouble() + 0.5,
-                            yaw,
-                            0f,
-                            true
-                        )
-                    )
-                }
-
-            }
-        } catch (_: Exception) {
-        }
-    }
+//    while (true) {
+//        try {
+//            while (false) {
+//                Thread.sleep(50)
+//                if (yaw >= 360f) yaw = 0f
+//                else yaw += 0.5f
+//
+//                val id = blocks.find { it.id == client.getWorld().getOrSet(x, y - 1, z).id }?.name ?: "minecraft:air"
+//                val id1 = blocks.find { it.id == client.getWorld().getOrSet(x, y - 2, z).id }?.name ?: "minecraft:air"
+//
+//                if (id == "minecraft:air" || id.contains("torch", true)) {
+//                    if (id1 == "minecraft:air" || id.contains("torch", true)) {
+//                        client.sendPacket(
+//                            CPlayerPositionPacket(
+//                                x.toDouble() + 0.5,
+//                                y.toDouble() - 1,
+//                                z.toDouble() + 0.5,
+//                                false
+//                            )
+//                        )
+//                        y -= 1
+//                    } else {
+//                        client.sendPacket(
+//                            CPlayerPositionPacket(
+//                                x.toDouble() + 0.5,
+//                                y.toDouble() - 1,
+//                                z.toDouble() + 0.5,
+//                                false
+//                            )
+//                        )
+//                        y -= 1
+//                    }
+//                } else {
+//                    client.sendPacket(
+//                        CPlayerPositionAndLookPacket(
+//                            x.toDouble() + 0.5,
+//                            y.toDouble(),
+//                            z.toDouble() + 0.5,
+//                            yaw,
+//                            0f,
+//                            true
+//                        )
+//                    )
+//                }
+//
+//            }
+//        } catch (_: Exception) {
+//        }
+//    }
 }

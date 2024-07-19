@@ -39,7 +39,7 @@ fun main() {
                 }
             }
             logger.info(outMsg)
-            client.stop()
+//            client.stop()
         }
     }
 }

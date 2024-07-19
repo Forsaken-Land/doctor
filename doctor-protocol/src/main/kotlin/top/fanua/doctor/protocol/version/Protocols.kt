@@ -21,6 +21,7 @@ fun createProtocol(versionNumber: ProtocolVersion, pluginManager: IPluginManager
 
         ProtocolVersion.V1_17_1 -> MinecraftClientProtocol_v1_17_1(pluginManager)
 
+        ProtocolVersion.V1_18_2 -> MinecraftClientProtocol_v1_18_2(pluginManager)
     }
 }
 
