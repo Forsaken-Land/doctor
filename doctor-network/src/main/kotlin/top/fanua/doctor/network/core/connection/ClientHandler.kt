@@ -17,12 +17,12 @@ class ClientHandler(private val emitter: EventEmitter) : ChannelInboundHandlerAd
     private val logger: Logger = LoggerFactory.getLogger(ClientHandler::class.java)
 
     override fun channelActive(ctx: ChannelHandlerContext) {
-        logger.debug("连接成功:${ctx.channel().remoteAddress()}")
+        logger.debug("连接成功:{}", ctx.channel().remoteAddress())
         emitter.emit(ConnectionEvent.Connected, ConnectionEventArgs(ctx))
     }
 
     override fun channelInactive(ctx: ChannelHandlerContext) {
-        logger.debug("连接断开:${ctx.channel().remoteAddress()}")
+        logger.debug("连接断开:{}", ctx.channel().remoteAddress())
         emitter.emit(ConnectionEvent.Disconnect, ConnectionEventArgs(ctx))
     }
 
@@ -30,6 +30,7 @@ class ClientHandler(private val emitter: EventEmitter) : ChannelInboundHandlerAd
         emitter.emit(ConnectionEvent.Read, ConnectionEventArgs(ctx, msg))
     }
 
+    @Deprecated("Deprecated in Java")
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
         logger.error("客户端异常事件:${cause.message}", cause)
         ctx.close()

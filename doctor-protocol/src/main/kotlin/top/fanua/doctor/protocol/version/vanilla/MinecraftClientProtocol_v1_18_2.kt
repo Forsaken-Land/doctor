@@ -42,7 +42,7 @@ class MinecraftClientProtocol_v1_18_2(pluginManager: IPluginManager) : IPacketRe
         }
         packetMap(ProtocolState.PLAY) {
             whenS2C {
-                register(0x1F, KeepAliveDecoder())
+                register(0x21, KeepAliveDecoder())
                 register(0x26, JoinGameType1Decoder())
                 register(0x18, CustomPayloadDecoder())
 //                register(0x22, ChunkDataType1Decoder())
@@ -55,12 +55,12 @@ class MinecraftClientProtocol_v1_18_2(pluginManager: IPluginManager) : IPacketRe
 
             }
             whenC2S {
-                register(0x10, KeepAliveEncoder())
-                register(0x05, ClientSettingEncoder())
-                register(0x00, TeleportConfirmEncoder())
-                register(0x04, ClientStatusEncoder())
+                register(0x0F, KeepAliveEncoder())
+//                register(0x05, ClientSettingEncoder())
+//                register(0x00, TeleportConfirmEncoder())
+                register(0x09, ClientStatusEncoder())
                 register(0x03, CChatEncoder())
-                register(0x12, CPlayerPositionEncoder())
+//                register(0x12, CPlayerPositionEncoder())
 //                register(0x06, CTabCompleteType1Encoder())
             }
         }

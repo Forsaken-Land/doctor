@@ -54,7 +54,7 @@ class Forge2PacketHandler(
             outBuf.writeBytes(buf)
             buf.release()
             out.add(LoginPluginResponsePacket(msg.messageId, true, outBuf))
-            logger.debug("FML2协议包编码:id=$packetId $msg")
+            logger.trace("FML2协议包编码:id={} {}", packetId, msg)
         } catch (e: Exception) {
             logger.warn(e.message)
             return
@@ -79,7 +79,7 @@ class Forge2PacketHandler(
                 msg.close()
                 packet.close()
                 out.add(packetInPacket)
-                logger.debug("FML2协议包解码:packetId=${packerId} $packetInPacket")
+                logger.trace("FML2协议包解码:packetId={} {}", packerId, packetInPacket)
             } catch (e: Exception) {
                 logger.debug(e.message)
                 logger.debug("尝试自动发送")

@@ -13,7 +13,7 @@ class Mc116VanillaLang : Mc116LangResources() {
     override fun load() {
         lock.lock()
         if (!loaded) {
-            val file = javaClass.getResource("/mc116vanillalang/zh_cn.lang")?.openStream()
+            val file = javaClass.getResource("/mc116vanillalang/zh_cn.json")?.openStream()
             load(file)
             loaded = true
         }

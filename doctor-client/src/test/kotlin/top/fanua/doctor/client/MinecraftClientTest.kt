@@ -1,9 +1,6 @@
 package top.fanua.doctor.client
 
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.querz.nbt.tag.CompoundTag
 import net.querz.nbt.tag.StringTag
 import top.fanua.doctor.client.running.AutoVersionForgePlugin
@@ -13,7 +10,6 @@ import top.fanua.doctor.client.running.player.list.PlayerListPlugin
 import top.fanua.doctor.client.running.player.list.getPlayerListTab
 import top.fanua.doctor.client.running.player.status.PlayerStatusPlugin
 import top.fanua.doctor.client.running.player.world.PlayerWorldPlugin
-import top.fanua.doctor.client.running.player.world.getWorld
 import top.fanua.doctor.client.running.tabcomplete.TabCompletePlugin
 import top.fanua.doctor.client.running.tabcomplete.tabCompleteTool
 import top.fanua.doctor.client.running.tps.TpsPlugin
@@ -25,9 +21,9 @@ import top.fanua.doctor.plugin.forge.definations.fml1.Ids
 import top.fanua.doctor.plugin.forge.definations.fml1.RegistryDataPacket
 import top.fanua.doctor.plugin.ftbquests.PluginFtbQuests
 import top.fanua.doctor.plugin.ftbquests.definations.MessageClaimAllRewardsPacket
-import top.fanua.doctor.protocol.definition.play.client.*
-import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionAndLookPacket
-import top.fanua.doctor.protocol.definition.play.server.CPlayerPositionPacket
+import top.fanua.doctor.protocol.definition.play.client.ChatPacket
+import top.fanua.doctor.protocol.definition.play.client.DisconnectPacket
+import top.fanua.doctor.protocol.definition.play.client.PlayerPositionAndLookPacket
 import top.fanua.doctor.protocol.entity.text.ChatSerializer
 import top.fanua.doctor.translation.api.I18n
 import java.math.RoundingMode
@@ -41,7 +37,7 @@ fun main() {
 //    val name = pros["name"] as String
 
     val client = MinecraftClient.builder()
-        //.name(name)
+//        .name(name)
         .user(username, password)
         .authServerUrl(authServerUrl)
         .sessionServerUrl(sessionServerUrl)
@@ -74,29 +70,36 @@ fun main() {
         if (packet.name == "minecraft:items") {
             items.addAll(packet.ids)
         }
-    }
-        .onPacket<ChatPacket> {
-            if (!packet.json.contains("commands.forge.tps.summary")) {
-                val chat = ChatSerializer.jsonToChat(packet.json)
-                logger.info(chat.getFormattedText())
-            }
-        }.onPacket<DisconnectPacket> {
-            val reason = ChatSerializer.jsonToChat(packet.reason)
-            logger.warn(reason.getFormattedText())
-        }.onPacket<PlayerPositionAndLookPacket> {
-            val tempX = packet.x.toBigDecimal().setScale(0, RoundingMode.DOWN).toInt()
-            y = packet.y.toInt()
-            val tempZ = packet.z.toBigDecimal().setScale(0, RoundingMode.DOWN).toInt()
-            x = if (tempX >= 0) tempX else tempX - 1
-            z = if (tempZ >= 0) tempZ else tempZ - 1
-        }.onPacket<PlayerListItemPacket> {
-            println(this.packet.players.forEach { playerInfo ->
-                playerInfo.properties?.forEach {
-                    println(it)
-                }
-            })
+    }.onPacket<ChatPacket> {
+        if (!packet.json.contains("commands.forge.tps.summary")) {
+            val chat = ChatSerializer.jsonToChat(packet.json)
+            logger.info(chat.getFormattedText())
         }
-    var yaw = 0f
+    }.onPacket<DisconnectPacket> {
+        val reason = ChatSerializer.jsonToChat(packet.reason)
+        logger.warn(reason.getFormattedText())
+    }.onPacket<PlayerPositionAndLookPacket> {
+        val tempX = packet.x.toBigDecimal().setScale(0, RoundingMode.DOWN).toInt()
+        y = packet.y.toInt()
+        val tempZ = packet.z.toBigDecimal().setScale(0, RoundingMode.DOWN).toInt()
+        x = if (tempX >= 0) tempX else tempX - 1
+        z = if (tempZ >= 0) tempZ else tempZ - 1
+    }.onPacket<PlayerPositionAndLookPacket> {
+        MainScope().launch(Dispatchers.IO) {
+            delay(1000)
+            client.sendMessage("/list")
+//            client.sendMessage("/forge tps")
+//            delay(1000)
+//            client.stop()
+        }
+
+//            println(this.packet.players.forEach { playerInfo ->
+//                playerInfo.properties?.forEach {
+//                    println(it)
+//                }
+//            })
+    }
+//    var yaw = 0f
     GlobalScope.launch {
         launch {
             while (true) {
@@ -188,7 +191,7 @@ fun main() {
 //            }
 //        }
     }
-    Thread.sleep(15000)
+//    Thread.sleep(15000)
 //    while (true) {
 //        try {
 //            while (false) {

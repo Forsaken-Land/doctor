@@ -13,7 +13,7 @@ enum class ProtocolVersion(val versionNumber: Int, val versionName: String) {
     V1_17_1(756, "1.17.1"),
     V1_18_2(758, "1.18.2");
     companion object {
-        private val protocolVersionMap = values().associateBy { it.versionNumber }
+        private val protocolVersionMap = entries.associateBy { it.versionNumber }
         fun fromNumber(versionNumber: Int) =
             protocolVersionMap[versionNumber] ?: throw ProtocolException("未知的协议版本号：$versionNumber")
     }
